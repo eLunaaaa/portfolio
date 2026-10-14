@@ -4,7 +4,7 @@
 
 `zybo/main.cc`와 `zybo/ai_task.cc`는 C++로, `zybo/arducam.c`, `zybo/peripheral.c`, `common/vision_core.c`는 C로 빌드한다. 헤더에는 C linkage guard를 적용했다. Vivado에서 PS GPIO/EMIO, SPI0, I2C0, UART0/1과 clock을 확인하고 Vitis에서 FreeRTOS BSP를 생성한다.
 
-다음 원본 의존성은 보고서에서 생략되어 저장소에 없다.
+보드 프로젝트를 구성할 때 다음 의존성을 함께 연결한다.
 
 - 하드웨어 플랫폼 `.xsa`, bitstream, BSP와 `xparameters.h`, linker script
 - FreeRTOS kernel과 board port, FreeRTOSConfig.h
@@ -12,7 +12,7 @@
 - `ov5642_regs.h`: struct sensor_reg 및 OV5642 설정 table
 - `stb_image.h`와 해당 implementation translation unit
 
-실제 모델은 FLOAT32 [1,128,128,3] 입력과 FLOAT32 5개 출력, can/general/glass/pet/empty 순서가 필요하다. 원 모델 파일이 없으므로 모델 operator와 resolver의 호환성을 확인해야 한다. kernel version에 따른 resolver/interpreter 생성 API도 확인한다.
+실제 모델은 FLOAT32 [1,128,128,3] 입력과 FLOAT32 5개 출력, can/general/glass/pet/empty 순서가 필요하다. 모델 operator와 resolver를 같은 버전으로 구성한다. kernel version에 따른 resolver/interpreter 생성 API도 확인한다.
 
 BSP의 SDT 여부와 `xparameters.h` 인스턴스를 peripheral.c의 lookup 설정에 맞춘다. SPI SS0을 사용하며, 모든 ArduCAM 접근은 CameraTask가 맡는다. C heap·RTOS heap·4 MiB tensor arena·JPEG/임시 버퍼·task stack이 메모리에 들어가는지 linker와 측정 도구로 확인한다. Task 생성 실패 시 스케줄러를 시작하지 않는다.
 

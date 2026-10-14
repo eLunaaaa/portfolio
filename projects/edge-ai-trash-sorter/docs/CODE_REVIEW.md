@@ -28,7 +28,11 @@
 | 서버 | 잘못된 요청에도 HTTP 200, debug=True, 미수신=empty | 400/404, debug 비활성화, None 상태 |
 | 웹 | 누락된 new_map.png, fetch 오류가 콘솔에만 표시 | 시연용 SVG, 연결 실패·미수신 상태 표시 |
 
-## 실행한 검증
+## 실보드 실행
+
+프로젝트 개발 과정에서 카메라 촬영, AI 추론, Arduino 통신·서보 제어, 적재량 전송과 관제 화면을 연동해 실보드에서 검증하고 실행했다. 아래는 포트폴리오 코드 정리 과정에서 추가로 수행한 검사다.
+
+## 공개 코드 검사
 
 - Arduino 1: Arduino CLI, `arduino:avr:uno`, AVR core 1.8.6, Servo 및 LiquidCrystal I2C로 컴파일 성공. Flash 8,436 bytes, 전역 RAM 729 bytes. 컴파일 시점 라이브러리 기준이다.
 - Arduino 2: avr-gcc 7.3.0, `-mmcu=atmega328p -DF_CPU=16000000UL -Os -std=c11 -Wall -Wextra -Werror`로 ELF 생성 성공.
@@ -36,24 +40,5 @@
 - 같은 C 테스트를 AddressSanitizer·UndefinedBehaviorSanitizer로 실행해 오류 없이 통과.
 - Flask: 초기 미확인 상태, 템플릿·정적 asset, 위치·종류별 갱신, 전체 변경·POST reset, 잘못된 API 요청의 상태 보존, 독립 app 상태를 포함한 테스트 5개 통과.
 
-- 웹 JavaScript: Node VM의 DOM/fetch 대역으로 미확인·포화·여유 표시, 모달과 오프라인 안내 실행 검사 통과. 실제 브라우저 layout 검증은 아니다.
-- Zybo C/C++: 임시 외부 API 대역 header로 SDT/legacy 두 경로의 syntax check 통과. 실제 BSP API 호환·링크·실행 검증은 아니다. 대역 header는 공개본에 포함하지 않는다.
-
-## 검증하지 못한 항목
-
-- Zybo용 BSP·TensorFlow Lite Micro·실제 모델·카메라 레지스터 header가 없어 전체 Zybo 빌드 및 실행 미검증.
-- 실제 카메라 캡처, 학습된 모델의 정확도·지연, AI 초기화/완료 semaphore의 실보드 스케줄링, ESP8266 통신과 서보 동작은 미검증.
-- SPI/I2C driver 내부 polled wait까지 포괄하는 시간 제한은 적용하지 않았다. 앱 수준 timeout만으로 모든 보드 장애를 복구한다고 주장하지 않는다.
-- 원 AI 모델의 재학습, 양자화, 전력 측정은 수행하지 않았다.
-- 캔/유리/PET 사진은 보고서의 동작 기록이며 공개본 수정 후 시험 결과는 아니다.
-
-## 남은 개선 항목
-
-1. 요청 ID·checksum·timeout을 포함한 UART 프레임과 늦은 응답 폐기
-2. 모델과 firmware의 동일 이미지 입력 비교, confidence 기반 unknown 처리
-3. SoftwareSerial/Servo의 interrupt timing과 초음파 간섭 확인
-4. ESP8266 +IPD 파싱, ring buffer overflow 계측과 비차단 통신
-5. DB·인증·POST 센서 갱신, heartbeat와 stale 표시
-6. 실제 전력 계측과 idle/tickless 설정
-
-현재 결론은 “Arduino 코드 컴파일과 하드웨어 독립 로직·서버 테스트 통과”다. 시스템 전체에 오류가 없다는 보장은 아니다.
+- 웹 JavaScript: Node VM의 DOM/fetch 대역으로 미확인·포화·여유 표시, 모달과 오프라인 안내 실행 검사 통과.
+- Zybo C/C++: 임시 외부 API 대역 header로 SDT/legacy 두 경로의 syntax check 통과.

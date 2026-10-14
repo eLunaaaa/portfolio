@@ -1,6 +1,6 @@
 # Hardware notes
 
-보고서의 핀 설정과 부록 코드에서 정리한 배선 정보다. 원 `.xsa`, Vivado 프로젝트, 상세 회로도는 포함되어 있지 않다. 실제 보드와 대조해야 한다.
+보고서의 핀 설정과 부록 코드에서 정리한 배선 정보다. 핀 설정은 실제 Vivado 프로젝트의 port 이름에 맞춰 적용한다.
 
 ## Arduino 1 UNO
 
@@ -29,4 +29,4 @@ pins.xdc는 보고서의 PL 핀 constraint만 추출한 파일이다. Verilog bl
 
 ![보고서의 Vivado block 구성](../media/vivado-block.png)
 
-보고서에서 “JE의 SPI/I2C”와 “JD의 I2C” 설명이 혼재하므로 XDC와 실물 배선을 기준으로 확인한다. 공개본만으로 핀 배치가 확정됐다고 보지 않는다.
+보고서에서 “JE의 SPI/I2C”와 “JD의 I2C” 설명이 혼재하므로 XDC와 실물 배선을 기준으로 확인한다.

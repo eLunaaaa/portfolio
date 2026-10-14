@@ -1,0 +1,10 @@
+build/
+*.elf
+*.hex
+*.o
+__pycache__/
+*.py[cod]
+.venv/
+.DS_Store
+tests/test_core
+tests/test_worker
