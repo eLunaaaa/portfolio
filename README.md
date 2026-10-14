@@ -2,6 +2,16 @@
 
 전자공학 기반의 임베디드 시스템 프로젝트 포트폴리오입니다.
 
+## Embedded Linux System Programming · 졸업연구 기술 구현
+
+졸업연구에서 담당한 C 기반 Linux 시스템 프로그래밍 경험입니다.
+
+- **개인 기여**: 사용자 공간 모듈, 시간·메모리·데이터 처리, 공통 설정·빌드 구성
+- **기술**: C · Embedded Linux · POSIX · UDP socket · mmap/mlockall · 시간 API · eBPF/XDP 환경 설정
+- **구현 방식**: 초기화·반복 처리 분리, 절대 시각 기준 실행, 메모리 사전 준비, 바이트 순서 관리, 신호 기반 종료 처리
+
+[사용 기술과 구현 방식](projects/embedded-linux-system-programming/README.md)
+
 ## Arduino Dynamic Load Balancer · 동적 부하 분산 시스템
 
 Arduino UNO 5대로 합성곱 연산을 분산 처리하고, Slave별 연산 잔량을 서보로 시각화한 팀 프로젝트입니다.
