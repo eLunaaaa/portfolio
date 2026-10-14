@@ -1,0 +1,8 @@
+#ifndef TRASH_SECRETS_H
+#define TRASH_SECRETS_H
+#define WIFI_SSID "YOUR_WIFI_SSID"
+#define WIFI_PASS "YOUR_WIFI_PASSWORD"
+#define SERVER_IP "192.168.1.100"
+#define SERVER_PORT "5000"
+#define ZONE_ID "t1"
+#endif

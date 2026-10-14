@@ -1,0 +1,11 @@
+secrets.h
+.env
+.venv/
+__pycache__/
+*.py[cod]
+build/
+*.elf
+*.hex
+*.o
+.DS_Store
+tests/test_vision

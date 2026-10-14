@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650">
+<rect width="1200" height="650" fill="#f5f6f8"/>
+<g fill="white" stroke="#b5bdc7" stroke-width="4"><rect x="50" y="50" width="380" height="270"/><rect x="690" y="330" width="450" height="270"/></g>
+<path d="M460 50v550h200V50" fill="#e8ecf1"/>
+<g fill="#415064" font-family="sans-serif" font-size="30" text-anchor="middle"><text x="240" y="200">탕비실</text><text x="915" y="480">회의실</text><text x="560" y="300">통로</text><text x="600" y="630" font-size="18">시연용 배치도</text></g></svg>

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사무실 쓰레기통 관제 시스템</title>
+
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Noto Sans KR', sans-serif; background-color: #f0f2f5; }
+
+        /* 도면 컨테이너 */
+        .map-container {
+            position: relative; width: 95%; max-width: 1200px; margin: 30px auto;
+            border: 1px solid #ddd; background: #fff; border-radius: 8px; overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .map-image { width: 100%; display: block; }
+
+        /* 쓰레기통 아이콘 디자인 */
+        .trash-bin {
+            position: absolute; width: 50px; height: 50px; border-radius: 50%;
+            background-color: #999; border: 3px solid #fff;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+            display: flex; justify-content: center; align-items: center;
+            font-size: 24px; cursor: pointer; transition: all 0.3s ease; z-index: 10;
+        }
+        .trash-bin:hover { transform: scale(1.15); }
+        .trash-bin::after { content: '🗑️'; }
+
+        /* 아이콘 라벨 */
+        .trash-name {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 20;
+        }
+        .trash-name::after {
+            content: ''; position: absolute; bottom: -4px; left: 50%; margin-left: -4px;
+            border-width: 4px; border-style: solid;
+            border-color: rgba(0,0,0,0.8) transparent transparent transparent;
+        }
+
+        /* 위치 설정 (t1:탕비실, t2:회의실) */
+        #bin-t1 { top: 15%; left: 5%; }
+        #bin-t2 { top: 70%; right: 5%; }
+
+        /* 상태별 색상 */
+        .level-1 { background-color: #FFD700 !important; } /* 노랑 */
+        .level-2 { background-color: #FF8C00 !important; color: white; } /* 주황 */
+        .level-3 { background-color: #FF0000 !important; color: white; animation: pulse 1.5s infinite; } /* 빨강 */
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 15px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
+
+        /* 모달창 */
+        .modal { display: none; position: fixed; z-index: 9999; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.75); justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 30px; border-radius: 15px; width: 90%; max-width: 400px; text-align: center; position: relative; }
+        .back-btn { position: absolute; top: 15px; left: 20px; font-weight: bold; color: #666; cursor: pointer; text-decoration: none; }
+
+        .status-item { display: flex; justify-content: space-between; padding: 12px; margin-bottom: 8px; background: #f9f9f9; border-radius: 8px; font-size: 16px; align-items: center; }
+        .state { font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 0.9em; }
+        .state.full { color: #d32f2f; background: #ffcdd2; }
+        .state.empty { color: #388e3c; background: #c8e6c9; }
+    </style>
+</head>
+<body>
+
+    <p id="connection-status" role="status" style="text-align:center">상태를 불러오는 중입니다.</p>
+    <div class="map-container">
+        <img src="{{ url_for('static', filename='images/demo-layout.svg') }}" alt="탕비실과 회의실의 시연용 배치도" class="map-image">
+
+        <div id="bin-t1" class="trash-bin" onclick="openModal('t1')">
+            <div class="trash-name">탕비실</div>
+        </div>
+        <div id="bin-t2" class="trash-bin" onclick="openModal('t2')">
+            <div class="trash-name">회의실</div>
+        </div>
+    </div>
+
+    <div id="detail-modal" class="modal">
+        <div class="modal-content">
+            <a href="#" class="back-btn" onclick="closeModal()">← 지도</a>
+            <h2 id="modal-title">상세 정보</h2>
+            <div id="modal-list">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let globalData = {};
+        let currentModalId = null;
+
+        function updateDashboard() {
+            fetch('/status')
+                .then(response => {
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    globalData = data;
+                    document.getElementById('connection-status').textContent = '서버 연결됨 · 센서 미수신 항목은 확인 중으로 표시합니다.';
+                    updateIcon('t1', data.t1);
+                    updateIcon('t2', data.t2);
+                    if(currentModalId) {
+                        renderModalContent(currentModalId);
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('connection-status').textContent = '서버 연결 실패 · 표시된 상태는 최신 정보가 아닐 수 있습니다.';
+                    console.error(err);
+                });
+        }
+
+        function updateIcon(binId, binData) {
+            const binDiv = document.getElementById('bin-' + binId);
+            if (!binDiv || !binData) return;
+            let fullCount = 0;
+            if(binData.ge) fullCount++;
+            if(binData.pe) fullCount++;
+            if(binData.gl) fullCount++;
+            if(binData.ca) fullCount++;
+
+            binDiv.classList.remove('level-1', 'level-2', 'level-3');
+            if(fullCount >= 3) binDiv.classList.add('level-3');
+            else if(fullCount >= 2) binDiv.classList.add('level-2');
+            else if(fullCount >= 1) binDiv.classList.add('level-1');
+        }
+
+        function openModal(binId) {
+            currentModalId = binId;
+            const modal = document.getElementById('detail-modal');
+            const title = document.getElementById('modal-title');
+
+            const locationName = (binId === 't1') ? '탕비실 쓰레기통' : '회의실 쓰레기통';
+            title.innerText = locationName;
+
+            modal.style.display = 'flex';
+            renderModalContent(binId);
+        }
+
+        function closeModal() {
+            document.getElementById('detail-modal').style.display = 'none';
+            currentModalId = null;
+        }
+
+        // ==========================================
+        // [수정됨] 모달창 내부 순서 변경
+        // 일반(ge) -> 캔(ca) -> 유리(gl) -> 페트(pe)
+        // ==========================================
+        function renderModalContent(binId) {
+            const data = globalData[binId];
+            if(!data) return;
+
+            const listDiv = document.getElementById('modal-list');
+
+            // 이름 매핑 (ca=캔, pe=페트로 표준화)
+            const names = { 'ge':'일반', 'ca':'캔', 'gl':'유리', 'pe':'페트' };
+
+            let html = '';
+
+            // ★ 여기서 배열 순서를 바꿨습니다: ge -> ca -> gl -> pe
+            ['ge', 'ca', 'gl', 'pe'].forEach(type => {
+                const isFull = data[type];
+                const stateClass = isFull === true ? 'full' : isFull === false ? 'empty' : 'unknown';
+                const stateText = isFull === true ? '수거 필요' : isFull === false ? '여유 있음' : '확인 중';
+
+                html += `
+                    <div class="status-item">
+                        <span style="font-weight:bold;">${names[type]}</span>
+                        <span class="state ${stateClass}">${stateText}</span>
+                    </div>
+                `;
+            });
+            listDiv.innerHTML = html;
+        }
+
+        setInterval(updateDashboard, 1000);
+        window.onload = updateDashboard;
+    </script>
+</body>
+</html>
