@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+# 스마트 우산꽂이 모델의 UART 표본 수집 도구입니다.
+# Master의 H/UMB/HMEAN/DH 로그를 읽고 사용자가 지정한 dry/wet label을 붙여 CSV에 저장합니다.
+
 """Collect Master UART samples formatted as H=.. UMB=.. HMEAN=.. DH=..."""
 
 import argparse
@@ -15,6 +18,10 @@ SAMPLE = re.compile(
 FIELDS = ["H", "UMB", "HMEAN", "DH", "LABEL"]
 
 
+# 기능: Master UART 로그를 dry/wet label을 붙인 CSV로 수집합니다.
+# 입력: serial 포트, label 0/1, baud, output 경로.
+# 출력: H/UMB/HMEAN/DH/LABEL 열의 CSV.
+# 처리 구조: UART를 읽어 정규식에 맞는 표본만 추출하고 label을 붙여 flush합니다. Ctrl+C 시 파일을 닫고 종료합니다.
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("port", help="serial port, e.g. COM5 or /dev/tty.usbmodem...")
@@ -48,4 +55,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -1,3 +1,9 @@
+/*
+ * ArduCAM 제어칩과 OV5642 센서의 카메라 드라이버 어댑터입니다.
+ * SPI로 제어 레지스터와 JPEG FIFO를 읽고 I2C로 센서 레지스터를 설정합니다.
+ * Zybo CameraTask가 초기화·촬영·길이 조회·burst 읽기 순서로 호출합니다.
+ */
+
 #include "peripheral.h"
 #include "arducam.h"
 #include "xil_printf.h"
@@ -8,10 +14,22 @@
 #include <string.h>
 #include "xparameters.h"
 
+/**
+ * 기능: 센서 I2C 버스가 다음 명령을 받을 수 있을 때까지 기다립니다.
+ * 입력: 없음. 전역 Iic 인스턴스를 사용합니다.
+ * 출력: 100 ms 안에 idle이면 XST_SUCCESS, 아니면 XST_FAILURE.
+ * 처리 구조: FreeRTOS tick 차이로 제한 시간을 확인하며 1 tick씩 양보합니다.
+ */
 static int wait_i2c_idle(void);
 static int spi_failed;
 
 // SPI 쓰기
+/**
+ * 기능: ArduCAM SPI 제어 레지스터에 한 바이트를 씁니다.
+ * 입력: addr: 레지스터 주소, data: 설정값.
+ * 출력: SPI로 설정을 보내고 실패 여부를 spi_failed에 누적합니다.
+ * 처리 구조: 주소의 write bit를 세운 2바이트 전송을 XSpiPs_PolledTransfer로 수행합니다.
+ */
 void ArduCAM_WriteReg(u8 addr, u8 data) {
     u8 tx[2];
     tx[0] = addr | 0x80;
@@ -20,6 +38,12 @@ void ArduCAM_WriteReg(u8 addr, u8 data) {
 }
 
 // SPI 읽기
+/**
+ * 기능: ArduCAM SPI 제어 레지스터의 값을 읽습니다.
+ * 입력: addr: 읽을 레지스터 주소.
+ * 출력: 수신한 1바이트. 전송 실패 시 0과 spi_failed 상태를 남깁니다.
+ * 처리 구조: read 주소와 dummy byte를 전송하고 두 번째 RX 바이트를 반환합니다.
+ */
 u8 ArduCAM_ReadReg(u8 addr) {
     u8 tx[2], rx[2] = {0};
     tx[0] = addr & 0x7F;
@@ -32,6 +56,12 @@ u8 ArduCAM_ReadReg(u8 addr) {
 }
 
 // I2C 쓰기 (상세 디버깅)
+/**
+ * 기능: OV5642의 16비트 레지스터 주소에 8비트 값을 씁니다.
+ * 입력: regID: 센서 레지스터 주소, regDat: 설정값.
+ * 출력: Xilinx I2C 전송 상태 코드.
+ * 처리 구조: 주소 상·하위 바이트와 데이터를 구성하고 idle 확인 후 센서 주소로 전송합니다.
+ */
 int wrSensorReg16_8(u16 regID, u8 regDat) {
     u8 tx[3];
     int Status;
@@ -55,6 +85,12 @@ int wrSensorReg16_8(u16 regID, u8 regDat) {
 }
 
 // I2C 읽기 (상세 디버깅)
+/**
+ * 기능: OV5642의 16비트 주소에서 8비트 센서 값을 읽습니다.
+ * 입력: regID: 주소, regDat: 값을 저장할 포인터.
+ * 출력: I2C 상태 코드와 regDat에 저장된 센서값.
+ * 처리 구조: 주소 2바이트를 먼저 보내고 버스 idle을 확인한 뒤 1바이트를 수신합니다.
+ */
 int rdSensorReg16_8(u16 regID, u8* regDat) {
     u8 tx[2];
     int Status;
@@ -80,6 +116,12 @@ int rdSensorReg16_8(u16 regID, u8* regDat) {
     return Status;
 }
 
+/**
+ * 기능: 카메라 설정 테이블의 레지스터·값 쌍을 순서대로 적용합니다.
+ * 입력: reglist: sensor_reg 배열, 끝 항목은 reg=0xFFFF/val=0xFF.
+ * 출력: 모두 성공하면 XST_SUCCESS, 잘못된 배열이나 전송 실패이면 오류 코드.
+ * 처리 구조: 종료 sentinel을 전송하지 않고 각 항목을 쓰며 첫 오류에서 중단합니다.
+ */
 int wrSensorRegs16_8(const struct sensor_reg reglist[]) {
     if (reglist == NULL) return XST_FAILURE;
     for (const struct sensor_reg *next = reglist;
@@ -90,6 +132,12 @@ int wrSensorRegs16_8(const struct sensor_reg reglist[]) {
     return XST_SUCCESS;
 }
 
+/**
+ * 기능: 센서 I2C 버스가 다음 명령을 받을 수 있을 때까지 기다립니다.
+ * 입력: 없음. 전역 Iic 인스턴스를 사용합니다.
+ * 출력: 100 ms 안에 idle이면 XST_SUCCESS, 아니면 XST_FAILURE.
+ * 처리 구조: FreeRTOS tick 차이로 제한 시간을 확인하며 1 tick씩 양보합니다.
+ */
 static int wait_i2c_idle(void) {
     TickType_t start = xTaskGetTickCount();
     while (XIicPs_BusIsBusy(&Iic)) {
@@ -101,6 +149,12 @@ static int wait_i2c_idle(void) {
 }
 
 // I2C 버스 스캐너 (연결된 모든 장치 찾기)
+/**
+ * 기능: I2C 버스에서 응답하는 장치 주소를 디버그 로그에 표시합니다.
+ * 입력: 없음. 전역 Iic 인스턴스를 사용합니다.
+ * 출력: 응답 주소와 장치 수를 콘솔에 출력합니다.
+ * 처리 구조: 7비트 주소를 차례로 탐색하고 주소별 응답·버스 상태를 검사합니다.
+ */
 void I2C_Scanner() {
     int Status;
     u8 buffer[1] = {0x00}; // 더미 데이터
@@ -130,6 +184,12 @@ void I2C_Scanner() {
     }
 }
 
+/**
+ * 기능: SPI 제어칩과 OV5642 센서를 JPEG 촬영 상태로 초기화합니다.
+ * 입력: 없음. 초기화된 SPI/I2C 인스턴스와 센서 설정 테이블을 사용합니다.
+ * 출력: 초기화 성공이면 XST_SUCCESS, 통신·센서 ID·설정 오류이면 XST_FAILURE.
+ * 처리 구조: 리셋→SPI 테스트→센서 ID 확인→JPEG/해상도 레지스터→FIFO/프레임 설정 순서로 진행합니다.
+ */
 int ArduCAM_Init() {
     u8 vid = 0, pid = 0;
     spi_failed = 0;
@@ -188,6 +248,12 @@ int ArduCAM_Init() {
     return XST_SUCCESS;
 }
 
+/**
+ * 기능: 카메라 촬영을 시작하고 FIFO 준비 완료를 기다립니다.
+ * 입력: 없음. 초기화된 카메라를 사용합니다.
+ * 출력: 완료되면 XST_SUCCESS, 통신 오류·5초 timeout이면 XST_FAILURE.
+ * 처리 구조: FIFO를 비우고 capture bit를 설정한 뒤 CAP_DONE을 tick 기준으로 확인합니다.
+ */
 int ArduCAM_Capture() {
     spi_failed = 0;
     // 1. FIFO 초기화
@@ -223,6 +289,12 @@ int ArduCAM_Capture() {
 }
 
 // 캡처된 이미지 크기 읽기
+/**
+ * 기능: 캡처된 JPEG의 FIFO 바이트 수를 읽습니다.
+ * 입력: 없음. 카메라 FIFO 크기 레지스터를 사용합니다.
+ * 출력: 3개 레지스터를 조합한 길이, SPI 오류 시 0.
+ * 처리 구조: low/middle/high 바이트를 읽고 지원하는 길이 비트 마스크를 적용합니다.
+ */
 u32 ArduCAM_ReadFifoLength() {
     u32 len1, len2, len3;
     len1 = ArduCAM_ReadReg(FIFO_SIZE1);
@@ -233,6 +305,12 @@ u32 ArduCAM_ReadFifoLength() {
 }
 
 // 이미지 데이터 읽기 (Burst Read)
+/**
+ * 기능: 카메라 FIFO의 압축 영상을 연속 SPI 전송으로 가져옵니다.
+ * 입력: buffer: 출력 JPEG 공간, length: 읽을 바이트 수(최대 512 KiB).
+ * 출력: 전송 상태 코드와 성공 시 buffer에 복사한 JPEG.
+ * 처리 구조: 명령+dummy TX와 RX 임시 공간을 준비하고 하나의 전송으로 읽습니다. 명령 응답 바이트를 제외해 복사하고 양쪽 임시 공간을 해제합니다.
+ */
 int ArduCAM_ReadFifoBurst(u8 *buffer, u32 length) {
     if (buffer == NULL || length == 0 || length > 512u * 1024u)
         return XST_FAILURE;

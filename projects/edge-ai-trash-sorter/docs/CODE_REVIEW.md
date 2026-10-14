@@ -1,6 +1,6 @@
 # Code review and validation
 
-검토일: 2026-10-14. 보고서 부록의 Zybo, Arduino 1/2, Flask, HTML 코드를 추출해 공개본으로 정리했다. 원본 Word 문서는 변경하지 않았다. 아래 변경은 원 시제품의 실험 당시 코드와 구분해야 한다.
+Zybo·Arduino 센싱/구동·Flask 서버·관제 화면 코드의 점검 및 정리 내용이다.
 
 ## 확인한 오류와 공개본 수정
 

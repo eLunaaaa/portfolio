@@ -29,4 +29,4 @@ pins.xdc는 보고서의 PL 핀 constraint만 추출한 파일이다. Verilog bl
 
 ![보고서의 Vivado block 구성](../media/vivado-block.png)
 
-보고서에서 “JE의 SPI/I2C”와 “JD의 I2C” 설명이 혼재하므로 XDC와 실물 배선을 기준으로 확인한다.
+SPI/I2C의 PL port 연결은 pins.xdc와 Vivado block wrapper에 맞춰 구성한다.

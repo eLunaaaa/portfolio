@@ -2,8 +2,6 @@
 
 5대의 Arduino UNO로 5×5 입력 행렬과 3×3 필터의 합성곱을 분산 처리하는 임베디드 팀 프로젝트입니다. Master가 9개 패치를 현재 미처리 부하가 가장 적은 Slave에 배정하고, 4개 Slave는 연산 잔량을 서보 각도로 보여줍니다.
 
-> 임베디드시스템설계 Project 1 · 전자공학과 7조
-
 ![시제품 정면](media/prototype-front.jpeg)
 
 ## 제출용 프로젝트 요약
@@ -142,6 +140,10 @@ python3 -m unittest discover -s tests -p 'test_*.py' -v
 ```
 
 Python 테스트에는 `host/requirements.txt`의 pyserial이 필요합니다.
+
+## 코드 읽기
+
+처음 보는 분을 위한 [파일별 역할·호출 흐름 안내](docs/CODE_GUIDE.md)를 제공합니다. 각 source 파일의 첫머리와 함수 위에도 기능·입력·출력·처리 구조를 한글로 설명했습니다.
 
 ## 저장소 구조
 

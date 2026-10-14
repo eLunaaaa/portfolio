@@ -1,8 +1,16 @@
+# 쓰레기통 관제용 Flask 서버입니다.
+# 위치 t1/t2의 일반·캔·유리·PET 상태를 저장하고 센서 갱신 API와 화면 조회 API를 제공합니다.
+# create_app 내부의 data/lock과 route 함수가 한 앱의 상태를 공유하며 index.html이 /status를 주기적으로 조회합니다.
+
 """Local prototype dashboard; GET update routes retained for ESP8266 compatibility."""
 from threading import Lock
 from flask import Flask, jsonify, render_template
 
 
+# 기능: 독립적인 쓰레기통 상태 저장소와 Flask 경로를 구성합니다.
+# 입력: 없음. 앱별 데이터와 lock을 새로 만듭니다.
+# 출력: 구성된 Flask 앱 객체.
+# 처리 구조: 두 위치·네 종류 상태를 None으로 시작하고 화면, 조회, 변경, reset 경로를 내부 함수로 등록합니다.
 def create_app():
     app = Flask(__name__)
     lock = Lock()
@@ -11,10 +19,18 @@ def create_app():
             for zone in ("t1", "t2")}
 
     @app.get("/")
+    # 기능: 관제 대시보드의 첫 화면을 반환합니다.
+    # 입력: HTTP GET /.
+    # 출력: index.html 렌더링 결과.
+    # 처리 구조: Flask template에 정의된 지도·상세창·상태 갱신 화면을 반환합니다.
     def home():
         return render_template("index.html")
 
     @app.get("/status")
+    # 기능: 모든 위치·종류의 현재 포화 상태를 조회합니다.
+    # 입력: HTTP GET /status.
+    # 출력: 위치별 종류 상태 JSON; None=미수신, false=여유, true=포화.
+    # 처리 구조: lock 안에서 상태를 복사해 응답하고 no-store를 지정해 이전 응답 cache를 사용하지 않게 합니다.
     def status():
         with lock:
             result = {zone: values.copy() for zone, values in data.items()}
@@ -23,6 +39,10 @@ def create_app():
         return response
 
     @app.get("/<bin_id>/<action>/<type_id>")
+    # 기능: 센서가 보고한 위치·종류별 포화 상태를 저장합니다.
+    # 입력: URL의 bin_id: t1/t2, action: fill/empty, type_id: ge/ca/gl/pe/al.
+    # 출력: 성공 문자열과 HTTP 200, 잘못된 위치·명령·종류이면 404/400.
+    # 처리 구조: 인자를 먼저 검증하고 lock 안에서 선택 종류 또는 al 전체 종류를 변경합니다.
     def control_bin(bin_id, action, type_id):
         if bin_id not in data:
             return "ERROR: Wrong Bin ID", 404
@@ -39,6 +59,10 @@ def create_app():
         return response
 
     @app.post("/reset")
+    # 기능: 저장된 모든 상태를 미확인 상태로 초기화합니다.
+    # 입력: HTTP POST /reset.
+    # 출력: reset 완료 문자열과 모든 상태 None.
+    # 처리 구조: lock 안에서 모든 위치·종류를 순회해 값만 초기화합니다.
     def reset():
         with lock:
             for values in data.values():

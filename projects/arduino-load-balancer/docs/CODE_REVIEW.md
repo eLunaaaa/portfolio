@@ -1,10 +1,10 @@
 # Code review and validation
 
-검토일: 2026-10-14. Project 1 보고서의 Master와 Slave 4개 부록 코드를 분석하고, 공개용 구조로 정리했다. 원 PDF는 그대로 보존했다.
+Master·Slave·공통 스케줄러·PC 호스트 코드의 점검 및 정리 내용이다.
 
 ## 코드 점검 및 정리
 
-| 영역 | 보고서 코드에서 확인한 내용 | 공개본 반영 |
+| 영역 | 정리한 동작 | 공개본 반영 |
 |---|---|---|
 | 부하 계산 | Master는 입력 nonzero 수만, Slave는 입력·필터 nonzero 및 곱셈/덧셈 가중치 사용 | 같은 `3n−1` 공통 함수로 통일 |
 | 서보 PWM | OCR 하한 -250으로 음수가 uint16에 저장될 수 있음 | Timer1 250~500 tick으로 clamp |
@@ -20,7 +20,7 @@
 | timer 공유값 | 16비트 counter의 비원자적 read/write | uint32 tick의 atomic snapshot과 elapsed 비교 |
 | 원본 중복 | Slave 주소별 거의 같은 4개 파일 | 주소 macro로 빌드하는 공통 Slave |
 
-원 보고서의 기능을 기준으로 레지스터 기반 Master·Slave 어댑터와 공통 로직을 정리했다. 공개본은 작업 payload에 입력·필터·배치 번호를 함께 담고, 결과를 int32 frame으로 송수신한다. 같은 공개본 버전의 Master/Slave를 함께 사용한다.
+레지스터 기반 Master·Slave 어댑터와 공통 로직을 구성했다. 공개본은 작업 payload에 입력·필터·배치 번호를 함께 담고, 결과를 int32 frame으로 송수신한다. 같은 공개본 버전의 Master/Slave를 함께 사용한다.
 
 ## 동작·성능 기록
 

@@ -1,4 +1,9 @@
 <!DOCTYPE html>
+<!--
+쓰레기통 관제 대시보드의 HTML·CSS·JavaScript입니다.
+위치 아이콘을 지도에 표시하고 클릭 시 종류별 상태를 상세창에 보여줍니다.
+Flask의 /status 응답을 1초마다 받아 갱신하며 센서 미수신과 연결 실패를 화면에 구분해 표시합니다.
+-->
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -97,6 +102,10 @@
         let globalData = {};
         let currentModalId = null;
 
+        // 기능: 서버의 최신 상태를 받아 화면과 열린 상세창을 갱신합니다.
+        // 입력: 인자 없음. /status fetch 응답을 사용합니다.
+        // 출력: globalData·아이콘·상세창·연결 상태 문구를 갱신합니다.
+        // 처리 구조: HTTP 성공 여부 확인→JSON 저장→위치별 icon 갱신→현재 modal 갱신 순서이며 실패하면 연결 실패 안내를 표시합니다.
         function updateDashboard() {
             fetch('/status')
                 .then(response => {
@@ -118,6 +127,10 @@
                 });
         }
 
+        // 기능: 한 위치의 포화된 종류 수에 맞춰 지도 아이콘 색을 정합니다.
+        // 입력: binId: 위치 ID, binData: 종류별 상태 객체.
+        // 출력: DOM 아이콘의 level-1/2/3 CSS class.
+        // 처리 구조: 참인 종류 수를 세고 기존 class를 제거한 뒤 1/2/3개 이상에 맞는 class를 추가합니다.
         function updateIcon(binId, binData) {
             const binDiv = document.getElementById('bin-' + binId);
             if (!binDiv || !binData) return;
@@ -133,6 +146,10 @@
             else if(fullCount >= 1) binDiv.classList.add('level-1');
         }
 
+        // 기능: 선택한 위치의 종류별 상세창을 엽니다.
+        // 입력: binId: 클릭한 위치 ID.
+        // 출력: currentModalId·제목·표시 상태와 상세 내용.
+        // 처리 구조: 선택 위치를 기억하고 modal을 flex로 표시한 뒤 renderModalContent를 호출합니다.
         function openModal(binId) {
             currentModalId = binId;
             const modal = document.getElementById('detail-modal');
@@ -145,6 +162,10 @@
             renderModalContent(binId);
         }
 
+        // 기능: 위치 상세창을 닫습니다.
+        // 입력: 없음. 현재 modal DOM을 사용합니다.
+        // 출력: modal 숨김과 currentModalId 초기화.
+        // 처리 구조: display를 none으로 바꾸고 이후 주기 갱신이 닫힌 modal을 갱신하지 않도록 선택 상태를 지웁니다.
         function closeModal() {
             document.getElementById('detail-modal').style.display = 'none';
             currentModalId = null;
@@ -154,6 +175,10 @@
         // [수정됨] 모달창 내부 순서 변경
         // 일반(ge) -> 캔(ca) -> 유리(gl) -> 페트(pe)
         // ==========================================
+        // 기능: 종류별 서버 상태를 한국어 상세 목록으로 만듭니다.
+        // 입력: binId: 위치 ID, globalData의 저장 상태.
+        // 출력: 일반→캔→유리→PET 순서의 HTML 상태 목록.
+        // 처리 구조: true/false/미수신을 수거 필요/여유 있음/확인 중으로 나누고 해당 CSS class와 문구를 구성합니다.
         function renderModalContent(binId) {
             const data = globalData[binId];
             if(!data) return;

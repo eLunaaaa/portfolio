@@ -1,8 +1,19 @@
+/*
+ * 기능 검산용 테스트 파일입니다.
+ * 고정·경계·오류 입력 또는 대역 환경에서 함수 결과를 기대값과 비교합니다.
+ */
+
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include "vision_core.h"
 
+/**
+ * 기능: 이 파일의 기능 검산을 실행합니다.
+ * 입력: 고정 표본·경계값과 필요 시 대역 환경.
+ * 출력: 검사가 모두 맞으면 성공 로그와 정상 종료, 다르면 assertion 실패.
+ * 처리 구조: 테스트 함수 또는 프로토콜 시나리오를 순서대로 실행합니다.
+ */
 int main(void) {
     uint8_t jpeg[] = {0xff,0xd8,1,2,0xff,0xd9,0,0};
     size_t len = sizeof(jpeg);

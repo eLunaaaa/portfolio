@@ -1,3 +1,5 @@
+/* PC 테스트 전용 AVR 레지스터 대역입니다. register 변수와 bit 상수로 Slave 코드를 그대로 호출해 buffer·결과·ACK 상태를 검사합니다. */
+
 #pragma once
 #include <stdint.h>
 // Register stand-ins for the native worker state-machine test only.

@@ -1,3 +1,6 @@
+// 기능 검산용 테스트 파일입니다.
+// 고정·경계·오류 입력 또는 대역 환경에서 함수 결과를 기대값과 비교합니다.
+
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');

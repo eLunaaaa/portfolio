@@ -1,9 +1,20 @@
+/*
+ * 기능 검산용 테스트 파일입니다.
+ * 고정·경계·오류 입력 또는 대역 환경에서 함수 결과를 기대값과 비교합니다.
+ */
+
 #include <cassert>
 #include <climits>
 #include <cstdio>
 #include <random>
 #include "LoadBalancerCore.h"
 
+/**
+ * 기능: zero-skip 부하·32비트 연산, byte order codec, PWM 상·하한을 검사합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_math_protocol() {
     int8_t patch[9], filter[9];
     for (int i = 0; i < 9; ++i) { patch[i] = -128; filter[i] = -128; }
@@ -22,6 +33,12 @@ static void test_math_protocol() {
     assert(lb::servo_ticks(0) == 250 && lb::servo_ticks(52) == 500);
     assert(lb::servo_ticks(65535) == 500);
 }
+/**
+ * 기능: 원형 FIFO의 빈 상태·포화·순서·인덱스 순환을 반복 검사합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_queue() {
     lb::Queue q{}; lb::Job j{};
     assert(!q.pop(j));
@@ -31,12 +48,24 @@ static void test_queue() {
         for (uint8_t i = 0; i < lb::QueueCapacity; ++i) { assert(q.pop(j)); assert(j.patch == i); }
     }
 }
+/**
+ * 기능: 지정 출력 위치 하나의 기준 합성곱을 계산합니다.
+ * 입력: input: 5×5 signed 배열, filter: 3×3 signed 배열, index: 출력 위치 0~8.
+ * 출력: 해당 출력 위치의 signed int32 기준 결과.
+ * 처리 구조: index의 행·열에서 시작하는 3×3 영역을 직접 곱해 더하고 스케줄러의 결과와 비교합니다.
+ */
 static int32_t reference(const int8_t input[25], const int8_t filter[9], int index) {
     int32_t sum = 0;
     for (int y = 0; y < 3; ++y) for (int x = 0; x < 3; ++x)
         sum += (int32_t)input[(index / 3 + y) * 5 + index % 3 + x] * filter[y * 3 + x];
     return sum;
 }
+/**
+ * 기능: 두 행렬·필터의 동시 배정과 무작위 완료 순서를 100회 기준 계산과 비교합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_pipeline() {
     std::mt19937 random(20261014);
     lb::Scheduler s; s.init(); s.next_sequence = 65535;
@@ -75,6 +104,12 @@ static void test_pipeline() {
         for (const auto &w : s.workers) assert(w.total_load == 0 && w.queue.count == 0 && w.pending_count == 0);
     }
 }
+/**
+ * 기능: 이 파일의 기능 검산을 실행합니다.
+ * 입력: 고정 표본·경계값과 필요 시 대역 환경.
+ * 출력: 검사가 모두 맞으면 성공 로그와 정상 종료, 다르면 assertion 실패.
+ * 처리 구조: 테스트 함수 또는 프로토콜 시나리오를 순서대로 실행합니다.
+ */
 int main() {
     test_math_protocol(); test_queue(); test_pipeline();
     lb::Scheduler wrap; wrap.init();

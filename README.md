@@ -2,15 +2,14 @@
 
 전자공학 기반의 임베디드 시스템 프로젝트 포트폴리오입니다.
 
-## Embedded Linux System Programming · 졸업연구 기술 구현
+## Embedded Linux Experiment Setup · 졸업연구 실험 환경 구성
 
-졸업연구에서 담당한 C 기반 Linux 시스템 프로그래밍 경험입니다.
+실험 환경과 PREEMPT_RT 도구 설정, CPU 3번 고정, 논문 리딩·정리를 담당했습니다.
 
-- **개인 기여**: 사용자 공간 모듈, 시간·메모리·데이터 처리, 공통 설정·빌드 구성
-- **기술**: C · Embedded Linux · POSIX · UDP socket · mmap/mlockall · 시간 API · eBPF/XDP 환경 설정
-- **구현 방식**: 초기화·반복 처리 분리, 절대 시각 기준 실행, 메모리 사전 준비, 바이트 순서 관리, 신호 기반 종료 처리
+- **개인 기여**: 실험 세팅, PREEMPT_RT 실험 도구 설정, CPU affinity 적용, 관련 논문 정리
+- **기술·도구**: Embedded Linux · PREEMPT_RT · cyclictest · taskset · CPU affinity · Shell
 
-[사용 기술과 구현 방식](projects/embedded-linux-system-programming/README.md)
+[담당 작업과 기술 구현](projects/embedded-linux-system-programming/README.md)
 
 ## Arduino Dynamic Load Balancer · 동적 부하 분산 시스템
 

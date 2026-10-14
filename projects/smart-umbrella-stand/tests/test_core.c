@@ -1,3 +1,8 @@
+/*
+ * 기능 검산용 테스트 파일입니다.
+ * 고정·경계·오류 입력 또는 대역 환경에서 함수 결과를 기대값과 비교합니다.
+ */
+
 #include <assert.h>
 #include <stdio.h>
 #include "date_utils.h"
@@ -5,6 +10,12 @@
 #include "control_logic.h"
 #include "slave2_spi.h"
 
+/**
+ * 기능: 센서 frame round-trip과 잘못된 헤더·ADC·우산 플래그 거부, 이전 값 보존을 확인합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_sensor_frame(void)
 {
     SensorData source = {1234u, 4095u, true}, decoded = {0};
@@ -26,6 +37,12 @@ static void test_sensor_frame(void)
     assert(!sensor_frame_decode(&decoded, frame));
 }
 
+/**
+ * 기능: 윤년 2월·월말·연말을 넘는 시간 이동 결과를 확인합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_dates(void)
 {
     DateTime leap = {2024u, 2u, 28u, 23u, 0u, 0u};
@@ -38,6 +55,12 @@ static void test_dates(void)
     assert(year.year == 2026u && year.month == 1u && year.day == 1u && year.hour == 5u);
 }
 
+/**
+ * 기능: wet/rainy 진입·유지·해제와 팬·서보 명령 조합을 확인합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_control(void)
 {
     ControlState state = {0};
@@ -58,6 +81,12 @@ static void test_control(void)
     assert(!output.wet);
 }
 
+/**
+ * 기능: Slave2 첫 응답 헤더·후속 TX byte·표시 명령과 frame 이후 byte 무시를 확인합니다.
+ * 입력: 함수 내부의 고정 표본·대역 환경.
+ * 출력: 정상 조건은 assertion 통과, 차이는 assertion/테스트 실패.
+ * 처리 구조: 정상·경계·오류 조건을 구성해 기능의 기대 결과와 비교합니다.
+ */
 static void test_slave2_preload(void)
 {
     Slave2Spi state;
@@ -75,6 +104,12 @@ static void test_slave2_preload(void)
     assert(state.servo_level == 2u);
 }
 
+/**
+ * 기능: 이 파일의 기능 검산을 실행합니다.
+ * 입력: 고정 표본·경계값과 필요 시 대역 환경.
+ * 출력: 검사가 모두 맞으면 성공 로그와 정상 종료, 다르면 assertion 실패.
+ * 처리 구조: 테스트 함수 또는 프로토콜 시나리오를 순서대로 실행합니다.
+ */
 int main(void)
 {
     test_sensor_frame();
