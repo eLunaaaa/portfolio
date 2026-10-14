@@ -1,0 +1,12 @@
+read_verilog rtl/converted/design.v
+hierarchy -check -top cnn_top
+flatten
+proc
+opt
+memory
+opt
+techmap
+opt
+abc -fast -g gates,MUX
+clean
+stat

@@ -1,0 +1,5 @@
+{
+  "config": "test_config",
+  "test_accuracy": 97.48,
+  "quantization": "Q3.4"
+}

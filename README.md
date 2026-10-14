@@ -2,6 +2,16 @@
 
 전자공학 기반의 임베디드 시스템 프로젝트 포트폴리오입니다.
 
+## Configurable CNN Training and RTL · CNN 학습·RTL 자동화
+
+MNIST 모델 구조·학습부터 Q3.4 출력 평가, Verilog 연산 모듈, RTL 생성·합성·분석 자동화까지 직접 구현했습니다.
+
+- **개인 기여**: 전체 구현
+- **기술**: Python · PyTorch · JSON · Verilog/SystemVerilog · Icarus Verilog · sv2v · Yosys
+- **학습 평가 기록**: baseline 85.99%, 최종 구성 97.48%
+
+[프로젝트 상세와 코드](projects/configurable-cnn-rtl/README.md)
+
 ## Embedded Linux Experiment Setup · 졸업연구 실험 환경 구성
 
 실험 환경과 PREEMPT_RT 도구 설정, CPU 3번 고정, 논문 리딩·정리를 담당했습니다.
