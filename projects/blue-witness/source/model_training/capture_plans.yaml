@@ -1,6 +1,7 @@
 schema_version: 1
 
-# 새 촬영 묶음은 plans 아래에 추가한다. Python 코드는 수정하지 않는다.
+# 메타데이터를 미리 지정할 때 register_recordings.py --plan으로 선택한다.
+# --source-dir만 사용하는 폴더 자동 등록에는 이 계획이 필요 없다.
 plans:
   augmentation_round_01:
     source_directory: data/incoming/session11_13
@@ -157,3 +158,45 @@ plans:
       - {file: session22_video06.mp4, session_id: session22, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [opposite_direction, ioniq_front, confusion_case]}
       - {file: session22_video07.mp4, session_id: session22, vehicle_instances: [ioniq5_silver], condition_tags: [turning, extreme_close_up, priority_vehicle]}
       - {file: session22_video08.mp4, session_id: session22, vehicle_instances: [palisade_black, other_car_3], condition_tags: [hard_negative, opposite_direction, confusion_case]}
+
+  delegated_demo_round_04:
+    source_directory: data/incoming/session23_25
+    encoding_profile: primary_2_5mbps
+    dataset_usage: development
+    session_defaults:
+      session23: [installed_camera_pose, normal_light, demo_rehearsal, hard_example]
+      session24: [camera_pose_offset, side_light, demo_rehearsal, hard_example]
+      session25: [installed_camera_pose, dim_light, cluttered_background, demo_rehearsal, hard_example]
+    recordings:
+      - {file: session23_video01.mp4, session_id: session23, vehicle_instances: [ioniq5_silver], condition_tags: [front, near, extreme_close_up, priority_vehicle]}
+      - {file: session23_video02.mp4, session_id: session23, vehicle_instances: [ioniq5_silver], condition_tags: [rear, near, extreme_close_up, priority_vehicle]}
+      - {file: session23_video03.mp4, session_id: session23, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [same_direction, partial_occlusion, visibility_50, confusion_case]}
+      - {file: session23_video04.mp4, session_id: session23, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [opposite_direction, partial_occlusion, visibility_30, confusion_case]}
+      - {file: session23_video05.mp4, session_id: session23, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [t_bone_collision, right_occlusion, confusion_case]}
+      - {file: session23_video06.mp4, session_id: session23, vehicle_instances: [ioniq5_silver, other_car_1], condition_tags: [oblique_collision, partial_occlusion]}
+      - {file: session23_video07.mp4, session_id: session23, vehicle_instances: [ioniq5_silver, palisade_black], condition_tags: [rear_collision, partial_occlusion]}
+      - {file: session23_video08.mp4, session_id: session23, vehicle_instances: [other_car_3], condition_tags: [hard_negative, front, extreme_close_up, confusion_case]}
+      - {file: session23_video09.mp4, session_id: session23, vehicle_instances: [palisade_black, other_car_1, other_car_3], condition_tags: [hard_negative, multiple_vehicles, no_ioniq, confusion_case]}
+      - {file: session23_video10.mp4, session_id: session23, vehicle_instances: [], condition_tags: [negative, dynamic_background, shadow]}
+
+      - {file: session24_video01.mp4, session_id: session24, vehicle_instances: [ioniq5_silver], condition_tags: [front_oblique, left, near, extreme_close_up, priority_vehicle]}
+      - {file: session24_video02.mp4, session_id: session24, vehicle_instances: [ioniq5_silver], condition_tags: [rear_oblique, right, near, extreme_close_up, priority_vehicle]}
+      - {file: session24_video03.mp4, session_id: session24, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [same_direction, partial_occlusion, visibility_30, confusion_case]}
+      - {file: session24_video04.mp4, session_id: session24, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [opposite_direction, partial_occlusion, visibility_50, confusion_case]}
+      - {file: session24_video05.mp4, session_id: session24, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [t_bone_collision, left_occlusion, confusion_case]}
+      - {file: session24_video06.mp4, session_id: session24, vehicle_instances: [ioniq5_silver, other_car_1], condition_tags: [side_by_side, partial_occlusion]}
+      - {file: session24_video07.mp4, session_id: session24, vehicle_instances: [ioniq5_silver, palisade_black], condition_tags: [head_on, partial_occlusion]}
+      - {file: session24_video08.mp4, session_id: session24, vehicle_instances: [other_car_3], condition_tags: [hard_negative, rear, extreme_close_up, confusion_case]}
+      - {file: session24_video09.mp4, session_id: session24, vehicle_instances: [palisade_black, other_car_2, other_car_3], condition_tags: [hard_negative, multiple_vehicles, no_ioniq, confusion_case]}
+      - {file: session24_video10.mp4, session_id: session24, vehicle_instances: [], condition_tags: [negative, reflections, side_light]}
+
+      - {file: session25_video01.mp4, session_id: session25, vehicle_instances: [ioniq5_silver], condition_tags: [front_oblique, right, near, extreme_close_up, priority_vehicle]}
+      - {file: session25_video02.mp4, session_id: session25, vehicle_instances: [ioniq5_silver], condition_tags: [rear_oblique, left, near, extreme_close_up, priority_vehicle]}
+      - {file: session25_video03.mp4, session_id: session25, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [same_direction, partial_occlusion, visibility_50, confusion_case]}
+      - {file: session25_video04.mp4, session_id: session25, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [opposite_direction, partial_occlusion, visibility_30, confusion_case]}
+      - {file: session25_video05.mp4, session_id: session25, vehicle_instances: [ioniq5_silver, other_car_3], condition_tags: [t_bone_collision, center_occlusion, confusion_case]}
+      - {file: session25_video06.mp4, session_id: session25, vehicle_instances: [ioniq5_silver, other_car_2], condition_tags: [oblique_collision, partial_occlusion]}
+      - {file: session25_video07.mp4, session_id: session25, vehicle_instances: [ioniq5_silver, palisade_black], condition_tags: [t_bone_collision, center_occlusion]}
+      - {file: session25_video08.mp4, session_id: session25, vehicle_instances: [other_car_3], condition_tags: [hard_negative, side, extreme_close_up, confusion_case]}
+      - {file: session25_video09.mp4, session_id: session25, vehicle_instances: [palisade_black, other_car_1, other_car_2, other_car_3], condition_tags: [hard_negative, multiple_vehicles, no_ioniq, confusion_case]}
+      - {file: session25_video10.mp4, session_id: session25, vehicle_instances: [], condition_tags: [negative, cluttered_background, moving_object]}

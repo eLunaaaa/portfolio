@@ -46,7 +46,7 @@ function renderAdminEvents(events) {
           <td>
             ${escapeHtml(event.event_time_kst)}
           </td>
-          <td>수신 ${event.evidence_count}개 / 병합 ${event.merged_evidence_count ?? "미확인"}${event.merged_evidence_count == null ? "" : "개"}</td>
+          <td>${event.evidence_count}</td>
           <td>
             <span class="status-badge">
               ${escapeHtml(event.merge_status)}

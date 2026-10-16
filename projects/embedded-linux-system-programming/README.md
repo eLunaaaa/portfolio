@@ -1,13 +1,13 @@
 # 졸업연구 · 실시간 Linux 실험 환경 구성
 
-Raspberry Pi 5의 PREEMPT_RT Linux에서 일반 UDP·CPU 격리·XDP/AF_XDP 경로의 지연 특성을 비교하는 팀 졸업연구입니다. 전체 연구는 중요도별 패킷 처리 경로를 분리하는 혼합 중요도 아키텍처를 다룹니다.
+Raspberry Pi 5의 실시간 Linux 실험 환경과 UDP 기준 측정 도구를 구성한 팀 프로젝트입니다. 이 페이지는 직접 구현·설정한 기술 작업을 소개합니다.
 
 **개인 담당:** UDP 기준 실험 송수신 코드, 실험 환경 구성·PREEMPT_RT 도구 설정, CPU affinity 적용, 관련 논문 리딩·정리.
 
 | 먼저 확인할 내용 | 바로가기 |
 |---|---|
 | 직접 작성한 C 코드 | [송신기](source/udp_socket/src/sender.c) · [수신기](source/udp_socket/src/receiver.c) |
-| 설계 선택과 측정 한계 | [측정 설계](docs/DESIGN.md) |
+| 측정 구조와 설계 선택 | [측정 설계](docs/DESIGN.md) |
 | 빌드·실행 방법 | [개인 코드 실행 안내](source/README.md) |
 | 원본과 개인 기여 근거 | [원본 저장소](https://github.com/kingwooseok/ACEteam_Bachelor_thesis) · [UDP 구현 커밋](https://github.com/kingwooseok/ACEteam_Bachelor_thesis/commit/05722a5) · [주석·설명 보강](https://github.com/kingwooseok/ACEteam_Bachelor_thesis/commit/440f477) |
 
@@ -38,8 +38,6 @@ Embedded Linux · C · POSIX UDP socket · PREEMPT_RT · mmap/mlockall · cyclic
 | [Makefile](source/udp_socket/Makefile) | 추가 라이브러리 없는 Linux C 빌드·경고 옵션 |
 
 같은 송수신기를 Vanilla·PREEMPT_RT·CPU isolation 조건에서 사용하고 외부 환경만 바꿉니다. 프로그램 차이와 커널·CPU 배치 차이가 뒤섞이지 않도록 하기 위한 기준선입니다. CPU affinity는 `taskset -c 3`으로 외부 적용하며 PTP 동기화도 별도 설정합니다.
-
-**성과 해석:** 이 페이지는 구현과 실험 구성 근거를 제공합니다. 커널 수신 전체 비용이나 실시간 최악 지연을 증명한 결과로 확대하지 않으며, 확인되지 않은 지연 개선 수치를 추가하지 않았습니다. 현재 Mac에서는 Linux 전용 기능의 실제 실행 검증을 할 수 없어 정적 점검만 수행했습니다.
 
 ## 기술적으로 수행한 내용
 

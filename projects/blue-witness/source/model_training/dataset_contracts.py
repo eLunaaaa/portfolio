@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""데이터셋 파이프라인이 공유하는 계약, 입출력, 검증 도구."""
+"""@file dataset_contracts.py
+@brief 데이터 준비부터 배포까지 공통으로 사용하는 파일 형식과 검증 계약을 제공한다.
+
+이 모듈은 JSON/JSONL 원자적 저장, SHA-256 계산, config 검증, recording manifest
+탐색, ffprobe 영상 분석, bbox 정규화와 데이터셋 버전 규칙을 한곳에 모은다. 각
+pipeline이 서로 다른 방식으로 같은 파일을 해석하지 않도록 단일 계약 계층으로
+사용하며, 계약 위반은 DatasetContractError로 즉시 보고한다.
+"""
 
 from __future__ import annotations
 
@@ -51,12 +58,27 @@ class VideoMetadata:
 
 
 def read_json(path: Path) -> Any:
+    """UTF-8 JSON 파일을 읽어 Python 값으로 반환한다."""
     with path.open("r", encoding="utf-8") as handle:
         return json.load(handle)
 
 
+# -----------------------------------------------------------------------------
+# 기능: 같은 디렉터리의 임시 파일을 교체하여 JSON을 원자적으로 저장한다.
+#
+# 동작 방법:
+#   1. 저장할 내용과 대상 경로를 준비한다.
+#   2. 중간 실패가 완성 파일처럼 보이지 않도록 안전하게 기록하고 오류를 호출자에게 전달한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   path (Path) - 처리할 파일 또는 디렉터리 경로.
+#   value (Any) - 검증하거나 변환할 입력 값.
+#
+# 반환: 반환값은 없으며 검증·저장 또는 객체 상태 변경을 완료한다.
+# -----------------------------------------------------------------------------
 def atomic_write_json(path: Path, value: Any) -> None:
-    """같은 디렉터리의 임시 파일을 교체하여 JSON을 원자적으로 저장한다."""
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
@@ -72,6 +94,7 @@ def atomic_write_json(path: Path, value: Any) -> None:
 
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    """JSONL의 빈 줄을 제외하고 각 줄을 하나의 record로 읽는다."""
     records: list[dict[str, Any]] = []
     if not path.exists():
         return records
@@ -91,8 +114,22 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return records
 
 
+# -----------------------------------------------------------------------------
+# 기능: 전체 JSONL을 임시 파일에 쓴 뒤 원자적으로 교체한다.
+#
+# 동작 방법:
+#   1. 저장할 내용과 대상 경로를 준비한다.
+#   2. 중간 실패가 완성 파일처럼 보이지 않도록 안전하게 기록하고 오류를 호출자에게 전달한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   path (Path) - 처리할 파일 또는 디렉터리 경로.
+#   records (Iterable[dict[str, Any]]) - 이 함수의 records 처리에 사용하는 값.
+#
+# 반환: 반환값은 없으며 검증·저장 또는 객체 상태 변경을 완료한다.
+# -----------------------------------------------------------------------------
 def atomic_write_jsonl(path: Path, records: Iterable[dict[str, Any]]) -> None:
-    """전체 JSONL을 임시 파일에 쓴 뒤 원자적으로 교체한다."""
     path.parent.mkdir(parents=True, exist_ok=True)
     descriptor, temporary_name = tempfile.mkstemp(
         prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
@@ -109,6 +146,7 @@ def atomic_write_jsonl(path: Path, records: Iterable[dict[str, Any]]) -> None:
 
 
 def sha256_file(path: Path) -> str:
+    """큰 파일도 메모리에 전부 올리지 않고 SHA-256 digest를 계산한다."""
     digest = hashlib.sha256()
     with path.open("rb") as handle:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
@@ -117,6 +155,7 @@ def sha256_file(path: Path) -> str:
 
 
 def sha256_value(value: Any) -> str:
+    """정렬된 JSON 표현으로 구조화된 값의 재현 가능한 SHA-256을 만든다."""
     payload = json.dumps(
         value, ensure_ascii=False, sort_keys=True, separators=(",", ":")
     ).encode("utf-8")
@@ -124,13 +163,27 @@ def sha256_value(value: Any) -> str:
 
 
 def _require_mapping(value: Any, context: str) -> dict[str, Any]:
+    """설정 항목이 key-value 객체인지 확인하고 검증된 값을 반환한다."""
     if not isinstance(value, dict):
         raise DatasetContractError(f"{context}는 객체여야 합니다.")
     return value
 
 
+# -----------------------------------------------------------------------------
+# 기능: 설정을 읽고 클래스·경로·분할 계약을 엄격히 검증한다.
+#
+# 동작 방법:
+#   1. 입력 경로 또는 외부 source에서 필요한 정보를 읽는다.
+#   2. 읽은 값을 후속 단계가 사용하는 내부 계약 형태로 검증·변환한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   config_path (Path) - 경로·class·threshold 등 실행 계약이 기록된 YAML config 경로.
+#
+# 반환: dict[str, Any] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+# -----------------------------------------------------------------------------
 def load_settings(config_path: Path) -> dict[str, Any]:
-    """설정을 읽고 클래스·경로·분할 계약을 엄격히 검증한다."""
     with config_path.open("r", encoding="utf-8") as handle:
         raw = yaml.safe_load(handle)
     settings = _require_mapping(raw, "설정")
@@ -191,6 +244,7 @@ def load_settings(config_path: Path) -> dict[str, Any]:
 
 
 def resolve_project_path(config_path: Path, value: str) -> Path:
+    """config 기준 상대 경로를 절대 경로로 바꾸고 절대 경로는 유지한다."""
     path = Path(value).expanduser()
     return path if path.is_absolute() else (config_path.parent / path).resolve()
 
@@ -206,10 +260,25 @@ def class_maps(settings: dict[str, Any]) -> tuple[dict[str, int], dict[str, str]
     return class_to_id, instance_to_class
 
 
+# -----------------------------------------------------------------------------
+# 기능: 녹화 단위 추적성과 파생 영상 관계를 검증한다.
+#
+# 동작 방법:
+#   1. 필수 field, type, 값 범위와 상호 관계를 순서대로 검사한다.
+#   2. 계약이 맞으면 후속 처리를 허용하고 위반 시 구체적인 예외로 중단한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   manifest (dict[str, Any]) - 원본과 처리 결과의 추적 계약을 담은 manifest 객체.
+#   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
+#   manifest_path (Path) - 이 함수의 manifest_path 처리에 사용하는 값.
+#
+# 반환: 반환값은 없으며 검증·저장 또는 객체 상태 변경을 완료한다.
+# -----------------------------------------------------------------------------
 def validate_recording_manifest(
     manifest: dict[str, Any], settings: dict[str, Any], manifest_path: Path
 ) -> None:
-    """녹화 단위 추적성과 파생 영상 관계를 검증한다."""
     if manifest.get("schema_version") != 2:
         raise DatasetContractError(f"{manifest_path}: schema_version은 2여야 합니다.")
     required_strings = (
@@ -260,8 +329,22 @@ def validate_recording_manifest(
         )
 
 
+# -----------------------------------------------------------------------------
+# 기능: 하위 깊이와 무관하게 녹화 manifest를 찾아 비디오와 연결한다.
+#
+# 동작 방법:
+#   1. 입력 경로 또는 외부 source에서 필요한 정보를 읽는다.
+#   2. 읽은 값을 후속 단계가 사용하는 내부 계약 형태로 검증·변환한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   recordings_dir (Path) - 이 함수의 recordings_dir 처리에 사용하는 값.
+#   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
+#
+# 반환: list[tuple[Path, dict[str, Any]]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+# -----------------------------------------------------------------------------
 def discover_recordings(recordings_dir: Path, settings: dict[str, Any]) -> list[tuple[Path, dict[str, Any]]]:
-    """하위 깊이와 무관하게 녹화 manifest를 찾아 비디오와 연결한다."""
     discovered: list[tuple[Path, dict[str, Any]]] = []
     recording_ids: set[str] = set()
     for manifest_path in sorted(recordings_dir.rglob(RECORDING_MANIFEST)):
@@ -298,6 +381,7 @@ def discover_recordings(recordings_dir: Path, settings: dict[str, Any]) -> list[
 
 
 def _run_ffprobe(arguments: list[str], video_path: Path) -> dict[str, Any]:
+    """ffprobe를 JSON 모드로 실행하고 실패 원인을 데이터 계약 오류로 바꾼다."""
     command = ["ffprobe", "-v", "error", *arguments, "-of", "json", str(video_path)]
     try:
         completed = subprocess.run(command, check=True, capture_output=True, text=True)
@@ -313,14 +397,28 @@ def _run_ffprobe(arguments: list[str], video_path: Path) -> dict[str, Any]:
 
 
 def _parse_fraction(value: str | None) -> float:
+    """ffprobe의 분수형 FPS 문자열을 실수로 변환한다."""
     if not value or value in {"0/0", "N/A"}:
         return 0.0
     numerator, denominator = value.split("/", maxsplit=1)
     return float(numerator) / float(denominator)
 
 
+# -----------------------------------------------------------------------------
+# 기능: 컨테이너가 아닌 첫 영상 스트림의 실제 코덱·크기·FPS·비트레이트를 읽는다.
+#
+# 동작 방법:
+#   1. 입력 경로 또는 외부 source에서 필요한 정보를 읽는다.
+#   2. 읽은 값을 후속 단계가 사용하는 내부 계약 형태로 검증·변환한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   video_path (Path) - 원본 또는 평가 대상 MP4 경로.
+#
+# 반환: VideoMetadata 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+# -----------------------------------------------------------------------------
 def probe_video(video_path: Path) -> VideoMetadata:
-    """컨테이너가 아닌 첫 영상 스트림의 실제 코덱·크기·FPS·비트레이트를 읽는다."""
     payload = _run_ffprobe(
         [
             "-select_streams", "v:0",
@@ -348,8 +446,21 @@ def probe_video(video_path: Path) -> VideoMetadata:
     )
 
 
+# -----------------------------------------------------------------------------
+# 기능: 프레임별 best-effort PTS를 디코딩 순서대로 읽는다.
+#
+# 동작 방법:
+#   1. 입력 경로 또는 외부 source에서 필요한 정보를 읽는다.
+#   2. 읽은 값을 후속 단계가 사용하는 내부 계약 형태로 검증·변환한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   video_path (Path) - 원본 또는 평가 대상 MP4 경로.
+#
+# 반환: list[float | None] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+# -----------------------------------------------------------------------------
 def probe_frame_pts(video_path: Path) -> list[float | None]:
-    """프레임별 best-effort PTS를 디코딩 순서대로 읽는다."""
     payload = _run_ffprobe(
         [
             "-select_streams", "v:0",
@@ -365,10 +476,26 @@ def probe_frame_pts(video_path: Path) -> list[float | None]:
     return timestamps
 
 
+# -----------------------------------------------------------------------------
+# 기능: 실제 영상 스트림이 선언된 프로파일의 배포 입력 계약과 맞는지 확인한다.
+#
+# 동작 방법:
+#   1. 필수 field, type, 값 범위와 상호 관계를 순서대로 검사한다.
+#   2. 계약이 맞으면 후속 처리를 허용하고 위반 시 구체적인 예외로 중단한다.
+#
+# 사용 이유/연결: 데이터 준비·검수·export·학습·평가 CLI가 공통 계약으로 호출한다.
+#
+# 입력:
+#   metadata (VideoMetadata) - 이 함수의 metadata 처리에 사용하는 값.
+#   profile_name (str) - 이 함수의 profile_name 처리에 사용하는 값.
+#   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
+#   video_path (Path) - 원본 또는 평가 대상 MP4 경로.
+#
+# 반환: 반환값은 없으며 검증·저장 또는 객체 상태 변경을 완료한다.
+# -----------------------------------------------------------------------------
 def validate_video_profile(
     metadata: VideoMetadata, profile_name: str, settings: dict[str, Any], video_path: Path
 ) -> None:
-    """실제 영상 스트림이 선언된 프로파일의 배포 입력 계약과 맞는지 확인한다."""
     profile = settings["encoding_profiles"][profile_name]
     problems: list[str] = []
     if metadata.codec != str(profile["codec"]):
@@ -401,6 +528,7 @@ def normalize_bbox(bbox: Iterable[float], width: int, height: int) -> list[float
 
 
 def write_jpeg(path: Path, frame: Any, quality: int) -> None:
+    """OpenCV frame을 지정 품질의 JPEG로 원자적으로 저장한다."""
     path.parent.mkdir(parents=True, exist_ok=True)
     success, encoded = cv2.imencode(".jpg", frame, [cv2.IMWRITE_JPEG_QUALITY, quality])
     if not success:
@@ -422,5 +550,6 @@ def next_dataset_version(datasets_dir: Path) -> str:
 
 
 def validate_dataset_version_name(value: str) -> None:
+    """불변 데이터셋 이름이 dataset_vNNN 형식을 따르는지 검증한다."""
     if DATASET_VERSION_PATTERN.fullmatch(value) is None:
         raise DatasetContractError("데이터셋 버전은 dataset_v001 형식이어야 합니다.")

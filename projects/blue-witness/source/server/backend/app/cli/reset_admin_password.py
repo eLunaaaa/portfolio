@@ -1,13 +1,15 @@
 from getpass import getpass
 from pathlib import Path
 import sqlite3
+import sys
 
 from pwdlib import PasswordHash
 
 
-DATABASE_PATH = Path(
-    "storage/database/ace.db"
-)
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from app.db.database import DATABASE_PATH
 
 
 def open_database() -> sqlite3.Connection:

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="422" viewBox="0 0 1280 422">
+<rect width="1280" height="422" fill="white"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#236eac"/></marker></defs>
+<rect x="24" y="24" width="308" height="104" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="178" y="69.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">사고차 · IMU 감지</text>
+<text x="178" y="100.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">즉시 자체 영상 요청</text>
+<rect x="24" y="160" width="308" height="104" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="178" y="205.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">관측차 · 화각 통과</text>
+<text x="178" y="236.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">즉시 영상 분석 요청</text>
+<rect x="416" y="80" width="348" height="144" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="590" y="130" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">카메라는 계속 촬영</text>
+<text x="590" y="161" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">사고 전 8초 · 후 2초</text>
+<text x="590" y="192" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">같은 10초 구간 확보</text>
+<rect x="856" y="24" width="400" height="104" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="1056" y="69.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">사고차</text>
+<text x="1056" y="100.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">확보한 구간을 MP4로 저장</text>
+<rect x="856" y="160" width="400" height="104" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="1056" y="205.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">관측차</text>
+<text x="1056" y="236.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">YOLOX 검출 → 같은 구간 저장</text>
+<path d="M332 76 H372 V130 H416" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M332 212 H372 V177 H416" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M764 130 H805 V76 H856" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M764 177 H805 V212 H856" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="24" y="308" width="1232" height="88" rx="8" fill="#153247" stroke="none" stroke-width="1.5"/>
+<text x="640" y="345" font-family="Malgun Gothic, sans-serif" font-size="29" font-weight="700" fill="white" text-anchor="middle">MP4 완성 → 인계 기록 저장 → Uploader 영속성 큐</text>
+<text x="640" y="379" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="white" text-anchor="middle">영상 인계·전송과 다음 프레임 촬영을 병행</text>
+</svg>

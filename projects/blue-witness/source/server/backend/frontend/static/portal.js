@@ -93,13 +93,13 @@ function renderLatestIncident(events) {
     COLLECTING: "영상 수집 중", REGISTERED: "사고 접수",
   }[latest.merge_status] || "처리 중";
   // 영상 개수를 재사용하지 않고 차량 ID를 중복 제거하여 제공 차량 수를 셈.
-  const providerCount = latest.merged_evidence_count;
+  const providerCount = new Set(latest.evidence_vehicle_ids || []).size;
   container.innerHTML = `
     <div class="latest-incident-card">
       <div class="latest-incident-copy">
         <strong>${unreadEventBadge(latest.event_id)} ${escapeHtml(vehicleName)} 차량 사고</strong>
         <p>${escapeHtml(latestIncidentTime(latest.event_time_kst))}</p>
-        <span class="latest-incident-count">${providerCount == null ? "병합 영상 수 미확인" : `차량 ${providerCount}대 영상 병합`} ·</span>
+        <span class="latest-incident-count">차량 ${providerCount}대가 영상 제공 ·</span>
         <span class="status-badge">${escapeHtml(statusLabel)}</span>
       </div>
       <button type="button" class="primary-button" data-event-id="${escapeHtml(latest.event_id)}">사고 확인</button>
@@ -244,6 +244,19 @@ const copyPopupAccessCodeButton =
  * 사용자가 현재 선택한 사고 ID임.
  */
 let selectedEventId = null;
+let eventSelectionVersion = 0;
+let selectedEventReady = false;
+let eventAccessRequestQueue = Promise.resolve();
+
+// 쿠키 변경 응답의 순서를 보장해 이전 사고의 응답이 새 인증을 덮지 않게 함.
+function runEventAccessRequest(version, request) {
+  const pending = eventAccessRequestQueue.then(() => {
+    if (version !== eventSelectionVersion) return;
+    return request();
+  });
+  eventAccessRequestQueue = pending.catch(() => {});
+  return pending;
+}
 
 
 /*
@@ -684,7 +697,7 @@ function renderEvents(events) {
             </td>
 
             <td data-label="증거 차량">
-              ${event.merged_evidence_count ?? "미확인"}
+              ${event.evidence_count}
             </td>
 
             <td data-label="병합 상태">
@@ -970,7 +983,7 @@ function resetAccessCodeModal() {
  * 접근 코드 발급 팝업을 표시함.
  */
 function openAccessCodeModal() {
-  if (!selectedEventId) {
+  if (!selectedEventId || !selectedEventReady) {
     window.alert(
       "먼저 확인할 사고 기록을 선택해주세요.",
     );
@@ -1123,7 +1136,9 @@ async function clearAccidentAccessSession() {
  * 먼저 삭제하므로 본인인증 절차부터 다시 시작함.
  */
 async function selectEvent(eventId, sourceButton) {
+  const version = ++eventSelectionVersion;
   selectedEventId = eventId;
+  selectedEventReady = false;
 
   closeAccessCodeModal();
 
@@ -1133,6 +1148,7 @@ async function selectEvent(eventId, sourceButton) {
   resetMergedVideoAccess();
 
   accessCodeInput.value = "";
+  detailPanel.classList.add("hidden");
 
   /*
    * 상세 정보 조회가 끝나기 전까지
@@ -1159,7 +1175,8 @@ async function selectEvent(eventId, sourceButton) {
      * 이 호출이 없으면 이전에 잠금 해제한 영상이
      * 다시 사고를 선택했을 때 바로 표시됨.
      */
-    await clearAccidentAccessSession();
+    await runEventAccessRequest(version, clearAccidentAccessSession);
+    if (version !== eventSelectionVersion) return;
 
     /*
      * 기존 사고 인증을 삭제한 다음
@@ -1179,6 +1196,9 @@ async function selectEvent(eventId, sourceButton) {
           }/access-status`,
         ),
       ]);
+
+    if (version !== eventSelectionVersion) return;
+    selectedEventReady = true;
 
     detailPanel.classList.remove(
       "hidden",
@@ -1200,7 +1220,7 @@ async function selectEvent(eventId, sourceButton) {
     document.querySelector(
       "#detail-evidence-count",
     ).textContent =
-      detail.merged_evidence_count ?? "미확인";
+      detail.evidence_count;
 
     document.querySelector(
       "#detail-status",
@@ -1223,6 +1243,8 @@ async function selectEvent(eventId, sourceButton) {
     markEventViewed(eventId);
 
   } catch (error) {
+    if (version !== eventSelectionVersion) return;
+    selectedEventReady = false;
     resetMergedVideoAccess();
 
     unlockArea.classList.add(
@@ -1247,7 +1269,7 @@ async function selectEvent(eventId, sourceButton) {
  * 서버에 5분 접근 코드 발급을 요청함.
  */
 async function confirmMockIdentityVerification() {
-  if (!selectedEventId) {
+  if (!selectedEventId || !selectedEventReady) {
     window.alert(
       "선택된 사고가 없습니다.",
     );
@@ -1256,6 +1278,9 @@ async function confirmMockIdentityVerification() {
 
     return;
   }
+
+  const eventId = selectedEventId;
+  const version = eventSelectionVersion;
 
   confirmIdentityVerificationButton
     .disabled = true;
@@ -1267,7 +1292,7 @@ async function confirmMockIdentityVerification() {
     const requestUrl =
       `/api/v1/portal/events/${
         encodeURIComponent(
-          selectedEventId,
+          eventId,
         )
       }/access-code`;
 
@@ -1302,6 +1327,8 @@ async function confirmMockIdentityVerification() {
           "서버 응답을 JSON으로 읽을 수 없습니다.",
       };
     }
+
+    if (version !== eventSelectionVersion) return;
 
     console.log(
       "[ACCESS CODE] HTTP 상태:",
@@ -1362,6 +1389,7 @@ async function confirmMockIdentityVerification() {
 
     copyPopupAccessCodeButton.focus();
   } catch (error) {
+    if (version !== eventSelectionVersion) return;
     console.error(
       "[ACCESS CODE] 발급 실패:",
       error,
@@ -1371,12 +1399,14 @@ async function confirmMockIdentityVerification() {
       getErrorMessage(error),
     );
   } finally {
-    confirmIdentityVerificationButton
-      .disabled = false;
+    if (version === eventSelectionVersion) {
+      confirmIdentityVerificationButton
+        .disabled = false;
 
-    confirmIdentityVerificationButton
-      .textContent =
-      "본인인증 완료로 가정하고 확인";
+      confirmIdentityVerificationButton
+        .textContent =
+        "본인인증 완료로 가정하고 확인";
+    }
   }
 }
 
@@ -1471,6 +1501,7 @@ function copyTextWithTemporaryInput(text) {
  * 시스템 클립보드에 복사함.
  */
 async function copyPopupAccessCode() {
+  const version = eventSelectionVersion;
   const accessCode =
     (
       issuedAccessCodeInMemory
@@ -1524,6 +1555,8 @@ async function copyPopupAccessCode() {
     }
   }
 
+  if (version !== eventSelectionVersion) return;
+
   if (!copied) {
     copied = copyTextWithTemporaryInput(
       accessCode,
@@ -1549,6 +1582,7 @@ async function copyPopupAccessCode() {
    */
   window.setTimeout(
     () => {
+      if (version !== eventSelectionVersion) return;
       closeAccessCodeModal();
       accessCodeInput.focus();
       accessCodeInput.select();
@@ -1666,7 +1700,7 @@ accessCodeForm.addEventListener(
   async (event) => {
     event.preventDefault();
 
-    if (!selectedEventId) {
+    if (!selectedEventId || !selectedEventReady) {
       setMessage(
         portalMessage,
         "먼저 사고 기록을 선택해주세요.",
@@ -1675,6 +1709,9 @@ accessCodeForm.addEventListener(
 
       return;
     }
+
+    const eventId = selectedEventId;
+    const version = eventSelectionVersion;
 
     const accessCode =
       accessCodeInput.value.trim();
@@ -1696,20 +1733,22 @@ accessCodeForm.addEventListener(
        * 접근 코드 검증 API를 호출함.
        * 성공하면 event_access_session 쿠키가 발급됨.
        */
-      await apiRequest(
+      await runEventAccessRequest(version, () => apiRequest(
         "/api/v1/access/verify",
         {
           method: "POST",
 
           body: JSON.stringify({
             event_id:
-              selectedEventId,
+              eventId,
 
             access_code:
               accessCode,
           }),
         },
-      );
+      ));
+
+      if (version !== eventSelectionVersion) return;
 
       /*
        * 새로 발급된 event_access_session 쿠키를 기준으로
@@ -1719,15 +1758,18 @@ accessCodeForm.addEventListener(
         await apiRequest(
           `/api/v1/portal/events/${
             encodeURIComponent(
-              selectedEventId,
+              eventId,
             )
           }/access-status`,
         );
+
+      if (version !== eventSelectionVersion) return;
 
       updateVideoAccess(
         accessStatus,
       );
     } catch (error) {
+      if (version !== eventSelectionVersion) return;
       console.error(
         "[ACCESS VERIFY] 검증 실패:",
         error,

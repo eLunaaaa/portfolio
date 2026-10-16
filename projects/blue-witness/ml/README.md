@@ -1,8 +1,8 @@
 # 차량 검출 모델 학습·평가·배포
 
-[프로젝트 개요](../README.md) · [원본 학습 도구](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/model_training)
+[프로젝트 개요](../README.md) · [원본 학습 도구](../source/model_training)
 
-현재 포함 코드는 로컬 `ACE_Ai/vehicle_model` 기준입니다. GitHub 정리본과 다른 학습·export 선택은 [로컬 갱신 기록](../docs/LOCAL_SNAPSHOT.md)에 구분했습니다.
+현재 소스는 팀 기준과 개인 개발본의 세션 가중 sampling·미세조정을 통합했습니다. [통합 기록](../docs/LOCAL_SNAPSHOT.md)
 
 ## 담당한 흐름
 
@@ -43,7 +43,7 @@
 
 ## 학습 실행 흐름
 
-아래 명령은 **팀 원본 저장소를 내려받은 환경**에서 실행합니다. 원본 영상·라벨·사전학습 가중치는 별도 준비가 필요합니다. 이 포트폴리오는 모델이나 데이터셋을 재배포하지 않습니다.
+아래 명령은 이 저장소의 `projects/blue-witness/source`에서 실행합니다. 원본 영상·라벨·사전학습 가중치는 별도 준비가 필요합니다. 이 포트폴리오는 모델이나 데이터셋을 재배포하지 않습니다.
 
 ```bash
 cd model_training
@@ -54,7 +54,7 @@ python derive_two_class_dataset.py --source-dataset data/datasets/dataset_v001 -
 python train.py --config config_2class_tiny.yaml --dataset-version dataset_v001 --experiment-name portfolio_tiny --width 640 --height 480
 ```
 
-학습·내보내기 세부 CLI는 [원본 사용 안내](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/model_training/README.md)를 따릅니다. 버전 이름은 예시이며 실제 준비한 데이터 버전으로 바꿉니다.
+학습·내보내기 세부 CLI는 [원본 사용 안내](../source/model_training/README.md)를 따릅니다. 버전 이름은 예시이며 실제 준비한 데이터 버전으로 바꿉니다.
 
 ## 평가 해석
 
@@ -62,4 +62,4 @@ python train.py --config config_2class_tiny.yaml --dataset-version dataset_v001 
 
 전체 묶음은 임계값 선정에도 사용됐으므로 독립 최종 시험 점수로 주장하지 않습니다. 저장소가 별도로 보고한 test 1,633프레임의 유무 정답률은 98.65%입니다. 이 값은 BBox 위치의 mAP와 다른 지표입니다. 실제 도로·다른 차종·야간·우천으로 일반화하려면 별도 수집과 평가가 필요합니다.
 
-[설정 파일](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/model_training/config_2class_tiny.yaml) · [평가 CSV](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/docs/measurements/ai-evaluation/selected_threshold_metrics.csv)
+[설정 파일](../source/model_training/config_2class_tiny.yaml) · [평가 CSV](../analysis/measurements/ai-evaluation/selected_threshold_metrics.csv)

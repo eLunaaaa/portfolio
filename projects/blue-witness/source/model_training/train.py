@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""검증된 dataset version으로 YOLOX-Nano를 MPS/CPU에서 전이학습한다."""
+"""@file train.py
+@brief 불변 COCO 데이터셋으로 YOLOX Nano/Tiny를 전이학습하고 재현 가능한 실험을 저장한다.
+
+config·YOLOX source·pretrained checkpoint·dataset SHA를 검증한 뒤 MPS 또는 CPU device를
+선택한다. 공식 YOLOX loss와 augmentation loader로 epoch를 수행하고 last/best
+checkpoint, 학습 log와 experiment manifest를 새 실험 디렉터리에 기록한다. sanity
+mode와 정식 학습이 같은 경로를 사용하므로 본 학습 전 pipeline을 빠르게 확인할 수 있다.
+"""
 
 from __future__ import annotations
 
@@ -50,13 +57,29 @@ def configure_logging(log_path: Path) -> None:
 
 
 def seed_everything(seed: int) -> None:
+    """Python·NumPy·PyTorch 난수 seed를 맞춰 학습 재현성을 높인다."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
 
 
+# -----------------------------------------------------------------------------
+# 기능: 공식 YOLOX와 같은 BN/no-decay, weight/decay, bias 그룹의 SGD를 구성한다.
+#
+# 동작 방법:
+#   1. 공식 YOLOX와 같은 BN/no-decay, weight/decay, bias 그룹의 SGD를 구성한다
+#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
+#
+# 사용 이유/연결: 검증된 COCO 버전을 입력으로 받아 평가·ONNX export용 checkpoint를 만든다.
+#
+# 입력:
+#   model (torch.nn.Module) - 학습 또는 inference에 사용할 YOLOX model.
+#   learning_rate (float) - 이 함수의 learning_rate 처리에 사용하는 값.
+#   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
+#
+# 반환: torch.optim.Optimizer 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+# -----------------------------------------------------------------------------
 def build_optimizer(model: torch.nn.Module, learning_rate: float, settings: dict[str, Any]) -> torch.optim.Optimizer:
-    """공식 YOLOX와 같은 BN/no-decay, weight/decay, bias 그룹의 SGD를 구성한다."""
     batch_norm_weights, decay_weights, biases = [], [], []
     for module_name, module in model.named_modules():
         del module_name
@@ -78,17 +101,23 @@ def build_optimizer(model: torch.nn.Module, learning_rate: float, settings: dict
 
 
 # -----------------------------------------------------------------------------
-# 기능:
-#   공식 YOLOX 전처리와 train split을 연결하고 촬영 session별 sampling을 구성한다.
+# 기능: crop/Mosaic/MixUp 없이 공식 COCODataset과 TrainTransform만 연결한다.
+#
 # 동작 방법:
-#   COCO image ID 순서로 session 가중치를 대응시켜 WeightedRandomSampler에 전달한다.
-#   설정이 없으면 기존 shuffle을 사용하며 sanity 실행은 작은 고정 subset을 사용한다.
-# 사용 이유:
-#   실제 차량 장착·디오라마 자료의 학습 노출을 늘리면서 평가 데이터의 분포를 유지한다.
+#   1. crop/Mosaic/MixUp 없이 공식 COCODataset과 TrainTransform만 연결한다
+#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
+#
+# 사용 이유/연결: 검증된 COCO 버전을 입력으로 받아 평가·ONNX export용 checkpoint를 만든다.
+#
 # 입력:
-#   training의 session_sampling_weights는 session별 양수 상대 선택 가중치다.
-# 반환:
-#   한 epoch에 train 이미지 수만큼 추출하는 DataLoader. 중복 추출을 허용한다.
+#   source_dir (Path) - 검증된 공식 YOLOX source 디렉터리.
+#   dataset_dir (Path) - 불변 COCO 데이터셋 버전의 루트 경로.
+#   input_size (tuple[int, int]) - 이 함수의 input_size 처리에 사용하는 값.
+#   training (dict[str, Any]) - 이 함수의 training 처리에 사용하는 값.
+#   batch_size (int) - 이 함수의 batch_size 처리에 사용하는 값.
+#   sanity_image_count (int | None) - 이 함수의 sanity_image_count 처리에 사용하는 값.
+#
+# 반환: torch.utils.data.DataLoader 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
 # -----------------------------------------------------------------------------
 def create_training_loader(
     source_dir: Path,
@@ -149,10 +178,29 @@ def create_training_loader(
 
 
 def _git_commit(project_dir: Path) -> str | None:
+    """실험 manifest에 남길 Git commit을 읽고 저장소가 아니면 None을 반환한다."""
     result = subprocess.run(["git", "-C", str(project_dir), "rev-parse", "HEAD"], capture_output=True, text=True)
     return result.stdout.strip() if result.returncode == 0 else None
 
 
+# -----------------------------------------------------------------------------
+# 기능: 새 experiment를 생성하고 last/best checkpoint와 재현 정보를 함께 저장한다.
+#
+# 동작 방법:
+#   1. config와 YOLOX source/checkpoint SHA, dataset version·SHA와 class 순서를 검증한다.
+#   2. random seed를 고정하고 MPS 우선 device, Nano/Tiny 구조와 SGD optimizer를 준비한다.
+#   3. 공식 COCODataset loader로 train batch를 만들고 pretrained backbone weight를 적용한다.
+#   4. epoch마다 forward, YOLOX loss backward, optimizer update와 learning-rate schedule을 수행한다.
+#   5. 평균 loss가 가장 낮은 weight를 best.pt로, 매 epoch 최신 상태를 last.pt로 저장한다.
+#   6. 실행 인자, 환경, Git commit, dataset SHA와 checkpoint SHA를 experiment manifest에 기록한다.
+#
+# 사용 이유/연결: 검증된 COCO 버전을 입력으로 받아 평가·ONNX export용 checkpoint를 만든다.
+#
+# 입력:
+#   args (argparse.Namespace) - CLI에서 해석한 실행 인자 묶음.
+#
+# 반환: checkpoint와 log, 재현 manifest가 저장된 새 experiment 디렉터리 Path를 반환한다.
+# -----------------------------------------------------------------------------
 def train_model(args: argparse.Namespace) -> Path:
     """새 experiment를 생성하고 last/best checkpoint와 재현 정보를 함께 저장한다."""
     config_path = args.config.resolve()
@@ -307,6 +355,7 @@ def train_model(args: argparse.Namespace) -> Path:
 
 
 def parse_args() -> argparse.Namespace:
+    """학습 데이터셋, epoch, batch size와 실행 mode를 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--dataset-version", required=True)
@@ -320,6 +369,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """학습을 실행하고 설정·데이터·device 오류를 CLI 실패로 보고한다."""
     try:
         output = train_model(parse_args())
     except (DatasetContractError, OSError, RuntimeError, ValueError) as error:

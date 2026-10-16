@@ -24,6 +24,14 @@ Python에서는 실수 파라미터를 학습한 뒤 Conv·Linear 출력에 Q3.4
 
 가중치와 평가 기록은 [data/weights](data/weights)에 있습니다. `two_convs.json`은 두 합성곱 계층 구성을 비교하기 위한 설정입니다.
 
+## 저장 가중치와 RTL의 정수 연산 일치
+
+[정수 기준 모델](python/fixed_point.py)은 입력·가중치·bias를 signed Q3.4로 변환하고, 곱셈마다 산술 우측 shift 후 누적·포화하는 RTL 규칙을 구현합니다. 저장된 `baseline.pth`의 SHA-256과 양자화 계수를 검사한 뒤, MNIST test 입력 10개의 클래스 점수 100개를 [테스트벤치](testbench/tb_fixed_point.v)와 비교합니다.
+
+**결과: 100/100 byte 일치.** [검사 코드](tests/check_fixed_point.py) · [입력·계수·정답 벡터](tests/vectors/baseline.mem) · [전처리·출처](tests/vectors/baseline.json)
+
+위 표의 97.48%는 실수 가중치를 사용한 계층 출력 양자화 평가 기록입니다. 정수 가중치 RTL 검사는 baseline 모델의 연산 일치 여부를 확인합니다.
+
 ## 파일 안내
 
 | 파일·폴더 | 역할 |
@@ -48,6 +56,6 @@ make train CONFIG=configs/baseline.json
 python3 python/evaluate_design.py configs/baseline.json --skip-training
 ```
 
-`make test`는 설정 검증, 모델·가중치 로딩, 순전파·역전파, Q3.4 변환, RTL 연산과 top 연결을 확인합니다. `--skip-training`은 저장된 학습 기록을 사용합니다. 합성 분석의 면적·전력 수치는 셀별 고정 가중치를 합산한 설계 비교 지표입니다.
+`make test`는 설정 검증, 모델·가중치 로딩, 순전파·역전파, Q3.4 변환, RTL 연산과 top 연결, 저장 가중치 기반 정수·RTL 일치를 확인합니다. `--skip-training`은 저장된 학습 기록을 사용합니다. 합성 분석의 면적·전력 수치는 셀별 고정 가중치를 합산한 설계 비교 지표입니다.
 
 [코드 검토와 검증](docs/CODE_REVIEW.md) · [코드 읽는 순서](docs/CODE_GUIDE.md)

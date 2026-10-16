@@ -1,10 +1,10 @@
 # Uploader 연동 — 재시작과 ACK 유실을 견디는 완료 경계
 
-[서버 수신 코드](../../source/server/backend/app/api/evidence.py) · [서버 저장 코드](../../source/server/backend/app/services/storage.py) · [팀 Uploader](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/uploader)
+[서버 수신 코드](../../source/server/backend/app/api/evidence.py) · [서버 저장 코드](../../source/server/backend/app/services/storage.py) · [팀 Uploader](../../source/uploader)
 
 ## 담당 경계와 문제
 
-Uploader 본체는 팀 구현이며 복제하지 않습니다. 본인은 전체 Fail-safe 설계와 서버 측 저장·ACK 계약을 담당했습니다. 핵심 질문은 ‘보냈는가’가 아니라 **어디까지 안전하게 완료됐는가**입니다.
+본인은 전체 Fail-safe·Uploader 구조와 서버 측 저장·ACK 계약을 설계했습니다. Uploader 전체 모듈은 팀 구현과 함께 source/uploader에 포함했습니다. 핵심 질문은 ‘보냈는가’가 아니라 **어디까지 안전하게 완료됐는가**입니다.
 
 네트워크 전송 도중 연결이 끊기면 서버에 저장됐는지 모를 수 있습니다. 다시 보내면 중복 처리 위험이 있고, 성공으로 처리하면 실제 미저장 파일이 사라질 수 있습니다. 메모리에만 작업을 보관하면 프로세스 재시작 때 사라집니다.
 
@@ -51,4 +51,4 @@ TLS 오류가 나면 인증서를 무시하거나 HTTP로 자동 downgrade하지
 - 서버 ACK·hash·멱등 조회는 복제된 서버 테스트로 확인합니다.
 - 단절 복구 3회·영상 12건은 팀 통합 자료의 사건·차량·파일 hash로 연결합니다.
 - 로컬 ACK 후 서버 미저장, 서버 저장 후 ACK 유실, 전송 중 종료를 별개 시험으로 봐야 합니다.
-- Uploader 코드를 새로 구현하거나 이번 문서에서 모든 장애 주입을 재실행한 것은 아닙니다.
+- [큐 중복·재시작·ACK·HTTP 검사](../../../../scripts/check_uploader.py)에서 실제 C 구현의 회귀 동작을 확인합니다.

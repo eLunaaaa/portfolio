@@ -1,5 +1,18 @@
 #!/usr/bin/env python3
-"""프레임 제안 상자를 사람이 클래스·차량 인스턴스와 함께 확정하는 OpenCV 도구."""
+"""@file review_annotations.py
+@brief 자동 bbox 초안을 사람이 class·차량 instance와 함께 최종 확정하는 OpenCV 도구다.
+
+전체 흐름
+1. prepare_dataset.py가 만든 frame manifest와 annotation 초안을 읽는다.
+2. 완료되지 않은 첫 frame부터 이미지와 bbox를 화면 중앙에 표시한다.
+3. 마우스로 bbox를 추가·이동·resize하고 키보드로 실제 차량과 상태를 지정한다.
+4. frame을 이동하거나 종료할 때 annotation과 manifest를 원자적으로 저장한다.
+
+고정 bbox는 같은 recording 안에서만 다음 frame으로 전달되며, 미지정 proposal과 크게
+겹치거나 같은 차량으로 지정된 중복 bbox를 제거한다. proposal은 검수 편의를 위한
+초안일 뿐 자동 승인하지 않는다. 모든 객체의 class-instance 계약이 맞아야 approved가
+가능하며, 최종 결과는 export_coco.py의 데이터셋 입력으로 사용된다.
+"""
 
 from __future__ import annotations
 
@@ -109,7 +122,12 @@ def fullscreen_canvas_width(viewport_width: int, viewport_height: int, screen_as
 
 
 class ReviewSession:
-    """검수 상태와 키보드·마우스 편집 동작을 관리한다."""
+    """검수 frame, bbox 편집 상태와 저장 lifecycle을 함께 관리한다.
+
+    annotation과 frame manifest를 frame_id로 연결하고, 현재 선택 bbox·drag·고정 전파
+    상태를 한 객체에 유지한다. 화면 좌표는 중앙 정렬과 확대·축소 비율을 역변환하여
+    원본 640×480 좌표로 저장하므로 창 크기가 달라져도 COCO bbox 계약은 변하지 않는다.
+    """
 
     def __init__(self, settings: dict[str, Any], work_dir: Path) -> None:
         self.settings = settings
@@ -157,7 +175,9 @@ class ReviewSession:
 
     def load_image(self) -> None:
         path = self.work_dir / self.frame["image_path"]
-        self.image = cv2.imread(str(path))
+        self.image = cv2.imdecode(
+            np.frombuffer(path.read_bytes(), dtype=np.uint8), cv2.IMREAD_COLOR
+        )
         if self.image is None:
             raise DatasetContractError(f"이미지를 읽을 수 없습니다: {path}")
         objects = self.annotation["objects"]
@@ -211,6 +231,7 @@ class ReviewSession:
         class_name = self.class_names[next_index]
         item["class_name"] = class_name
         item["vehicle_instance"] = self.instances_by_class[class_name][0]
+        self._sync_fixed_label(item)
         self.annotation["status"] = "manual_review_required"
 
     def cycle_instance(self) -> None:
@@ -226,7 +247,15 @@ class ReviewSession:
         current = item.get("vehicle_instance")
         next_index = 0 if current not in instances else (instances.index(current) + 1) % len(instances)
         item["vehicle_instance"] = instances[next_index]
+        self._sync_fixed_label(item)
         self.annotation["status"] = "manual_review_required"
+
+    def _sync_fixed_label(self, item: dict[str, Any]) -> None:
+        """고정 중인 객체의 라벨 수정도 다음 프레임에 반영한다."""
+        fixed = self.fixed_bbox
+        if fixed is not None and item is fixed.get("object"):
+            fixed["class_name"] = item["class_name"]
+            fixed["vehicle_instance"] = item["vehicle_instance"]
 
     def approve_selected_vehicle_and_move(self, vehicle_instance: str) -> None:
         """선택 bbox를 지정 차량의 유일한 박스로 확정하고 다음 frame으로 이동한다.
@@ -247,6 +276,7 @@ class ReviewSession:
         item = objects[self.selected_object]
         item["class_name"] = class_name
         item["vehicle_instance"] = vehicle_instance
+        self._sync_fixed_label(item)
         self.annotation["objects"] = [
             candidate for candidate in objects
             if candidate is item or candidate.get("vehicle_instance") != vehicle_instance
@@ -286,7 +316,7 @@ class ReviewSession:
         selected = objects[self.selected_object]
         instance = selected.get("vehicle_instance")
         class_name = selected.get("class_name")
-        if self.instance_to_class.get(instance) != class_name:
+        if instance not in self.instance_to_class or self.instance_to_class[instance] != class_name:
             raise DatasetContractError("고정할 bbox의 class와 실제 차량을 먼저 지정하세요.")
         self.fixed_bbox = {
             "recording_id": self.frame["recording_id"],
@@ -302,8 +332,7 @@ class ReviewSession:
         """같은 녹화의 bbox 중복을 제거하고 고정 bbox 하나를 적용한다.
 
         F 키로 선택한 현재 프레임은 상태와 무관하게 명시적으로 수정한다. 이후
-        자동 전파에서는 approved·negative를 보호하지만 rejected는 검수 대상으로
-        되돌려 사용자가 새 bbox를 확인할 수 있게 한다.
+        자동 전파에서는 approved·negative·rejected 상태를 그대로 유지한다.
         """
         fixed = self.fixed_bbox
         if fixed is None:
@@ -312,7 +341,7 @@ class ReviewSession:
             self.fixed_bbox = None
             return
         annotation = self.annotation
-        if not include_reviewed and annotation["status"] in {"approved", "negative"}:
+        if not include_reviewed and annotation["status"] in {"approved", "negative", "rejected"}:
             return
         bbox = normalize_bbox(
             fixed["bbox"], self.frame["width"], self.frame["height"]
@@ -325,13 +354,14 @@ class ReviewSession:
             "class_name": fixed["class_name"],
             "vehicle_instance": fixed["vehicle_instance"],
         }
-        # instance가 같거나 고정 bbox와 크게 겹치는 자동 제안은 같은 차량의
-        # 중복 후보로 취급한다. 사람이 직접 그린 다른 차량 bbox는 보존한다.
+        # 같은 차량의 중복 박스와 고정 박스에 겹치는 미지정 자동 제안을 정리한다.
+        # 다른 차량으로 지정된 bbox는 겹쳐 있어도 보존한다.
         remaining_objects = [
             item for item in annotation["objects"]
             if item.get("vehicle_instance") != fixed["vehicle_instance"]
             and not (
                 item.get("proposal_confidence") is not None
+                and item.get("vehicle_instance") is None
                 and bbox_iou(item["bbox"], bbox) >= FIXED_PROPOSAL_IOU_THRESHOLD
             )
         ]
@@ -452,20 +482,6 @@ class ReviewSession:
                 )
         return remaining, class_counts
 
-    # 미검수 위치를 찾아 이동하되 현재 편집 내용은 기존 move() 경로로 저장한다.
-    # 현재 위치 다음부터 한 바퀴 검색하며, 남은 항목이 현재 프레임뿐이면 유지한다.
-    # 건너뛰기에서는 정지 차량 고정 bbox를 전파하지 않아 검수 대상을 변경하지 않는다.
-    def jump_to_remaining(self) -> None:
-        for offset in range(1, len(self.frames) + 1):
-            target = (self.index + offset) % len(self.frames)
-            annotation = self.annotations[self.frames[target]["frame_id"]]
-            if annotation["status"] not in {"approved", "negative", "rejected"}:
-                if target != self.index:
-                    self.fixed_bbox = None
-                    self.move(offset)
-                return
-        print("남은 미검수 프레임이 없습니다.")
-
     def draw(self) -> Any:
         canvas = self.image.copy()
         for index, item in enumerate(self.annotation["objects"]):
@@ -516,7 +532,7 @@ class ReviewSession:
             f"status={self.annotation['status']}  remaining={remaining}",
             "classes=" + ", ".join(f"{name}:{class_counts[name]}" for name in self.class_names),
             "empty drag:add  box drag:move  corner drag:resize  C:class V:instance D:delete F:fix/unfix",
-            "A:approve N:negative X:reject R:remaining [ ]:prev/next { }:100 prev/next SPACE:approve+next Q:quit",
+            "A:approve N:negative X:reject  [ ]:prev/next { }:100 prev/next SPACE:save+next Q:quit",
             "1:Ioniq+next 2:Palisade+next 3:Other1+next 4:Other2+next 5:Other3+next 0:negative+next 9:reject+next",
         ]
         if self.fixed_bbox is not None:
@@ -599,6 +615,26 @@ class ReviewSession:
             self._finish_drag((x, y))
 
 
+# -----------------------------------------------------------------------------
+# 기능:
+#   OpenCV 검수 창을 열고 마우스·키보드 입력을 annotation 상태 변경으로 연결한다.
+#
+# 동작 방법:
+#   1. config와 작업 manifest를 읽어 ReviewSession을 만든다.
+#   2. 창의 실제 viewport 크기에 맞춰 이미지를 중앙에 배치한다.
+#   3. 영문 또는 두벌식 한글 키 입력을 같은 물리 자판 단축키로 정규화한다.
+#   4. frame 이동과 종료 시 변경 내용을 저장하고 OpenCV resource를 정리한다.
+#
+# 사용 이유:
+#   자동 proposal을 정답으로 사용하지 않고 사람이 bbox·class·instance를 확정한 뒤
+#   COCO 내보내기 단계로 전달하기 위한 pipeline의 수동 검수 경계다.
+#
+# 입력:
+#   config_path - class 계약과 work directory가 기록된 YAML config 경로.
+#
+# 반환:
+#   반환값은 없으며 검수 결과를 annotations.jsonl과 frame_manifest.jsonl에 저장한다.
+# -----------------------------------------------------------------------------
 def run_review(config_path: Path) -> None:
     settings = load_settings(config_path)
     work_dir = resolve_project_path(config_path, settings["paths"]["work_dir"])
@@ -656,14 +692,12 @@ def run_review(config_path: Path) -> None:
                     session.set_status("negative")
                 elif key == ord("x"):
                     session.set_status("rejected")
-                elif key in (ord("r"), ord("R")):
-                    session.jump_to_remaining()
                 elif key == ord("["):
                     session.move(-1)
                 elif key == ord("]"):
                     session.move(1)
                 elif key == ord(" "):
-                    session.set_status_and_move("approved")
+                    session.move(1)
                 elif key == ord("{"):
                     session.move(-LARGE_FRAME_JUMP)
                 elif key == ord("}"):

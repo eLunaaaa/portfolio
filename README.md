@@ -1,91 +1,40 @@
-# Portfolio
+# 이민석 · 임베디드 시스템 포트폴리오
 
-전자공학 기반의 임베디드 시스템 프로젝트 포트폴리오입니다.
+센서·통신·실시간 제어부터 AI 학습, Linux 서비스와 웹 서버까지 구현했습니다. 프로젝트별로 **담당 역할 → 설계 선택 → 코드 → 검증 자료**를 연결했습니다.
 
-## 프로젝트 빠르게 보기
+[![Portfolio verification](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml/badge.svg)](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)
 
-프로젝트 이름을 누르면 **담당 범위 → 설계 선택 → 구현 코드 → 검증 결과** 순서로 확인할 수 있습니다.
+## 대표 프로젝트
 
-| 프로젝트 | 핵심 담당 | 먼저 볼 자료 |
+### [Blue Witness · 다중 시점 사고 영상 수집](projects/blue-witness/README.md)
+
+Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영상을 선별해 서버에서 시간에 맞춰 병합하는 팀 프로젝트입니다. 2026 임베디드 소프트웨어 경진대회 본선 참가 프로젝트입니다.
+
+- **개인 담당:** 차량 검출 모델 학습·배포, FastAPI 서버·웹, Chrony 상태 IPC, 전체 Fail-safe·Uploader 설계, CI/CD 설계·구축.
+- **주요 구현:** 촬영 세션별 데이터 분리, YOLOX-Tiny 학습·ONNX 계약 검증, 영속 업로드 큐와 저장 ACK, 지연 영상 재병합, 스레드 진행 감시·재시작 복구.
+- **확인 자료:** [담당 모듈 전체 소스](projects/blue-witness/source/README.md) · [설계 선택](projects/blue-witness/docs/design/DECISIONS.md) · [평가 CSV·분석](projects/blue-witness/analysis/README.md).
+
+원본 팀 저장소에 접속하지 않아도 이 저장소 안에서 코드·테스트·측정 자료를 읽을 수 있습니다. 업로더와 AI·공통 IPC의 협업 구현도 포함하며, 개인 설계와 팀 구현 역할은 [기여 안내](projects/blue-witness/docs/CODE_GUIDE.md)에 표시했습니다.
+
+### [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md)
+
+JSON으로 정의한 CNN을 PyTorch 모델과 Verilog로 구성하고 학습·양자화·시뮬레이션·합성을 연결했습니다. **전체 개인 구현**입니다.
+
+- **기술:** Python · PyTorch · signed Q3.4 · Verilog · Icarus Verilog · Yosys.
+- **검증:** 저장된 baseline 가중치와 MNIST 입력 10개를 사용해 Python 정수 계산과 RTL의 클래스 점수 **100개 일치**를 확인합니다.
+- **학습 기록:** Conv·Linear 출력에 Q3.4 변환을 적용한 소프트웨어 평가 85.99% → 97.48%. [가중치·RTL 검증](projects/configurable-cnn-rtl/tests/check_fixed_point.py).
+
+## 추가 프로젝트
+
+| 프로젝트 | 개인 담당 | 구현·검증 자료 |
 |---|---|---|
-| [2026 임베디드 SW 경진대회 본선 · Blue Witness](projects/blue-witness/README.md) | AI 학습·서버·시간 동기화·전체 Fail-safe·CI/CD | [설계 선택](projects/blue-witness/docs/design/DECISIONS.md) · [모델 결과 분석](projects/blue-witness/analysis/README.md) · [코드](projects/blue-witness/source/README.md) |
-| [졸업연구 · 실시간 Linux 패킷 처리 실험](projects/embedded-linux-system-programming/README.md) | UDP 기준선 구현·PREEMPT_RT 실험 세팅·CPU affinity | [C 코드](projects/embedded-linux-system-programming/source/README.md) · [설계 선택](projects/embedded-linux-system-programming/docs/DESIGN.md) |
-| [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md) | PyTorch 학습·고정소수점 평가·RTL 생성·합성 | [구현과 평가](projects/configurable-cnn-rtl/README.md) |
-| [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | 연산 스케줄링·통신·인터럽트 | [시연과 구현](projects/arduino-load-balancer/README.md) |
-| [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | AI·RTOS·하드웨어·웹 통합 | [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md) |
-| [스마트 우산꽂이](projects/smart-umbrella-stand/README.md) | STM32 제어·SPI·날씨·상태 표시 | [시연과 구현](projects/smart-umbrella-stand/README.md) |
+| [실시간 Linux 실험 환경](projects/embedded-linux-system-programming/README.md) | UDP 기준 송수신 구현, PREEMPT_RT 도구 설정, CPU 3 고정, 논문 리딩 | [C 코드](projects/embedded-linux-system-programming/source/README.md) · [측정 설계](projects/embedded-linux-system-programming/docs/DESIGN.md) |
+| [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | Master 스케줄링, I²C·인터럽트, Slave 합성곱·큐, PWM·UART·타이머 | 시연 지연 포함 측정 234초 → 80.5초 · [통신 규격](projects/arduino-load-balancer/docs/PROTOCOL.md) |
+| [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | 시스템·카메라·AI·FreeRTOS, 적재량·Wi-Fi, Flask·웹 | [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md) · Arduino·C·API 검사 |
+| [스마트 우산꽂이](projects/smart-umbrella-stand/README.md) | 아이디어, STM32 Master·SPI, Slave2 날씨·LCD·상태 표시 | [구조·시연](projects/smart-umbrella-stand/README.md) · 센서 처리 2,264 → 1,171 cycles |
 
-## 2026 임베디드 소프트웨어 경진대회 본선 · Blue Witness
+## 코드 확인과 자동 검사
 
-여러 Raspberry Pi 차량에서 사고 전후 영상을 확보하고, AI로 필요한 목격 영상을 선별해 시간축을 맞춰 웹에서 확인하는 팀 프로젝트입니다.
+각 프로젝트의 README에서 파일 역할과 실행 순서를 안내합니다. 주요 함수에는 입력·출력·처리 구조와 설계 이유를 한글 주석으로 설명했습니다.
 
-- **대회**: 2026 임베디드 소프트웨어 경진대회 본선 참가 · [대회 참여 자료](projects/blue-witness/docs/EVIDENCE.md)
-- **개인 기여**: 전체 Fail-safe 설계, 차량 검출 모델 학습·AI 배포·검출 설정, FastAPI 서버·웹, Chrony 상태 IPC, GitHub Actions CI·Pi 수동 배포 흐름 구축
-- **공동 작업**: 데이터 라벨 검수, 프로세스·통신 규약 통합, 실제 차량 시나리오 검증. 센서·V2V·위치 필터·업로더는 팀 모듈과 연동
-- **기술**: C/C++ · Raspberry Pi 5 · libcamera · YOLOX-Tiny · PyTorch/MPS · ONNX Runtime · FFmpeg · FastAPI · SQLite · Chrony · GitHub Actions
-- **평가 기록**: 전체 BBox 검증 12,873프레임의 대상 차종 유무 정답률 98.39%; 별도 test 묶음 1,633프레임에서 98.65%
-- **팀 통합 검증**: 테스트베드 실제 충돌 27회 시나리오 성공, 사고·목격 영상 81건 서버 저장 확인
-- **로컬 최신본 검증**: 서버 Python 64개·웹 JavaScript 36개·모델 학습 파이프라인 30개 테스트 통과. 원격 전용 회귀 검사와의 차이도 별도 기록
-
-[프로젝트 상세 및 기여](projects/blue-witness/README.md) · [모델 학습](projects/blue-witness/ml/README.md) · [전체 Fail-safe 설계](projects/blue-witness/docs/FAILSAFE.md) · [코드·기여 근거](projects/blue-witness/docs/CODE_GUIDE.md) · [검증 및 한계](projects/blue-witness/docs/CODE_REVIEW.md)
-
-[담당 모듈 소스](projects/blue-witness/source/README.md) · [모듈별 상세 설계](projects/blue-witness/docs/design/README.md) · [기여·대회·측정 증빙](projects/blue-witness/docs/EVIDENCE.md)
-
-**설계 포인트:** [대안 비교·선택 이유·트레이드오프](projects/blue-witness/docs/design/DECISIONS.md)를 먼저 정리하고, 각 결정을 실제 코드·시험과 연결했습니다.
-
-## Configurable CNN Training and RTL · CNN 학습·RTL 자동화
-
-MNIST 모델 구조·학습부터 Q3.4 출력 평가, Verilog 연산 모듈, RTL 생성·합성·분석 자동화까지 직접 구현했습니다.
-
-- **개인 기여**: 전체 구현
-- **기술**: Python · PyTorch · JSON · Verilog/SystemVerilog · Icarus Verilog · sv2v · Yosys
-- **학습 평가 기록**: baseline 85.99%, 최종 구성 97.48%
-
-[프로젝트 상세와 코드](projects/configurable-cnn-rtl/README.md)
-
-## 졸업연구 · 실시간 Linux 패킷 처리 실험
-
-UDP 기준 실험 송수신기를 구현하고, PREEMPT_RT 도구 설정·CPU 3번 고정·논문 리딩을 담당했습니다.
-
-- **개인 기여**: UDP 송수신·측정 기록 구현, 실험 세팅, PREEMPT_RT 도구 설정, CPU affinity 적용, 관련 논문 정리
-- **기술·도구**: C · POSIX UDP · mmap/mlockall · Embedded Linux · PREEMPT_RT · cyclictest · taskset
-- **설계 포인트**: 송신 주기와 측정 시계 분리, 측정 구간의 파일 쓰기 제거, 동일 바이너리로 커널·CPU 조건 비교
-
-[담당 작업과 기술 구현](projects/embedded-linux-system-programming/README.md)
-
-## Arduino Dynamic Load Balancer · 동적 부하 분산 시스템
-
-Arduino UNO 5대로 합성곱 연산을 분산 처리하고, Slave별 연산 잔량을 서보로 시각화한 팀 프로젝트입니다.
-
-- **개인 기여**: Master 부하 계산·스케줄링, I²C·완료 인터럽트, Slave 연산·큐, PWM·UART·타이머
-- **공동 작업**: 아이디어·설계·통합, 실험·성능 분석·시연
-- **기술**: C/C++ · ATmega328P · I²C/TWI · UART · INT/PCINT · Timer/PWM · Python
-- **문제 해결**: zero-skip, 미처리 부하 기반 배정, 이중 버퍼, 결과 ACK와 signed 32비트 연산
-- **성과**: 보고서의 시연 지연 포함 조건에서 순차 234초 → 분산 80.5초, 약 2.91배
-- **검증**: 실보드 시연 기록, Master·Slave 4개 주소 컴파일, 1,800개 패치의 파이프라인·호스트 테스트 통과
-
-[프로젝트 상세 및 시연](projects/arduino-load-balancer/README.md) · [코드 검토 결과](projects/arduino-load-balancer/docs/CODE_REVIEW.md) · [통신 규격](projects/arduino-load-balancer/docs/PROTOCOL.md)
-
-## Edge AI Trash Sorter · 엣지 AI 쓰레기 분류 시스템
-
-카메라 기반 AI 분류와 쓰레기통 자동 개방, 적재량 모니터링을 통합한 팀 프로젝트입니다.
-
-- **개인 기여**: 시스템 설계·통합, Zybo 하드웨어·카메라, AI 학습·변환, AI 실행·FreeRTOS, Arduino 적재량·Wi-Fi, Flask 서버·웹 대시보드
-- **공동 작업**: Arduino 물체 감지·뚜껑·LCD 제어
-- **기술**: C/C++ · Zybo Z7-20 · FreeRTOS · TensorFlow Lite Micro · MobileNetV2 · Arduino · ESP8266 · Flask
-- **문제 해결**: 촬영 요청과 AI 완료 신호 분리, JPEG·tensor 검증, 적재량 히스테리시스, 전송 실패 재시도
-- **공개본 검증**: Arduino 1/2 컴파일, C 호스트 테스트·ASan/UBSan, Flask API 테스트 5개 통과. 프로젝트 실보드 연동·실행 완료
-
-[프로젝트 상세 및 시연](projects/edge-ai-trash-sorter/README.md) · [코드 검토 결과](projects/edge-ai-trash-sorter/docs/CODE_REVIEW.md) · [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md)
-
-## Smart Umbrella Stand · 스마트 우산꽂이
-
-센서 데이터와 날씨 정보를 결합해 우산 건조·승강·상태 표시를 자동화한 팀 프로젝트입니다.
-
-- **개인 기여**: 아이디어 제안, Master STM32 제어·SPI 통신, Slave2 날씨 정보·LCD·상태 표시 담당
-- **기술**: C · STM32F103 · SPI · ADC/DMA · PWM · Python · 경량 로지스틱 회귀
-- **문제 해결**: 명시적 통신 프레임, 타임아웃, 상태 히스테리시스, 날짜 rollover 처리
-- **성능 기록**: 보고서의 센서 처리 구간 기준 2,264 → 1,171 cycles, 약 48.3% 감소
-- **공개본 검증**: C 호스트 테스트·ASan/UBSan 및 Python 학습 파이프라인 통과
-
-[프로젝트 상세 및 시연 영상](projects/smart-umbrella-stand/README.md) · [코드 검토 결과](projects/smart-umbrella-stand/docs/CODE_REVIEW.md) · [시스템 구조](projects/smart-umbrella-stand/docs/ARCHITECTURE.md)
+[GitHub Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)는 서버·웹 회귀, Uploader·Time Sync Linux 빌드, 모델 파이프라인, CNN 정수·RTL 일치, 하드웨어 독립 제어 코어와 문서 링크를 검사합니다. [검사 정의](.github/workflows/portfolio-ci.yml)

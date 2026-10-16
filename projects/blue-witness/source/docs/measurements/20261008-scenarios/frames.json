@@ -1,0 +1,32 @@
+[
+  {
+    "trial": 1,
+    "event_id": "EVT_20261008_200908812_CAR02",
+    "vehicle_id": "CAR_04",
+    "source_video_sha256": "57bed936e3084e5e3b8658d1d02baeca70a1ab54466e15db0e030582c0b4b545",
+    "frame_file": "frames/trial01-CAR_04.jpg",
+    "seek_seconds_from_clip_start": 7.981045,
+    "reference_event_time_ns": 1791457748812000000,
+    "frame_sha256": "ebc43f129cd47580b8c54a34d3c826a1c461f11dedd3a7de7e958a02b93ebee3"
+  },
+  {
+    "trial": 1,
+    "event_id": "EVT_20261008_200908812_CAR02",
+    "vehicle_id": "CAR_05",
+    "source_video_sha256": "a77ac1c34af18f1c2ea5d52e29110992fdd49147248569f94023285277962057",
+    "frame_file": "frames/trial01-CAR_05.jpg",
+    "seek_seconds_from_clip_start": 7.976655,
+    "reference_event_time_ns": 1791457748812000000,
+    "frame_sha256": "de830e2f00ced88c2862492cd5a77e86c7cd8b7c8fc313b5357ac0cacdc5ea88"
+  },
+  {
+    "trial": 1,
+    "event_id": "EVT_20261008_200908812_CAR02",
+    "vehicle_id": "CAR_06",
+    "source_video_sha256": "5b705df22a5389936502e4f9de7862da5e9469dee76e5ab40cd78d07d4144b9f",
+    "frame_file": "frames/trial01-CAR_06.jpg",
+    "seek_seconds_from_clip_start": 7.969085,
+    "reference_event_time_ns": 1791457748812000000,
+    "frame_sha256": "42e36ed7f3dc758424d8ee6d9f45e9f3dd605e20a250cb0243a684b585fd05c2"
+  }
+]

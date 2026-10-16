@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="286" viewBox="0 0 1280 286"><rect width="1280" height="286" fill="white"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#236eac"/></marker><marker id="green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#138174"/></marker></defs>
+<text x="24" y="34" fill="#236eac" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="600" text-anchor="start">외부 NTP → 인터넷 연결 시 서버 노트북 시각 보정</text>
+<rect x="24" y="72" width="350" height="110" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="199" y="115" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" text-anchor="middle">서버 노트북</text>
+<text x="199" y="152" fill="#526d80" font-family="Malgun Gothic, sans-serif" font-size="22" font-weight="600" text-anchor="middle">공통 NTP 기준</text>
+<rect x="464" y="72" width="350" height="110" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="639" y="115" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" text-anchor="middle">각 Pi의 Chrony</text>
+<text x="639" y="152" fill="#526d80" font-family="Malgun Gothic, sans-serif" font-size="22" font-weight="600" text-anchor="middle">시스템 시각 보정</text>
+<rect x="904" y="72" width="350" height="110" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="1079" y="115" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" text-anchor="middle">Time Sync → 카메라</text>
+<text x="1079" y="152" fill="#526d80" font-family="Malgun Gothic, sans-serif" font-size="22" font-weight="600" text-anchor="middle">동기화 상태·오차 기록</text>
+<path d="M374 127 H464" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M814 127 H904" fill="none" stroke="#138174" stroke-width="3" marker-end="url(#green)"/>
+<text x="419" y="99" fill="#236eac" font-family="Malgun Gothic, sans-serif" font-size="19" font-weight="700" text-anchor="middle">로컬</text>
+<text x="419" y="121" fill="#236eac" font-family="Malgun Gothic, sans-serif" font-size="18" font-weight="700" text-anchor="middle">Wi-Fi</text>
+<text x="859" y="109" fill="#138174" font-family="Malgun Gothic, sans-serif" font-size="18" font-weight="700" text-anchor="middle">상태 조회</text>
+<rect x="24" y="218" width="1232" height="48" rx="8" fill="#f4f7fa" stroke="none" stroke-width="1.5"/>
+<text x="640" y="249" fill="#526d80" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="600" text-anchor="middle">같은 Wi-Fi망의 공통 시간 기준 → 각 차량의 영상 시각과 동기화 정보에 반영</text>
+</svg>

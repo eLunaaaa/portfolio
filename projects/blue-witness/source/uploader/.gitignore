@@ -1,0 +1,12 @@
+/build/
+deploy/certs/*.key
+deploy/certs/*.pem
+*.p12
+*.pfx
+*.o
+*.d
+*.log
+core
+core.*
+vgcore.*
+asan.*

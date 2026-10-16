@@ -49,4 +49,4 @@ Monitor·State·IPC 업무의 진행을 감시합니다. 정상 대기와 외부
 - chronyd 중단·명령 없음·파싱 오류·offset 초과·stale·정상 상태를 구분해 확인해야 합니다.
 - 상태 IPC가 살아 있다는 것과 시계가 정확하다는 것은 다릅니다.
 - 측정 P95는 로컬 시험 조건의 수치이며 nanosecond timestamp의 단위와 실제 오차를 혼동하지 않습니다.
-- 공용 IPC·watchdog은 팀 의존성이라 본인 코드로 복제하지 않았습니다. 이 모듈은 해당 원본 트리에서 빌드합니다.
+- 공용 IPC·watchdog 팀 의존성도 source/ipc에 포함했습니다. source/에서 `make -C time_sync`로 빌드합니다.

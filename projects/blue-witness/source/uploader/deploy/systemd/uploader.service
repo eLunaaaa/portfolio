@@ -1,0 +1,26 @@
+[Unit]
+Description=ACE evidence uploader
+After=network.target
+
+[Service]
+Type=simple
+User=@UPLOADER_USER@
+Group=@UPLOADER_GROUP@
+WorkingDirectory=@INSTALL_ROOT@
+Environment=HOME=@SERVICE_HOME@
+ExecStartPre=/bin/sh -ec '. ./uploader.env; exec "@EXEC_ROOT@/uploader" check'
+ExecStart=/bin/sh -ec '. ./uploader.env; exec "@EXEC_ROOT@/uploader"'
+Restart=on-failure
+RestartSec=5s
+WatchdogSec=15s
+NotifyAccess=main
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=false
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

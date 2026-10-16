@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
-"""동일 입력에서 PyTorch와 ONNXRuntime raw·후처리 출력을 비교한다."""
+"""@file compare_outputs.py
+@brief 같은 입력에 대한 PyTorch와 ONNXRuntime 결과가 배포 허용 오차 안에 있는지 검증한다.
+
+전체 흐름
+1. 학습 checkpoint와 ONNX 모델, 비교 이미지를 불러온다.
+2. 두 runtime에 완전히 같은 전처리 tensor를 입력한다.
+3. raw tensor 오차와 decode·NMS 이후 detection 차이를 각각 계산한다.
+4. 수치·class·bbox 비교 결과를 JSON report로 원자적으로 저장한다.
+
+ONNX 변환이 성공했다는 사실만으로 모델 동등성을 보장할 수 없으므로 배포 전에 이
+검사를 수행한다. 입력 shape, 클래스 순서 또는 모델 계약이 다르면 비교를 중단한다.
+"""
 
 from __future__ import annotations
 
@@ -24,8 +35,21 @@ from yolox_runtime import (
 onnxruntime.disable_telemetry_events()
 
 
+# -----------------------------------------------------------------------------
+# 기능: raw tensor 수치 오차와 NMS 이후 detection 차이를 별도로 기록한다.
+#
+# 동작 방법:
+#   1. raw tensor 수치 오차와 NMS 이후 detection 차이를 별도로 기록한다
+#   2. 중간 산출물의 계약을 검사하고 완료 결과만 다음 pipeline 단계에 전달한다.
+#
+# 사용 이유/연결: ONNX export 뒤에 실행되며 결과 report는 배포 동등성 판단에 사용된다.
+#
+# 입력:
+#   args (argparse.Namespace) - CLI에서 해석한 실행 인자 묶음.
+#
+# 반환: dict[str, object] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+# -----------------------------------------------------------------------------
 def compare(args: argparse.Namespace) -> dict[str, object]:
-    """raw tensor 수치 오차와 NMS 이후 detection 차이를 별도로 기록한다."""
     config_path = args.config.resolve()
     settings = load_settings(config_path)
     source_dir, _ = validate_yolox_installation(config_path, settings)
@@ -101,6 +125,7 @@ def compare(args: argparse.Namespace) -> dict[str, object]:
 
 
 def parse_args() -> argparse.Namespace:
+    """PyTorch와 ONNX 비교에 필요한 경로·입력 크기·threshold를 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--checkpoint", type=Path, required=True)
@@ -114,6 +139,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
+    """출력 비교를 실행해 JSON report를 저장하고 CLI 종료 코드를 반환한다."""
     args = parse_args()
     try:
         report = compare(args)

@@ -49,6 +49,7 @@ def main():
         print(layer,'RTL PASS')
     subprocess.run(['iverilog','-g2012','-s','tb_cnn_top','-o','build/top.out',*map(str,Path('rtl').glob('*.v')),'testbench/tb_cnn_top.v'],check=True)
     subprocess.run(['vvp','build/top.out'],check=True)
+    subprocess.run([sys.executable,'tests/check_fixed_point.py'],check=True)
 
 
 if __name__ == '__main__': main()

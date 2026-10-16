@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="208" viewBox="0 0 1280 208">
+<rect width="1280" height="208" fill="white"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#236eac"/></marker></defs>
+<rect x="24" y="24" width="272" height="118" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="160" y="76.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">촬영·추출</text>
+<text x="160" y="107.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">시점·거리·가림 수집</text>
+<path d="M296 83 H344" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="344" y="24" width="272" height="118" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="480" y="76.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">박스 검수</text>
+<text x="480" y="107.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">차종·차량 지정</text>
+<path d="M616 83 H664" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="664" y="24" width="272" height="118" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="800" y="76.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">데이터셋 분리</text>
+<text x="800" y="107.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">촬영 묶음별 배정</text>
+<path d="M936 83 H984" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="984" y="24" width="272" height="118" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="1120" y="76.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">학습·배포</text>
+<text x="1120" y="107.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">YOLOX-Tiny → ONNX</text>
+<text x="640" y="184" font-family="Malgun Gothic, sans-serif" font-size="24" font-weight="600" fill="#526d80" text-anchor="middle">같은 촬영 묶음의 프레임은 학습·검증·시험 중 한 세트에 배정</text>
+</svg>

@@ -1,0 +1,31 @@
+[Unit]
+Description=ACE witness vehicle inference
+Wants=uploader.service time_sync.service
+After=uploader.service time_sync.service
+Conflicts=video_processor.service
+Before=video_processor.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+NotifyAccess=main
+WatchdogSec=15s
+User=@AI_USER@
+Group=@AI_GROUP@
+SupplementaryGroups=video gpio
+WorkingDirectory=@AI_ROOT@
+Environment=HOME=@SERVICE_HOME@
+ExecStartPre=/usr/bin/test -r @AI_ROOT@/vehicle_detector.onnx
+ExecStart=/bin/sh -ec '. "@UPLOADER_ENV@"; exec "@EXEC_ROOT@/inference"'
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=false
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="202" viewBox="0 0 1280 202">
+<rect width="1280" height="202" fill="#ffffff"/>
+<defs><marker id="blue-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#236eac"/></marker><marker id="teal-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#138174"/></marker></defs>
+<rect x="24" y="18" width="350" height="96" rx="7" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="199" y="60" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="28" font-weight="700" text-anchor="middle">① 사고 감지·알림</text>
+<text x="199" y="90" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="24" font-weight="600" text-anchor="middle">IMU · 사고 좌표 · V2V</text>
+<rect x="464" y="18" width="350" height="96" rx="7" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="639" y="60" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="28" font-weight="700" text-anchor="middle">② 관측 영상 선별</text>
+<text x="639" y="90" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="24" font-weight="600" text-anchor="middle">위치·화각 → YOLOX-Tiny</text>
+<rect x="904" y="18" width="350" height="96" rx="7" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="1079" y="60" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="28" font-weight="700" text-anchor="middle">③ 증거 수집·확인</text>
+<text x="1079" y="90" fill="#153247" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="600" text-anchor="middle">전 8초·후 2초 → 저장·병합</text>
+<path d="M374 66 H464" fill="none" stroke="#236eac" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#blue-arrow)"/>
+<path d="M814 66 H904" fill="none" stroke="#138174" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#teal-arrow)"/>
+<text x="859" y="50" fill="#138174" font-family="Malgun Gothic, sans-serif" font-size="20" font-weight="700" text-anchor="middle">통과</text>
+<path d="M199 114 V166 H1079 V114" fill="none" stroke="#236eac" stroke-width="2.8" stroke-linejoin="round" marker-end="url(#blue-arrow)"/>
+<rect x="510" y="145" width="260" height="41" rx="0" fill="#ffffff" stroke="none" stroke-width="1.5"/>
+<text x="640" y="174" fill="#236eac" font-family="Malgun Gothic, sans-serif" font-size="24" font-weight="700" text-anchor="middle">사고차 자체 영상</text>
+</svg>

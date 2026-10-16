@@ -1,6 +1,6 @@
 # AI·카메라 연동 — 검출보다 먼저 영상이 남아야 한다
 
-[개인 AI 변경 patch](../../source/ai/contribution-patches) · [학습 코드](../../source/model_training) · [팀 AI 런타임](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/ai)
+[개인 AI 변경 patch](../../source/ai/contribution-patches) · [학습 코드](../../source/model_training) · [팀 AI 런타임](../../source/ai)
 
 ## 담당 경계
 
@@ -47,4 +47,4 @@ Snapshot 보호
 
 ## 검증과 한계
 
-27회 시나리오·81건 저장 자료는 전체 인계 흐름의 통합 근거이고, fault injection 전체를 대신하지 않습니다. 메모리 고갈·하드웨어 분리·전원 차단·디스크 고갈은 별도 시험이 필요합니다. 본 문서의 watchdog·Snapshot 구현을 본인 단독 소스로 공개하지 않은 이유도 역할과 코드 저작 범위를 구분하기 위해서입니다.
+27회 시나리오·81건 저장 자료는 전체 인계 흐름의 통합 근거이고, fault injection 전체를 대신하지 않습니다. 메모리 고갈·하드웨어 분리·전원 차단·디스크 고갈은 별도 시험이 필요합니다. watchdog·Snapshot 구현은 source/에 포함했으며 팀 구현으로 표시했습니다.

@@ -1,0 +1,29 @@
+[Unit]
+Description=ACE accident vehicle video processor
+Wants=uploader.service time_sync.service
+After=uploader.service time_sync.service inference.service
+Conflicts=inference.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+NotifyAccess=main
+WatchdogSec=15s
+User=@AI_USER@
+Group=@AI_GROUP@
+SupplementaryGroups=video
+WorkingDirectory=@AI_ROOT@
+Environment=HOME=@SERVICE_HOME@
+ExecStart=/bin/sh -ec '. "@UPLOADER_ENV@"; exec "@EXEC_ROOT@/video_processor"'
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=false
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

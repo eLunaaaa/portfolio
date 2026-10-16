@@ -1,0 +1,95 @@
+name: Portfolio verification
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: portfolio-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  server:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg
+      - run: python -m pip install -r projects/blue-witness/source/server/backend/requirements.txt httpx cryptography PyYAML
+      - name: Server and frontend regressions
+        working-directory: projects/blue-witness/source/server/backend
+        run: |
+          python -m unittest discover -s tests -v
+          node --test tests/*.cjs
+  linux-modules:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update -qq && sudo apt-get install -y build-essential libssl-dev libsqlite3-dev
+      - name: Build uploader and Time Sync
+        run: |
+          make -C projects/blue-witness/source/uploader
+          make -C projects/blue-witness/source/time_sync
+          make -C projects/embedded-linux-system-programming/source/udp_socket
+          python scripts/check_uploader.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-host-binaries-${{ github.sha }}
+          path: |
+            projects/blue-witness/source/test/uploader
+            projects/blue-witness/source/test/time_sync
+          retention-days: 7
+  models-and-rtl:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: '2'
+      MKL_NUM_THREADS: '2'
+      PORTFOLIO_TEST_PRETRAINED: ${{ github.workspace }}/.ci-fixtures/tiny.pth
+      PORTFOLIO_TEST_PRETRAINED_NANO: ${{ github.workspace }}/.ci-fixtures/nano.pth
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update -qq && sudo apt-get install -y ffmpeg iverilog
+      - name: CPU inference dependencies
+        run: |
+          python -m pip install torch==2.9.1 torchvision==0.24.1 --index-url https://download.pytorch.org/whl/cpu
+          python -m pip install numpy==2.2.6 opencv-python-headless==4.12.0.88 PyYAML loguru scikit-image tqdm Pillow thop tabulate pycocotools onnx onnxruntime matplotlib
+      - name: Create disposable checkpoints
+        run: |
+          python scripts/create_yolox_fixture.py "$PORTFOLIO_TEST_PRETRAINED"
+          python scripts/create_yolox_fixture.py "$PORTFOLIO_TEST_PRETRAINED_NANO" --variant nano
+      - name: Model training and runtime contracts
+        env:
+          PYTHONPATH: projects/blue-witness/source/model_training
+        run: python -m unittest discover -s projects/blue-witness/source/model_training/tests -v
+      - name: CNN model and RTL bit equivalence
+        working-directory: projects/configurable-cnn-rtl
+        run: python tests/run_checks.py
+  portfolio:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python scripts/check_portfolio.py
+      - name: Hardware independent cores
+        run: |
+          make -C projects/smart-umbrella-stand/tests test
+          make -C projects/arduino-load-balancer/tests test
+          make -C projects/edge-ai-trash-sorter/tests test

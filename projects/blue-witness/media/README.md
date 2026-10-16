@@ -6,6 +6,5 @@
 |---|---|
 | training-flow.png | docs/assets/vision-training-flow.png |
 | merged-video.png | docs/assets/storage-merged-video.png |
-| contest-participation.png | 본인이 제공한 2026-10-16 대회 운영 대화방 스크린샷 |
 
 [원본 자료](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/docs/assets) · [서드파티 고지](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/THIRD_PARTY_LICENSE.md)

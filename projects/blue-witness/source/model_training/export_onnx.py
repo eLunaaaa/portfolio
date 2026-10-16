@@ -1,5 +1,12 @@
 #!/usr/bin/env python3
-"""학습된 YOLOX-Nano를 static FP32·NMS 미포함 ONNX와 manifest로 내보낸다."""
+"""@file export_onnx.py
+@brief 학습 checkpoint를 Raspberry Pi 배포용 static FP32 YOLOX ONNX release로 변환한다.
+
+checkpoint의 데이터셋 SHA, class 순서와 입력 크기를 먼저 검증한 뒤 NMS가 포함되지
+않은 raw prediction graph를 export한다. ONNX checker로 graph를 검사하고 전처리,
+출력 decode, threshold, NMS, class 순서와 파일 SHA를 model_manifest.json에 함께
+기록한다. 판정값은 C++ inference와 같은 공통 실행 설정에서 읽는다.
+"""
 
 from __future__ import annotations
 
@@ -11,6 +18,7 @@ from pathlib import Path
 import torch
 
 from dataset_contracts import DatasetContractError, atomic_write_json, load_settings, read_json, sha256_file
+from runtime_contract import load_runtime_contract, resolve_export_confidence
 from yolox_runtime import (
     expected_prediction_count,
     load_trained_checkpoint,
@@ -19,10 +27,34 @@ from yolox_runtime import (
 )
 
 
+# -----------------------------------------------------------------------------
+# 기능: 실제 graph 출력 shape를 검증한 뒤 release에 필요한 계약 파일을 함께 기록한다.
+#
+# 동작 방법:
+#   1. checkpoint가 지정 dataset SHA·class 순서·입력 크기로 학습됐는지 확인한다.
+#   2. 모델을 CPU evaluation mode로 바꾸고 head의 내부 decode를 꺼 raw 출력을 유지한다.
+#   3. FP32 dummy tensor로 실제 output shape를 확인한 뒤 static ONNX graph를 생성한다.
+#   4. ONNX checker를 통과시킨 뒤 공통 실행 설정의 confidence를 기록한다.
+#   5. 전처리, raw decode, NMS, class와 모든 SHA를 model_manifest에 기록한다.
+#   6. classes·dataset summary·evaluation을 함께 복사해 단독으로 검증 가능한 release를 만든다.
+#
+# 사용 이유/연결: 학습·Validation 평가가 끝난 뒤 실행되며 결과는 C++ inference가 사용한다.
+#
+# 입력:
+#   args (argparse.Namespace) - CLI에서 해석한 실행 인자 묶음.
+#
+# 반환: 생성 및 ONNX 구조 검증을 마친 vehicle_detector.onnx의 Path를 반환한다.
+# -----------------------------------------------------------------------------
 def export_model(args: argparse.Namespace) -> Path:
-    """실제 graph 출력 shape를 검증한 뒤 release에 필요한 계약 파일을 함께 기록한다."""
+    try:
+        runtime = load_runtime_contract()
+        threshold = resolve_export_confidence(getattr(args, "confidence_threshold", None), runtime)
+    except ValueError as error:
+        raise DatasetContractError(str(error)) from error
     config_path = args.config.resolve()
     settings = load_settings(config_path)
+    if float(settings["evaluation"]["nms_iou_threshold"]) != runtime["nms_iou_threshold"]:
+        raise DatasetContractError("NMS IoU는 ai/inference_config.h의 실행 설정과 같아야 합니다.")
     source_dir, _ = validate_yolox_installation(config_path, settings)
     dataset_dir = resolve_dataset_dir(config_path, settings, args.dataset_version)
     class_names = [item["name"] for item in settings["classes"]]
@@ -66,22 +98,12 @@ def export_model(args: argparse.Namespace) -> Path:
 
     onnx.checker.check_model(onnx.load(str(onnx_path)))
     evaluation = read_json(args.evaluation.resolve()) if args.evaluation else None
-    explicit_threshold = getattr(args, "confidence_threshold", None)
-    threshold = explicit_threshold
-    if threshold is None and evaluation:
-        threshold = evaluation.get("recommended_confidence_threshold")
     if evaluation and (
         evaluation.get("split") != "val"
         or evaluation.get("dataset_sha256") != dataset_manifest["dataset_sha256"]
         or evaluation.get("input_size") != [args.width, args.height]
     ):
         raise DatasetContractError("ONNX에는 같은 dataset/해상도의 Validation 평가만 연결할 수 있습니다.")
-    if evaluation and threshold is None:
-        raise DatasetContractError(
-            "release manifest를 확정하려면 Validation 추천값 또는 --confidence-threshold가 필요합니다."
-        )
-    if threshold is not None and not 0.0 <= float(threshold) <= 1.0:
-        raise DatasetContractError("confidence threshold는 0~1이어야 합니다.")
     manifest = {
         "model_name": f"vehicle_detector_yolox_{model_variant}",
         "version": 1,
@@ -103,12 +125,10 @@ def export_model(args: argparse.Namespace) -> Path:
         "objectness_and_class_scores": "sigmoid probabilities",
         "decode": {"strides": [8, 16, 32], "grid_order": "stride 8 then 16 then 32; row-major", "decoded_bbox": "pixel cx,cy,w,h"},
         "nms_included": False,
-        "confidence_threshold": float(threshold) if threshold is not None else None,
-        "confidence_threshold_source": (
-            "explicit_validation_review" if explicit_threshold is not None
-            else "evaluation_recommendation"
-        ),
-        "nms_iou_threshold": float(settings["evaluation"]["nms_iou_threshold"]),
+        "confidence_threshold": float(threshold),
+        "confidence_threshold_source": "ai/inference_config.h",
+        "nms_iou_threshold": runtime["nms_iou_threshold"],
+        "inference_frame_step": runtime["inference_frame_step"],
         "classes": class_names,
         "onnx_sha256": sha256_file(onnx_path),
         "dataset_version": args.dataset_version,
@@ -124,13 +144,14 @@ def export_model(args: argparse.Namespace) -> Path:
         "# Vehicle detector release\n\n"
         f"이 디렉터리는 YOLOX-{model_variant.capitalize()} FP32 ONNX 후보와 재현 계약을 함께 보관합니다. "
         "전처리·raw output·decode·NMS·class 순서는 model_manifest.json을 기준으로 구현합니다. "
-        "PyTorch↔ONNX 허용 오차가 확정되고 compare_outputs.py를 통과하기 전에는 최종 배포본으로 간주하지 않습니다.\n",
+        f"배포 confidence는 {threshold:.2f}이며 compare_outputs.py로 PyTorch와 ONNX 출력을 비교합니다.\n",
         encoding="utf-8",
     )
     return onnx_path
 
 
 def parse_args() -> argparse.Namespace:
+    """checkpoint, 데이터셋, 입력 크기와 ONNX 출력 경로를 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--dataset-version", required=True)
@@ -138,12 +159,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--width", type=int, required=True)
     parser.add_argument("--height", type=int, required=True)
     parser.add_argument("--evaluation", type=Path)
-    parser.add_argument("--confidence-threshold", type=float)
+    parser.add_argument("--confidence-threshold", type=float, default=None,
+                        help="ai/inference_config.h의 confidence 사용; 명시하면 실행 설정과 일치해야 함")
     parser.add_argument("--output-dir", type=Path, required=True)
     return parser.parse_args()
 
 
 def main() -> int:
+    """ONNX release 생성을 실행하고 계약 오류를 CLI 실패 코드로 변환한다."""
     try:
         output = export_model(parse_args())
     except (DatasetContractError, OSError, RuntimeError, ValueError) as error:

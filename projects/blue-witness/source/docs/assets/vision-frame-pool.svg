@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="516" viewBox="0 0 1280 516">
+<rect width="1280" height="516" fill="white"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#236eac"/></marker></defs>
+<text x="640" y="44" font-family="Malgun Gothic, sans-serif" font-size="31" font-weight="700" fill="#153247" text-anchor="middle">미리 확보한 960개 프레임 버퍼를 순환 사용</text>
+<rect x="24" y="72" width="624" height="416" rx="8" fill="#f6f9fb" stroke="#cbdbe5" stroke-width="1.5"/>
+<rect x="174" y="136" width="52" height="36" rx="5" transform="rotate(0 200 154)" fill="#236eac"/>
+<rect x="230" y="151.0051547761429" width="52" height="36" rx="5" transform="rotate(30 256 169.0051547761429)" fill="#236eac"/>
+<rect x="270.99484522385717" y="192" width="52" height="36" rx="5" transform="rotate(60 296.99484522385717 210)" fill="#236eac"/>
+<rect x="286" y="248" width="52" height="36" rx="5" transform="rotate(90 312 266)" fill="#236eac"/>
+<rect x="270.99484522385717" y="304" width="52" height="36" rx="5" transform="rotate(120 296.99484522385717 322)" fill="#236eac"/>
+<rect x="230" y="344.9948452238571" width="52" height="36" rx="5" transform="rotate(150 256 362.9948452238571)" fill="#236eac"/>
+<rect x="174" y="360" width="52" height="36" rx="5" transform="rotate(180 200 378)" fill="#236eac"/>
+<rect x="118.00000000000003" y="344.99484522385717" width="52" height="36" rx="5" transform="rotate(210 144.00000000000003 362.99484522385717)" fill="#236eac"/>
+<rect x="77.00515477614286" y="304" width="52" height="36" rx="5" transform="rotate(240 103.00515477614286 322)" fill="#138174"/>
+<rect x="62" y="248" width="52" height="36" rx="5" transform="rotate(270 88 266)" fill="#138174"/>
+<rect x="77.00515477614287" y="192" width="52" height="36" rx="5" transform="rotate(300 103.00515477614287 210)" fill="#138174"/>
+<rect x="117.99999999999994" y="151.0051547761429" width="52" height="36" rx="5" transform="rotate(330 143.99999999999994 169.0051547761429)" fill="#138174"/>
+<text x="200" y="253" font-family="Malgun Gothic, sans-serif" font-size="28" font-weight="700" fill="#153247" text-anchor="middle">RAM Ring</text>
+<text x="200" y="287" font-family="Malgun Gothic, sans-serif" font-size="25" font-weight="700" fill="#236eac" text-anchor="middle">최근 20초</text>
+<text x="459" y="174" font-family="Malgun Gothic, sans-serif" font-size="30" font-weight="700" fill="#236eac" text-anchor="middle">최대 640개</text>
+<text x="459" y="212" font-family="Malgun Gothic, sans-serif" font-size="24" font-weight="500" fill="#153247" text-anchor="middle">최근 프레임 유지</text>
+<text x="459" y="294" font-family="Malgun Gothic, sans-serif" font-size="30" font-weight="700" fill="#138174" text-anchor="middle">여유 320개</text>
+<text x="459" y="332" font-family="Malgun Gothic, sans-serif" font-size="24" font-weight="500" fill="#153247" text-anchor="middle">참조 중인 슬롯 교체</text>
+<text x="336" y="450" font-family="Malgun Gothic, sans-serif" font-size="28" font-weight="700" fill="#236eac" text-anchor="middle">새 프레임 촬영은 계속</text>
+<rect x="710" y="82" width="546" height="108" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="983" y="129.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">① 사고 구간 참조</text>
+<text x="983" y="160.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">프레임 본체 복사 없이 참조·시각 확보</text>
+<rect x="710" y="226" width="546" height="108" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="983" y="273.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">② 분석·저장 중 보호</text>
+<text x="983" y="304.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">참조 중인 프레임은 덮어쓰기 방지</text>
+<rect x="710" y="370" width="546" height="108" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="983" y="417.5" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">③ 처리 종료 후 반환</text>
+<text x="983" y="448.5" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">참조를 반환하고 버퍼 재사용</text>
+<path d="M983 190 V226" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M983 334 V370" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+</svg>

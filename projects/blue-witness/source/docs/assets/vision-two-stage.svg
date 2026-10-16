@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="388" viewBox="0 0 1280 388">
+<rect width="1280" height="388" fill="white"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#236eac"/></marker></defs>
+<rect x="24" y="28" width="360" height="142" rx="8" fill="#eaf3f8" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="204" y="77" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">① 위치·화각</text>
+<text x="204" y="108" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">사고차 차체 범위가</text>
+<text x="204" y="139" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">카메라에 들어오는 관측차</text>
+<rect x="460" y="28" width="360" height="142" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="640" y="77" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">② 실제 영상</text>
+<text x="640" y="108" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">YOLOX-Tiny가</text>
+<text x="640" y="139" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">대상 차종 검출</text>
+<rect x="896" y="28" width="360" height="142" rx="8" fill="#e8f5f1" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="1076" y="77" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">증거 수집</text>
+<text x="1076" y="108" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">통과한 관측 영상</text>
+<text x="1076" y="139" font-family="Malgun Gothic, sans-serif" font-size="23" font-weight="500" fill="#153247" text-anchor="middle">사고 ID로 저장·전송</text>
+<path d="M384 99 H460" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<path d="M820 99 H896" fill="none" stroke="#236eac" stroke-width="3" marker-end="url(#arrow)"/>
+<rect x="24" y="222" width="1232" height="136" rx="8" fill="#f5f8fa" stroke="#cbdbe5" stroke-width="1.5"/>
+<text x="640" y="270" font-family="Malgun Gothic, sans-serif" font-size="27" font-weight="700" fill="#153247" text-anchor="middle">방향이 맞아도 앞차·지하차도·고가도로가 시야를 가릴 수 있습니다.</text>
+<text x="640" y="318" font-family="Malgun Gothic, sans-serif" font-size="26" font-weight="500" fill="#153247" text-anchor="middle">먼저 위치로 분석 대상을 줄이고, 영상에서 대상 차량을 한 번 더 찾습니다.</text>
+</svg>

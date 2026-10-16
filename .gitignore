@@ -1,0 +1,13 @@
+**/__pycache__/
+**/*.pyc
+**/.venv/
+**/*.o
+**/build/
+projects/blue-witness/source/test/uploader
+projects/blue-witness/source/test/time_sync
+projects/blue-witness/source/server/backend/storage/
+projects/blue-witness/source/uploader/deploy/uploader.env
+projects/blue-witness/source/model_training/models/**/*.pth
+projects/blue-witness/source/model_training/runs/*/
+.ci-fixtures/
+:memory:*

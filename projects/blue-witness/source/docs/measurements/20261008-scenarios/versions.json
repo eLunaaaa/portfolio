@@ -1,0 +1,58 @@
+{
+  "code_commit": "2ebe4da88c2260c5f5154ea688f5cd8187310019",
+  "release_run": "37762360292-1",
+  "model_sha256": "10d95656c33a0241a24f9f999178e48f31c07709382526f1b033478a63621462",
+  "model_bytes": 20168140,
+  "confidence": 0.6,
+  "inference_frame_step": 6,
+  "nms_iou": 0.65,
+  "vote_window": 3,
+  "vote_hits": 2,
+  "clip_before_seconds": 8,
+  "clip_after_seconds": 2,
+  "vehicles": [
+    {
+      "vehicle_id": "CAR_02",
+      "role": "accident",
+      "release_commit": "2ebe4da88c2260c5f5154ea688f5cd8187310019",
+      "binaries": {
+        "video_processor": "3226d79d3d2d732ad5185d2e489f3a7c10a7cf51c2148e250d8ae6269c552bb9",
+        "uploader": "2bb93e015d66c3b37f8b22948b452a42225be4034999ab091a2163085b1fe75c",
+        "accident_aruco": "67b11d0432ad71d59df95b2d452fd14b7f753174488cacbd388525299a673c06"
+      }
+    },
+    {
+      "vehicle_id": "CAR_04",
+      "role": "observer",
+      "release_commit": "2ebe4da88c2260c5f5154ea688f5cd8187310019",
+      "binaries": {
+        "inference": "c1a5b4b6e4e8e8a26ef497b76ea3d0fa8e53bbc4d4fac6a33f6bbbb0806a1b30",
+        "uploader": "2bb93e015d66c3b37f8b22948b452a42225be4034999ab091a2163085b1fe75c",
+        "witness_filter": "d5573795cdb3b9a26dfbd2815eb6a3b6de29f8cc3cb9a884f9202158097f8eba"
+      },
+      "model_sha256": "10d95656c33a0241a24f9f999178e48f31c07709382526f1b033478a63621462"
+    },
+    {
+      "vehicle_id": "CAR_05",
+      "role": "observer",
+      "release_commit": "2ebe4da88c2260c5f5154ea688f5cd8187310019",
+      "binaries": {
+        "inference": "c1a5b4b6e4e8e8a26ef497b76ea3d0fa8e53bbc4d4fac6a33f6bbbb0806a1b30",
+        "uploader": "2bb93e015d66c3b37f8b22948b452a42225be4034999ab091a2163085b1fe75c",
+        "witness_filter": "d5573795cdb3b9a26dfbd2815eb6a3b6de29f8cc3cb9a884f9202158097f8eba"
+      },
+      "model_sha256": "10d95656c33a0241a24f9f999178e48f31c07709382526f1b033478a63621462"
+    },
+    {
+      "vehicle_id": "CAR_06",
+      "role": "observer",
+      "release_commit": "2ebe4da88c2260c5f5154ea688f5cd8187310019",
+      "binaries": {
+        "inference": "c1a5b4b6e4e8e8a26ef497b76ea3d0fa8e53bbc4d4fac6a33f6bbbb0806a1b30",
+        "uploader": "2bb93e015d66c3b37f8b22948b452a42225be4034999ab091a2163085b1fe75c",
+        "witness_filter": "d5573795cdb3b9a26dfbd2815eb6a3b6de29f8cc3cb9a884f9202158097f8eba"
+      },
+      "model_sha256": "10d95656c33a0241a24f9f999178e48f31c07709382526f1b033478a63621462"
+    }
+  ]
+}

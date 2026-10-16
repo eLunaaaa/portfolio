@@ -1,59 +1,40 @@
-# 코드·측정 자료 검증 기록
+# 코드 검수와 회귀 검사
 
-기준: 2026-10-16 로컬 서버·모델 학습 코드. 개발 폴더의 운영 DB·영상·인증서를 변경하지 않고 포트폴리오 복제본과 임시 fixture에서 검증했습니다. [로컬 반영 차이](LOCAL_SNAPSHOT.md)
+서버·학습 코드를 팀 기준 `5148804`의 수정과 통합했습니다. 개인 개발본의 병합 수 표시, 세션 가중 sampling, parent checkpoint 미세조정·BatchNorm 동결 기능을 함께 유지했습니다.
 
-## 이번 정리에서 직접 실행한 검사
+## 반영한 수정
 
-현재 코드를 복사한 뒤 복제본에서 서버·웹 시험을 실행했습니다. 학습은 로컬 YOLOX·사전학습 자료를 fixture로 사용해 원본·복제 코드 양쪽에서 확인했습니다. source manifest는 로컬 파일 hash와 기존 고정 커밋 출처를 구분합니다.
+| 문제 | 반영 내용 | 검사 위치 |
+|---|---|---|
+| 사건 삭제 중 파일 처리 실패 | 파일 staging·복원과 DB 삭제 순서 통합 | `test_admin_cleanup.py` |
+| 기존 DB·저장 경로 호환 | 경로 해석과 이전 DB 접근 규칙 통합 | `test_database_path_compatibility.py` |
+| 웹의 비동기 차량 선택 경쟁 | 이전 응답이 최신 선택을 덮지 않도록 요청·선택 상태 관리 | `test_portal_selection.cjs` |
+| 수신 영상 수와 병합 수 혼동 | 선택 revision의 비대체 입력만 병합 수로 집계 | `test_merged_counts.py` |
+| 학습·배포 설정 불일치 | 공통 런타임 header 기반 Confidence·shape 계약 검사 | `test_runtime_contract.py` |
+| 업로드 완료 오판 | 큐 재시작·중복 등록·ACK 식별자 불일치·HTTP 전송 검사 추가 | [Uploader 검사](../../../scripts/check_uploader.py) |
 
-| 검사 | 결과 |
+## 검사 구성
+
+| 검사 | 내용 |
 |---|---|
-| 로컬 서버 Python unittest | 64개 통과 |
-| 로컬 웹 Node.js 회귀 시험 | 36개 통과 |
-| 로컬 학습 파이프라인 | 30개 통과, 복제 코드로도 재실행 |
-| 27회 시나리오 검증 스크립트 | 27회·저장 영상 81건·복구 영상 12건·공개 체크섬 및 모델/버전 hash 대조 통과 |
+| 서버 Python 74개 | 저장·ACK·인증·병합·삭제 복구·DB 호환 |
+| 웹 Node.js 51개 | 영상 모드·이벤트·차량 선택·비동기 UI 회귀 |
+| 모델 파이프라인 44개 | 데이터 검수·split·학습·checkpoint·ONNX·런타임 계약 |
+| Uploader | 중복 등록, 재시작 상태 복구, ACK 일치·불일치, HTTP health/status/upload |
+| Linux 빌드 | Uploader·Time Sync 및 UDP 실험 모듈 |
 
-아래 명령은 포트폴리오의 `projects/blue-witness/source`에서 시작합니다. 학습 시험에는 `../YOLOX`·사전학습 fixture가 별도 필요합니다.
+[포트폴리오 Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)에서 각 commit의 실제 결과를 확인할 수 있습니다. 원본 팀의 ARM64·장치 배포 코드는 [automation](../source/automation/README.md)에 보존했습니다.
 
-```bash
-cd server/backend
-python -m unittest discover -s tests
-cd ../..
-node --test server/backend/tests/*.cjs
-PYTHONPATH=model_training python -m unittest discover -s model_training/tests -v
+## 직접 실행
+
+저장소 루트에서 서버 검사를 실행합니다.
+
+```sh
+cd projects/blue-witness/source/server/backend
+python -m unittest discover -s tests -v
+node --test tests/*.cjs
 ```
 
-서버 시험은 임시 DB·미디어 fixture를 사용합니다. 시나리오 검증은 원격 기준 자료를 앞선 정리에서 대조한 결과이며 새 충돌 시험이 아닙니다. 학습 시험은 임시 COCO·모델·export fixture를 포함하지만 전체 데이터 재학습이나 최종 release 전체 재검증을 의미하지 않습니다.
+모델 fixture 준비·44개 검사 명령은 [루트 workflow](../../../.github/workflows/portfolio-ci.yml)에 정의했습니다. Uploader HTTP 검사는 저장소 루트에서 `python scripts/check_uploader.py`로 실행합니다.
 
-## 원격 버전과의 비교 결과
-
-앞선 원격 `5148804`에서는 Python 72·Node 51·runtime contract 4개를 통과했습니다. 현재 로컬에는 일부 원격 수정·테스트가 없으며, 로컬 코드에 원격 Python 시험까지 섞은 74개 실행에서 실패 7·오류 3이 나왔습니다. 원격 전용 3개 파일은 [비교 자료](../reference/github-regressions/README.md)로 보존합니다. 로컬 자체 시험 통과를 모든 원격 회귀가 해결됐다는 뜻으로 바꾸지 않습니다.
-
-## 측정 자료와 해석
-
-- 프레임 평가 CSV의 전체 12,873행 묶음은 임계값 선정 자료를 포함합니다. 전체 정답률 98.39%를 독립 test 정확도 또는 BBox mAP로 바꿔 표현하지 않습니다.
-- 별도 test 묶음은 1,633프레임·유무 정답률 98.65%입니다. 촬영 조건이 다른 실제 도로 일반화는 추가 평가가 필요합니다.
-- 시각 P95 11.30~19.18ms는 각 관측차와 사고차 사이의 10,000회 시각 교환 결과입니다. 모든 환경의 상한 보장은 아닙니다.
-- 27/27 시나리오와 81/81 서버 저장은 팀 통합 시험의 해당 조건 결과입니다. 사고 검출·통신·업로드 전부를 개인 단독 성과로 간주하지 않습니다.
-
-## 이번에 수행하지 않은 항목
-
-- GPU/MPS 전체 재학습, 전체 BBox 수동 재검수, PyTorch/ONNX 실모델 출력 비교 재실행
-- Pi 교차 빌드 전체, 실제 카메라·도로 테스트베드 재시연, 물리 장치 fleet 배포
-- 보안 침투 시험·운영 부하 시험·인터넷 공개 서비스 배포
-
-## 남은 한계
-
-- 대상 차종과 1:18 테스트베드 중심이며 야간·우천·고속도로·실차 환경 검증은 별도 필요합니다.
-- 960프레임 NV12 pool은 저장 공간만 약 422MiB이므로 메모리·연산 요구를 낮춰야 더 작은 장치에 적용할 수 있습니다.
-- 시연용 신원·차량 확인 흐름은 외부 실명 인증이나 실제 차량 소유 증명 서비스가 아닙니다.
-- Private CA 배포·노드 키·self-hosted runner·권한 설정은 운영 절차가 필요하며 인증 정보를 포트폴리오에 공개하지 않습니다.
-- 모델 학습 원자료와 checkpoint가 포함되지 않아 포트폴리오 문서만으로 전체 학습을 즉시 재현할 수는 없습니다.
-
-## 모듈별 실행 가능 범위
-
-- 서버는 포함된 app·schema·frontend·tests로 임시 DB 기반 시험을 통과했습니다. 제조사 차량 이미지 일부는 미포함이라 원본 UI 자산 전체를 재배포한 것은 아닙니다.
-- 학습 코드는 포함하지만 서드파티 YOLOX·데이터·checkpoint는 외부 준비가 필요합니다.
-- Time Sync는 팀 공용 IPC·watchdog에 의존하므로 원본 트리에서 빌드합니다.
-- AI runtime 본체·Uploader·Sensor·Filter·P2P는 본인 작성 코드로 복제하지 않았습니다.
-- 자동화는 개인 작업 시점의 보존본이며 포트폴리오에서 Actions나 fleet 배포를 실행하지 않습니다.
+모델 평가 CSV와 팀 실장치 시나리오는 [측정 자료](EVIDENCE.md)로 연결했습니다. 프레임별 유무 판정, 소프트웨어 회귀, 장치 통합 시나리오의 지표를 각각 표시합니다.

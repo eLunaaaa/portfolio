@@ -1,0 +1,100 @@
+{
+  "test_date": "2026-10-08",
+  "run_id": "20261008T110904Z-collision27",
+  "valid_trials": 27,
+  "conditions": 9,
+  "repetitions_per_condition": 3,
+  "field_scenario_pass": 27,
+  "field_scenario_accuracy_percent": 100.0,
+  "recorded_videos": 81,
+  "server_stored_videos": 81,
+  "accident_videos": 27,
+  "observer_videos": 54,
+  "recovery_trials": 3,
+  "recovery_stored_videos": 12,
+  "condition_results": [
+    {
+      "condition": "모두 가시",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "관측차 1번 화각 밖",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "관측차 2번 화각 밖",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "관측차 3번 화각 밖",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "모두 화각 밖",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "관측차 2번 시야 가림",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "관측차 1번 시야 가림",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "관측차 3번 시야 가림",
+      "trials": 3,
+      "field_pass": 3
+    },
+    {
+      "condition": "인터넷 단절 중 사고 및 복구",
+      "trials": 3,
+      "field_pass": 3
+    }
+  ],
+  "clip_before_s_range": [
+    7.967009,
+    7.999889
+  ],
+  "clip_after_s_range": [
+    1.968889,
+    1.999494
+  ],
+  "ready_latency": {
+    "n": 81,
+    "mean_s": 6.554025,
+    "median_s": 5.246,
+    "p95_s": 13.385,
+    "min_s": 3.506,
+    "max_s": 14.871
+  },
+  "server_storage_latency": {
+    "n": 81,
+    "mean_s": 42.077679,
+    "median_s": 8.052,
+    "p95_s": 123.262,
+    "min_s": 4.175,
+    "max_s": 1598.297
+  },
+  "measurements": {
+    "scenario": "Scenario pass/fail recorded by the test operator at the testbed; expected and recorded vehicle IDs compared for all 27 valid events and joined with server storage acknowledgements.",
+    "stored": "UPLOAD_SERVER_ACK with storage_ack_confirmed=true, status=STORED, matching event/vehicle IDs and SHA-256 prefix.",
+    "ready": "IMU event_time_ns to CAMERA_READY_ACCEPTED timestamp.",
+    "timing": "Application log time= timestamps; server-storage elapsed time includes queue and network waiting. All valid clips included.",
+    "frame_window": "clip_start_time_ns and clip_end_time_ns relative to the IMU event_time_ns.",
+    "occlusion_order": [
+      "CAR_05",
+      "CAR_04",
+      "CAR_06"
+    ]
+  },
+  "video_count_matches": 27,
+  "vehicle_selection_matches": 27
+}

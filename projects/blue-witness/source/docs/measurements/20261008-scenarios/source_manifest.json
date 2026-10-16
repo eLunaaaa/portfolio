@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "run_id": "20261008T110904Z-collision27",
+  "sources": [
+    {
+      "vehicle_id": "CAR_02",
+      "bytes": 141937781,
+      "sha256": "18dd661cf90a63d47f5ec6fcfaba7c4f37cb3943eb903a3644ea2bed1d6ecb05"
+    },
+    {
+      "vehicle_id": "CAR_04",
+      "bytes": 26408151,
+      "sha256": "935d6d22fe11788fb46ae8684e5ae48a0c1b15c7db54535ce86b5182549e671f"
+    },
+    {
+      "vehicle_id": "CAR_05",
+      "bytes": 17576435,
+      "sha256": "0c1be8753e1275c8a75a9ae63dc0108cde7cf12665ecd07c01f9bf382faa9910"
+    },
+    {
+      "vehicle_id": "CAR_06",
+      "bytes": 13987457,
+      "sha256": "621d4b2035714f4423bc7f6123acb3684439b7af420b6192e15fd77ac5d1b4fa"
+    }
+  ],
+  "extraction": "Valid trial event IDs joined with per-vehicle MP4 metadata, local file hashes and uploader server acknowledgements.",
+  "published_files": {
+    "clips.csv": "aeb311f6091feb72d1a6ea18f778f8704e93e973691f9e57cfa42396c710a20c",
+    "evidence.jsonl": "567e0b14c2adfb9bb8c6c5c2cddcf2304cc9fbb1822404cd27b27d007ffcc2ae",
+    "recovery.csv": "de73e2e3190a203a197a8c0847cafa21eb31e835cbc2f58295285e52c729d51b",
+    "scenarios.csv": "8e49dcf7f26cd4f30f2dafd6996035587a809d3730f17093d8dfb899a0f498ed",
+    "summary.json": "6bf1ebf100a89458cd66b78573aecc4d7b256bcc22b77649f88ceaaa97187577",
+    "timing.csv": "ddbfb2906d0f2ec2b5cb41c83e344d8c70e5dd6866571141577770098df7501c",
+    "versions.json": "586471e745c195fe26559d91c4b564ea89141f6b0b1e997f16bab82adb05d006"
+  }
+}

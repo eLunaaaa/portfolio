@@ -27,10 +27,10 @@
 | [scripts/deploy/apply_release.sh](scripts/deploy/apply_release.sh) | 장치별 파일·서비스 적용·smoke·복원 |
 | [scripts/deploy/fleet-deploy.sudoers](scripts/deploy/fleet-deploy.sudoers) | 제한된 배포 helper 권한 |
 
-## 보존·실행 범위
+## 이 포트폴리오에서 실행하는 CI
 
-원본 `.github/`, `scripts/ci/`, `scripts/deploy/`의 추적 파일을 보존했습니다. 추가된 검사 도구·회귀 테스트를 포함하고 원본에서 사라진 구버전 스크립트는 제거했습니다. 파일별 commit·hash는 [manifest](../PROVENANCE.json)에 기록합니다.
+[루트 workflow](../../../../.github/workflows/portfolio-ci.yml)는 이 저장소에 포함된 코드를 검사합니다. 서버·웹 회귀, Uploader·Time Sync Linux 빌드와 HTTP 계약, 모델 파이프라인, CNN 정수·RTL 일치, 제어 코어·문서 링크를 독립 job으로 실행합니다.
 
-반영 검증: 원본 18개 파일의 byte·SHA-256 일치, YAML 5개 파싱, Shell 문법 검사를 확인했습니다. 로컬 CI 도구 회귀 시험은 36개 중 35개 통과·1개 환경 조건 skip입니다. 원본 YAML 2개의 EOF 빈 줄은 원문 보존을 위해 유지했습니다. 이번 복제로 전체 ARM64 빌드·장치 배포를 재실행한 것은 아닙니다.
+[포트폴리오 Actions 실행 목록](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)
 
-원본 프로젝트의 모듈·SDK·runner·Secrets·장치 접근 환경이 필요합니다. 이 하위 폴더만으로 전체 파이프라인이 실행되지는 않습니다. 포트폴리오 루트 workflow로 등록하지 않았으므로 push로 실제 fleet 배포가 실행되지 않습니다. 실행 근거는 위 원본 Actions 기록으로 확인합니다.
+이 폴더의 팀 workflow는 원래 ARM64 빌드·Pi fleet 배포 설계와 구현을 읽기 위한 보존본입니다. 실제 운영 CD는 위 팀 실행 기록으로 연결하고, 포트폴리오의 루트 workflow는 코드 검사와 Linux 빌드 산출물을 생성합니다.

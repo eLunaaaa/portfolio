@@ -1,0 +1,50 @@
+{
+  "model_sha256": "6ed8e739d789118a751cb228494edb90744efbee00ca342f3761facbd169f5a9",
+  "dataset": "MNIST original test split",
+  "dataset_images_sha256": "0fa7898d509279e482958e8ce81c8e77db3f2f8254e26661ceb7762c4d494ce7",
+  "input": "15x15 bilinear, (pixel/255-.1307)/.3081, Q3.4",
+  "samples": [
+    {
+      "test_index": 0,
+      "label": 7
+    },
+    {
+      "test_index": 1,
+      "label": 2
+    },
+    {
+      "test_index": 2,
+      "label": 1
+    },
+    {
+      "test_index": 3,
+      "label": 0
+    },
+    {
+      "test_index": 4,
+      "label": 4
+    },
+    {
+      "test_index": 5,
+      "label": 1
+    },
+    {
+      "test_index": 6,
+      "label": 4
+    },
+    {
+      "test_index": 7,
+      "label": 9
+    },
+    {
+      "test_index": 8,
+      "label": 5
+    },
+    {
+      "test_index": 9,
+      "label": 9
+    }
+  ],
+  "parameter_bytes": 750,
+  "values_per_sample": 235
+}

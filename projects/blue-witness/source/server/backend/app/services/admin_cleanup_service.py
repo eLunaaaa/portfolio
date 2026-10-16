@@ -9,6 +9,7 @@ from app.db.admin_cleanup_repository import (
     delete_user_records,
     get_event_id,
     get_user_deletion_target,
+    list_event_file_paths,
     reset_demo_records,
 )
 from app.schemas.admin_actions import (
@@ -155,27 +156,49 @@ def stage_event_files(
 
     staged_paths: list[StagedPath] = []
 
-    original_result = move_path_to_trash(
-        ORIGINALS_ROOT / event_id,
-        operation_directory,
-        "originals",
-    )
+    originals_root = ORIGINALS_ROOT.resolve()
+    original_directories = {originals_root / event_id}
+    for stored_path in list_event_file_paths(event_id):
+        file_path = (BACKEND_ROOT / stored_path).resolve()
+        relative_path = file_path.relative_to(originals_root)
+        parts = relative_path.parts
+        # 기존 event/vehicle/file과 날짜별 YYYY/MM/DD/event/vehicle/file 지원.
+        if len(parts) == 3 and parts[0] == event_id:
+            event_directory = originals_root / event_id
+        elif (
+            len(parts) == 6
+            and parts[3] == event_id
+            and re.fullmatch(r"\d{4}/\d{2}/\d{2}", "/".join(parts[:3]))
+        ):
+            event_directory = originals_root.joinpath(*parts[:4])
+        else:
+            raise ValueError("DB 영상 경로가 삭제할 사고의 원본 경로가 아님.")
+        original_directories.add(event_directory)
 
-    if original_result is not None:
-        staged_paths.append(
-            original_result
+    sources = [
+        (
+            path,
+            (Path("originals") / path.parent.relative_to(originals_root)).as_posix(),
         )
+        for path in sorted(original_directories)
+    ]
+    sources.append((MERGED_ROOT / event_id, "merged"))
 
-    merged_result = move_path_to_trash(
-        MERGED_ROOT / event_id,
-        operation_directory,
-        "merged",
-    )
+    # 경로 전체를 먼저 검사하므로 잘못된 DB 경로로 다른 사고를 옮기지 않음.
+    for source_path, category in sources:
+        root = originals_root if category.startswith("originals") else MERGED_ROOT.resolve()
+        resolved = source_path.resolve()
+        if root not in resolved.parents or resolved.name != event_id:
+            raise ValueError("영상 폴더가 삭제할 사고의 저장 경로를 벗어남.")
 
-    if merged_result is not None:
-        staged_paths.append(
-            merged_result
-        )
+    try:
+        for source_path, category in sources:
+            result = move_path_to_trash(source_path, operation_directory, category)
+            if result is not None:
+                staged_paths.append(result)
+    except Exception:
+        restore_staged_paths(staged_paths)
+        raise
 
     return (
         staged_paths,

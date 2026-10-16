@@ -28,7 +28,7 @@ Pi 소스를 x86 host compiler로만 검사하면 ARM 라이브러리·ABI 문�
 | FFmpeg fixture | 실제 인코딩·병합·probe | 실차 모든 codec·긴 영상 |
 | 웹 회귀 | 비동기 응답·재생·모달·선택 유지 | 모든 모바일 브라우저의 시각적 동작 |
 
-현재 운영본은 `check-server.py`와 OS별 의존성 설치로 계약·HTTP/TLS·미디어 검사를 연결합니다. `setup-windows-ffmpeg.py`는 캐시된 미디어 도구도 검증합니다. 복제한 로컬 서버의 64/36 테스트는 별도 재검증이며, 원격 Actions가 동일한 로컬 소스를 실행했다고 의미하지 않습니다.
+현재 운영본은 `check-server.py`와 OS별 의존성 설치로 계약·HTTP/TLS·미디어 검사를 연결합니다. `setup-windows-ffmpeg.py`는 캐시된 미디어 도구도 검증합니다. 이 저장소의 루트 workflow는 통합 서버 Python 74개·웹 51개와 C 서비스·모델·RTL 회귀 검사를 실제 포트폴리오 commit에서 실행합니다.
 
 ## 선택 4. 코드와 산출물의 연결
 
