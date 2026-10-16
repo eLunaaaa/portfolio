@@ -5,9 +5,7 @@ import argparse
 import subprocess
 import tempfile
 import unittest
-from contextlib import ExitStack
 from pathlib import Path
-from unittest.mock import Mock, patch
 
 import yaml
 import torch
@@ -31,7 +29,6 @@ from review_annotations import (
     center_review_image,
     fullscreen_canvas_width,
     normalize_review_key,
-    run_review,
 )
 from validate_dataset import validate_dataset
 from export_onnx import export_model
@@ -65,9 +62,7 @@ class DatasetPipelineTest(unittest.TestCase):
         source_config["frame_extraction"]["frame_interval"] = 10
         source_config["proposal_detector"]["enabled"] = False
         source_config["dataset_export"]["split_search_attempts"] = 1000
-        source_config["yolox"]["source_dir"] = str(
-            PROJECT_DIR / source_config["yolox"]["source_dir"]
-        )
+        source_config["yolox"]["source_dir"] = str(PROJECT_DIR.parent / "YOLOX")
         checkpoint_name = Path(source_config["yolox"]["pretrained_checkpoint"]).name
         source_config["yolox"]["pretrained_checkpoint"] = str(
             PROJECT_DIR / "models" / "pretrained" / checkpoint_name
@@ -226,31 +221,6 @@ class DatasetPipelineTest(unittest.TestCase):
             manifest["vehicle_instances_present"],
             ["ioniq5_silver", "other_car_3"],
         )
-
-    def test_delegated_demo_capture_plan_metadata(self) -> None:
-        """인계 촬영 계획의 파일 수와 대표 차량 계약을 확인한다."""
-        plans_path = PROJECT_DIR / "capture_plans.yaml"
-        plan = load_capture_plan(plans_path, "delegated_demo_round_04")
-        self.assertEqual(len(plan["recordings"]), 30)
-        self.assertEqual(plan["source_directory"], "data/incoming/session23_25")
-
-        first = next(
-            item for item in plan["recordings"]
-            if item["file"] == "session23_video01.mp4"
-        )
-        collision = next(
-            item for item in plan["recordings"]
-            if item["file"] == "session24_video05.mp4"
-        )
-        negative = next(
-            item for item in plan["recordings"]
-            if item["file"] == "session25_video10.mp4"
-        )
-        self.assertEqual(first["vehicle_instances"], ["ioniq5_silver"])
-        self.assertEqual(
-            collision["vehicle_instances"], ["ioniq5_silver", "other_car_3"]
-        )
-        self.assertEqual(negative["vehicle_instances"], [])
 
     def test_full_prepare_export_validate_pipeline(self) -> None:
         for number, color in enumerate(("red", "green", "blue"), start=1):
@@ -627,7 +597,6 @@ class DatasetPipelineTest(unittest.TestCase):
 
     def test_review_numeric_shortcuts_override_existing_class_and_advance(self) -> None:
         session = ReviewSession.__new__(ReviewSession)
-        session.fixed_bbox = None
         session.frames = [{"frame_id": "frame"}, {"frame_id": "next"}]
         session.index = 0
         session.annotations = {
@@ -671,7 +640,6 @@ class DatasetPipelineTest(unittest.TestCase):
 
     def test_review_numeric_shortcut_removes_only_same_vehicle_duplicates(self) -> None:
         session = ReviewSession.__new__(ReviewSession)
-        session.fixed_bbox = None
         session.frames = [{"frame_id": "frame"}]
         session.index = 0
         session.annotations = {
@@ -708,7 +676,6 @@ class DatasetPipelineTest(unittest.TestCase):
 
     def test_review_numeric_shortcut_stays_when_other_box_unassigned(self) -> None:
         session = ReviewSession.__new__(ReviewSession)
-        session.fixed_bbox = None
         session.frames = [{"frame_id": "frame"}]
         session.index = 0
         session.annotations = {
@@ -869,7 +836,7 @@ class DatasetPipelineTest(unittest.TestCase):
         self.assertEqual(session.selected_object, 1)
         self.assertEqual(session.annotation["status"], "manual_review_required")
 
-    def test_review_fixed_bbox_removes_only_unassigned_overlapping_proposals(self) -> None:
+    def test_review_fixed_bbox_removes_overlapping_auto_proposals(self) -> None:
         session = ReviewSession.__new__(ReviewSession)
         session.frames = [
             {"frame_id": "first", "recording_id": "video_a", "width": 100, "height": 80},
@@ -904,7 +871,7 @@ class DatasetPipelineTest(unittest.TestCase):
 
         self.assertEqual(
             [item["vehicle_instance"] for item in session.annotation["objects"]],
-            ["other_car_3", "other_car_1", "other_car_2", "ioniq5_silver"],
+            ["other_car_1", "other_car_2", "ioniq5_silver"],
         )
 
     def test_review_edited_fixed_bbox_becomes_next_frame_position(self) -> None:
@@ -945,7 +912,7 @@ class DatasetPipelineTest(unittest.TestCase):
         session.mouse_callback(cv2.EVENT_LBUTTONUP, 60, 45, 0, None)
         self.assertEqual(session.fixed_bbox["bbox"], [25, 20, 35, 25])
 
-    def test_review_fixed_bbox_edits_current_but_preserves_rejected_next_frame(self) -> None:
+    def test_review_fixed_bbox_applies_now_and_to_rejected_next_frame(self) -> None:
         session = ReviewSession.__new__(ReviewSession)
         session.frames = [
             {"frame_id": "first", "recording_id": "video_a", "width": 100, "height": 80},
@@ -972,113 +939,8 @@ class DatasetPipelineTest(unittest.TestCase):
         self.assertEqual(session.annotation["status"], "manual_review_required")
 
         session.move(1)
-        self.assertEqual(session.annotation["objects"], duplicated)
-        self.assertEqual(session.annotation["status"], "rejected")
-
-    def test_review_fixed_bbox_rejects_unassigned_without_removing_other_boxes(self) -> None:
-        session = ReviewSession.__new__(ReviewSession)
-        session.frames = [{"frame_id": "frame", "recording_id": "video_a", "width": 640, "height": 480}]
-        session.index = 0
-        session.annotations = {"frame": {"status": "draft", "objects": [
-            {"bbox": [10, 10, 100, 100], "class_name": None, "vehicle_instance": None, "proposal_confidence": 0.9},
-            {"bbox": [300, 300, 100, 100], "class_name": None, "vehicle_instance": None, "proposal_confidence": 0.8},
-        ]}}
-        session.selected_object = 0
-        session.fixed_bbox = None
-        session.instance_to_class = {"ioniq5_silver": "ioniq5_silver"}
-        before = json.loads(json.dumps(session.annotation))
-
-        with self.assertRaisesRegex(DatasetContractError, "먼저 지정"):
-            session.toggle_fixed_bbox()
-
-        self.assertIsNone(session.fixed_bbox)
-        self.assertEqual(session.annotation, before)
-
-    def test_review_fixed_bbox_label_changes_propagate(self) -> None:
-        for action in ("class", "instance", "numeric"):
-            with self.subTest(action=action):
-                session = ReviewSession.__new__(ReviewSession)
-                session.frames = [
-                    {"frame_id": name, "recording_id": "video_a", "width": 100, "height": 80}
-                    for name in ("first", "second")
-                ]
-                session.index = 0
-                session.selected_object = 0
-                session.fixed_bbox = None
-                session.class_names = ["ioniq5_silver", "other_vehicle"]
-                session.class_to_id = {"ioniq5_silver": 0, "other_vehicle": 1}
-                session.instances_by_class = {"ioniq5_silver": ["ioniq5_silver"], "other_vehicle": ["other_car_1", "other_car_2"]}
-                session.instance_to_class = {"ioniq5_silver": "ioniq5_silver", "other_car_1": "other_vehicle", "other_car_2": "other_vehicle"}
-                initial_instance = "other_car_1" if action == "instance" else "ioniq5_silver"
-                session.annotations = {
-                    "first": {"status": "draft", "objects": [{
-                        "bbox": [20, 20, 30, 20], "class_name": session.instance_to_class[initial_instance],
-                        "vehicle_instance": initial_instance,
-                    }]},
-                    "second": {"status": "draft", "objects": []},
-                }
-                session.save = lambda: None
-                session.load_image = lambda: None
-                session.toggle_fixed_bbox()
-                if action == "numeric":
-                    expected = "other_car_2"
-                    session.approve_selected_vehicle_and_move(expected)
-                    self.assertEqual(session.annotations["first"]["status"], "approved")
-                else:
-                    expected = "other_car_1" if action == "class" else "other_car_2"
-                    if action == "class":
-                        session.cycle_class()
-                    else:
-                        session.cycle_instance()
-                    session.move(1)
-                self.assertEqual(session.fixed_bbox["vehicle_instance"], expected)
-                self.assertEqual(session.annotation["objects"][0]["vehicle_instance"], expected)
-                self.assertEqual(session.annotation["objects"][0]["class_name"], "other_vehicle")
-
-    def test_review_fixed_bbox_preserves_all_completed_statuses(self) -> None:
-        for status in ("approved", "negative", "rejected"):
-            with self.subTest(status=status):
-                session = ReviewSession.__new__(ReviewSession)
-                session.frames = [{"frame_id": "frame", "recording_id": "video_a", "width": 100, "height": 80}]
-                session.index = 0
-                session.annotations = {"frame": {"status": status, "objects": []}}
-                session.fixed_bbox = {"recording_id": "video_a", "bbox": [20, 20, 30, 20], "class_name": "ioniq5_silver", "vehicle_instance": "ioniq5_silver"}
-                session._apply_fixed_bbox()
-                self.assertEqual(session.annotation, {"status": status, "objects": []})
-
-    def test_review_loads_image_from_korean_path(self) -> None:
-        with tempfile.TemporaryDirectory() as directory:
-            session = ReviewSession.__new__(ReviewSession)
-            session.work_dir = Path(directory) / "한글 이미지"
-            session.work_dir.mkdir()
-            image = np.full((12, 16, 3), 73, dtype=np.uint8)
-            success, encoded = cv2.imencode(".png", image)
-            self.assertTrue(success)
-            (session.work_dir / "차량.png").write_bytes(encoded.tobytes())
-            session.frames = [{"frame_id": "frame", "image_path": "차량.png"}]
-            session.index = 0
-            session.selected_object = 0
-            session.annotations = {"frame": {"status": "draft", "objects": []}}
-            session.load_image()
-            np.testing.assert_array_equal(session.image, image)
-
-    def test_review_space_moves_without_approving(self) -> None:
-        session = Mock()
-        session.frame = {"width": 100, "height": 80}
-        session.draw.return_value = np.zeros((80, 100, 3), dtype=np.uint8)
-        with ExitStack() as stack:
-            stack.enter_context(patch("review_annotations.load_settings", return_value={"paths": {"work_dir": "."}}))
-            stack.enter_context(patch("review_annotations.ReviewSession", return_value=session))
-            stack.enter_context(patch("review_annotations.mac_screen_aspect_ratio", return_value=None))
-            stack.enter_context(patch("review_annotations.cv2.getWindowImageRect", return_value=(0, 0, 100, 80)))
-            stack.enter_context(patch("review_annotations.cv2.waitKeyEx", side_effect=[ord(" "), ord("q")]))
-            for name in ("namedWindow", "resizeWindow", "setMouseCallback", "imshow", "destroyAllWindows"):
-                stack.enter_context(patch(f"review_annotations.cv2.{name}"))
-            run_review(Path("unused-config.yaml"))
-        session.move.assert_called_once_with(1)
-        session.set_status.assert_not_called()
-        session.set_status_and_move.assert_not_called()
-        session.save.assert_called_once_with()
+        self.assertEqual(len(session.annotation["objects"]), 1)
+        self.assertEqual(session.annotation["status"], "manual_review_required")
 
     def test_korean_two_set_keys_match_english_keyboard_positions(self) -> None:
         for korean, english in {
@@ -1104,212 +966,37 @@ class DatasetPipelineTest(unittest.TestCase):
             export_dataset(self.config_path, None)
 
 
-class ManualWorkflowTest(unittest.TestCase):
-    def setUp(self) -> None:
-        import register_recordings
-        from dataset_contracts import VideoMetadata
+class RemainingNavigationTests(unittest.TestCase):
+    """미검수 탐색의 순환과 고정 bbox 해제 동작을 확인한다."""
 
-        self.temporary = tempfile.TemporaryDirectory(prefix="manual-bbox-")
-        self.addCleanup(self.temporary.cleanup)
-        self.root = Path(self.temporary.name)
-        self.register = register_recordings
-        self.config = yaml.safe_load((PROJECT_DIR / "config.yaml").read_text(encoding="utf-8"))
-        self.config["paths"] = {
-            "recordings_dir": str(self.root / "recordings"),
-            "work_dir": str(self.root / "work"),
-            "datasets_dir": str(self.root / "datasets"),
-        }
-        self.config["frame_extraction"]["frame_interval"] = 1
-        self.config["proposal_detector"]["enabled"] = True
-        self.config["proposal_detector"]["model_path"] = str(self.root / "absent.onnx")
-        self.config_path = self.root / "config.yaml"
-        self.config_path.write_text(yaml.safe_dump(self.config), encoding="utf-8")
-        self.metadata = VideoMetadata("h264", 640, 480, 30.0, 2500000, 2 / 30, 2)
+    def test_jump_skips_completed_and_wraps(self):
+        session = ReviewSession.__new__(ReviewSession)
+        session.frames = [{"frame_id": str(index)} for index in range(4)]
+        session.annotations = {str(index): {"status": status} for index, status in
+                               enumerate(["draft", "approved", "negative", "manual_review_required"])}
+        session.index = 0
+        session.fixed_bbox = {"bbox": [1, 2, 3, 4]}
+        calls = []
+        session.save = lambda: calls.append("save")
+        session.load_image = lambda: calls.append("load")
+        session.jump_to_remaining()
+        self.assertEqual(session.index, 3)
+        self.assertIsNone(session.fixed_bbox)
+        self.assertEqual(calls, ["save", "load"])
+        session.jump_to_remaining()
+        self.assertEqual(session.index, 0)
 
-    @staticmethod
-    def labeled_box(x: int = 10) -> list[dict]:
-        return [{"bbox": [x, 10, 20, 20], "class_name": "ioniq5_silver",
-                 "vehicle_instance": "ioniq5_silver"}]
-
-    def make_work(self, name: str, specs: list[dict]) -> Path:
-        import hashlib
-
-        directory = self.root / name
-        frames, annotations, recordings = [], [], []
-        for spec in specs:
-            fid = spec["id"]
-            rid = f"recording_{fid}"
-            image = np.full((60, 80, 3), spec.get("color", 20), dtype=np.uint8)
-            ok, encoded = cv2.imencode(".jpg", image)
-            self.assertTrue(ok)
-            relative = f"frames/{rid}/{fid}.jpg"
-            path = directory / relative
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_bytes(encoded.tobytes())
-            status = spec.get("status", "approved")
-            video_sha = hashlib.sha256(rid.encode()).hexdigest()
-            frame = {
-                "frame_id": fid, "image_path": relative, "session_id": f"session_{rid}",
-                "source_group_id": f"source_{rid}", "condition_tags": [],
-                "class_name": None, "vehicle_instance": None,
-                "source_video": str(directory / "recording.mp4"),
-                "source_video_sha256": video_sha, "recording_id": rid,
-                "derived_from": None, "encoding_profile": "primary_2_5mbps",
-                "dataset_usage": "development", "frame_index": 0,
-                "timestamp_seconds": 0.0, "timestamp_source": "ffprobe_best_effort_pts",
-                "video_bitrate_bps": 2500000, "width": 80, "height": 60,
-                "image_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-                "annotation_status": status,
-            }
-            if spec.get("instances_key", True):
-                frame["vehicle_instances_present"] = []
-            frames.append(frame)
-            annotations.append({"frame_id": fid, "status": status,
-                                "objects": spec.get("objects", self.labeled_box())})
-            recordings.append({"recording_id": rid, "source_video_sha256": video_sha})
-        for filename, records in (("frame_manifest.jsonl", frames), ("annotations.jsonl", annotations),
-                                  ("recording_index.jsonl", recordings)):
-            atomic_write_jsonl(directory / filename, records)
-        return directory
-
-    def snapshot_work(self) -> dict[str, bytes]:
-        directory = self.root / "work"
-        return {path.relative_to(directory).as_posix(): path.read_bytes()
-                for path in directory.rglob("*") if path.is_file()}
-
-    def test_folder_registration_handles_unicode_duplicates_and_new_files(self) -> None:
-        source = self.root / "한글 촬영 폴더"
-        source.mkdir()
-        (source / "첫 촬영.MP4").write_bytes(b"first video")
-        (source / "동일 영상.mp4").write_bytes(b"first video")
-        with patch.object(self.register, "probe_video", return_value=self.metadata):
-            result = self.register.register_recordings(
-                self.config_path, self.root / "missing-plans.yaml", None, source)
-            self.assertEqual(result, {"found": 2, "validated": 2, "saved": 1, "duplicate": 1})
-            repeat = self.register.register_recordings(
-                self.config_path, self.root / "missing-plans.yaml", None, source)
-            self.assertEqual((repeat["saved"], repeat["duplicate"]), (0, 2))
-            (source / "새 촬영.mp4").write_bytes(b"second video")
-            added = self.register.register_recordings(
-                self.config_path, self.root / "missing-plans.yaml", None, source)
-            self.assertEqual((added["saved"], added["duplicate"]), (1, 2))
-        manifests = list((self.root / "recordings").rglob("recording_manifest.json"))
-        self.assertEqual(len(manifests), 2)
-        sessions = set()
-        for path in manifests:
-            manifest = read_json(path)
-            self.assertEqual(manifest["vehicle_instances_present"], [])
-            self.assertRegex(manifest["recording_id"], r"^rec_[0-9a-f]{24}$")
-            self.assertEqual(manifest["session_id"], "clip_" + manifest["source_video_sha256"][:24])
-            sessions.add(manifest["session_id"])
-        self.assertEqual(len(sessions), 2)
-
-        other_source = self.root / "other_pc" / "incoming"
-        other_source.mkdir(parents=True)
-        (other_source / "renamed.mp4").write_bytes(b"first video")
-        original_plan = self.register.folder_capture_plan(source)
-        original = next(item for item in original_plan["recordings"] if item["file"] == "첫 촬영.MP4")
-        copied = self.register.folder_capture_plan(other_source)["recordings"][0]
-        self.assertEqual(copied["session_id"], original["session_id"])
-        self.assertEqual(copied["recording_id"], original["recording_id"])
-        grouped = self.register.folder_capture_plan(source, session_id="shared_capture")
-        self.assertEqual({item["session_id"] for item in grouped["recordings"]}, {"shared_capture"})
-
-    def test_manual_prepare_avoids_model_imports_and_preserves_approved(self) -> None:
-        import builtins
-        import importlib.util
-
-        source = self.root / "incoming"
-        source.mkdir()
-        (source / "clip.mp4").write_bytes(b"mock video")
-        with patch.object(self.register, "probe_video", return_value=self.metadata):
-            self.register.register_recordings(self.config_path, self.root / "unused.yaml", None, source)
-
-        class Capture:
-            def __init__(self, _path):
-                self.index = 0
-
-            def isOpened(self):
-                return True
-
-            def read(self):
-                if self.index == 2:
-                    return False, None
-                frame = np.full((480, 640, 3), self.index * 50, dtype=np.uint8)
-                self.index += 1
-                return True, frame
-
-            def release(self):
-                pass
-
-        original_import = builtins.__import__
-
-        def without_models(name, *args, **kwargs):
-            if name.split(".")[0] in {"torch", "yolox", "yolox_runtime"}:
-                raise AssertionError(f"수동 경로에서 모델 모듈을 불러왔습니다: {name}")
-            return original_import(name, *args, **kwargs)
-
-        with patch("builtins.__import__", side_effect=without_models):
-            spec = importlib.util.spec_from_file_location("manual_prepare_under_test", PROJECT_DIR / "prepare_dataset.py")
-            module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(module)
-            with patch.object(module, "probe_video", return_value=self.metadata), \
-                    patch.object(module, "probe_frame_pts", return_value=[0.0, 1 / 30]), \
-                    patch.object(module.cv2, "VideoCapture", Capture):
-                self.assertEqual(module.prepare(self.config_path, manual=True), (2, 0))
-                path = self.root / "work" / "annotations.jsonl"
-                annotations = read_jsonl(path)
-                annotations[0].update(status="approved", objects=self.labeled_box())
-                atomic_write_jsonl(path, annotations)
-                before = self.snapshot_work()
-                self.assertEqual(module.prepare(self.config_path, manual=True), (0, 1))
-                self.assertEqual(self.snapshot_work(), before)
-        self.assertTrue(yaml.safe_load(self.config_path.read_text(encoding="utf-8"))["proposal_detector"]["enabled"])
-
-    def test_merge_two_workers_deduplicates_images_and_repeated_delivery(self) -> None:
-        first = self.make_work("worker_one", [{"id": "first", "color": 20}])
-        second = self.make_work("worker_two", [{"id": "second", "color": 90},
-                                                 {"id": "same_pixels", "color": 20}])
-        result = self.register.merge_work(self.config_path, [first, second])
-        self.assertEqual(result, {"added": 2, "updated": 0, "duplicate": 1})
-        before = self.snapshot_work()
-        repeated = self.register.merge_work(self.config_path, [first, second])
-        self.assertEqual(repeated, {"added": 0, "updated": 0, "duplicate": 3})
-        self.assertEqual(self.snapshot_work(), before)
-        self.assertEqual(len(read_jsonl(self.root / "work" / "recording_index.jsonl")), 3)
-
-    def test_merge_conflicting_completed_boxes_leaves_all_existing_bytes(self) -> None:
-        first = self.make_work("first_worker", [{"id": "shared"}])
-        self.register.merge_work(self.config_path, [first])
-        before = self.snapshot_work()
-        second = self.make_work("second_worker", [{"id": "new", "color": 100},
-                                                    {"id": "shared", "objects": self.labeled_box(30)}])
-        with self.assertRaisesRegex(DatasetContractError, "같은 사진의 박스가 다릅니다"):
-            self.register.merge_work(self.config_path, [second])
-        self.assertEqual(self.snapshot_work(), before)
-
-    def test_merge_completed_labels_updates_old_metadata_without_instances_key(self) -> None:
-        old = self.make_work("old_worker", [{"id": "shared", "status": "manual_review_required",
-                                              "objects": [], "instances_key": False}])
-        completed = self.make_work("completed_worker", [{"id": "shared"}])
-        self.register.merge_work(self.config_path, [old])
-        result = self.register.merge_work(self.config_path, [completed])
-        self.assertEqual(result, {"added": 0, "updated": 1, "duplicate": 1})
-        annotations = read_jsonl(self.root / "work" / "annotations.jsonl")
-        self.assertEqual(annotations[0]["status"], "approved")
-        self.assertEqual(annotations[0]["objects"], self.labeled_box())
-        before = self.snapshot_work()
-        self.register.merge_work(self.config_path, [completed])
-        self.assertEqual(self.snapshot_work(), before)
-
-    def test_merge_preserves_rejected_unlabeled_boxes(self) -> None:
-        objects = [{"bbox": [1, 2, 10, 20], "class_name": None, "vehicle_instance": None}]
-        received = self.make_work("rejected_worker", [{"id": "discard", "status": "rejected", "objects": objects}])
-        result = self.register.merge_work(self.config_path, [received])
-        self.assertEqual(result["added"], 1)
-        annotation = read_jsonl(self.root / "work" / "annotations.jsonl")[0]
-        self.assertEqual(annotation["status"], "rejected")
-        self.assertEqual(annotation["objects"], objects)
+    def test_only_current_or_no_remaining_keeps_position(self):
+        session = ReviewSession.__new__(ReviewSession)
+        session.frames = [{"frame_id": "current"}]
+        session.annotations = {"current": {"status": "draft"}}
+        session.index = 0
+        session.jump_to_remaining()
+        self.assertEqual(session.index, 0)
+        session.annotations["current"]["status"] = "approved"
+        session.jump_to_remaining()
+        self.assertEqual(session.index, 0)
+        self.assertEqual(normalize_review_key(ord("ㄱ")), ord("r"))
 
 
 if __name__ == "__main__":

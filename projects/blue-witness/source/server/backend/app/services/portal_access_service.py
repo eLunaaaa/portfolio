@@ -1,9 +1,18 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from hashlib import sha256
+from pathlib import Path
 import sqlite3
 
-from app.db.database import DATABASE_PATH
+
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+
+DATABASE_PATH = (
+    BACKEND_ROOT
+    / "storage"
+    / "database"
+    / "ace.db"
+)
 
 
 @dataclass(frozen=True)

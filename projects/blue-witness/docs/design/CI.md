@@ -28,7 +28,7 @@ Pi 소스를 x86 host compiler로만 검사하면 ARM 라이브러리·ABI 문�
 | FFmpeg fixture | 실제 인코딩·병합·probe | 실차 모든 codec·긴 영상 |
 | 웹 회귀 | 비동기 응답·재생·모달·선택 유지 | 모든 모바일 브라우저의 시각적 동작 |
 
-초기 스냅샷은 `check-server.sh`, `check-server-tls.sh`, `check-server-merge.py`로 이를 분리합니다. 최신 팀 버전은 `check-server.py`와 OS별 의존성 설치로 통합·보완됐습니다. 이번 복제 서버의 72/51 테스트는 최신 담당 모듈에 대한 별도 재검증이며, 초기 CI 스냅샷 자체가 그 수를 실행했다고 의미하지 않습니다.
+초기 스냅샷은 `check-server.sh`, `check-server-tls.sh`, `check-server-merge.py`로 이를 분리합니다. 최신 팀 버전은 `check-server.py`와 OS별 의존성 설치로 통합·보완됐습니다. 현재 복제한 로컬 서버의 64/36 테스트는 별도 재검증이며, 초기 CI 스냅샷 자체가 그 수를 실행했다고 의미하지 않습니다. 기존 원격 코드 검증의 72/51과도 구분합니다.
 
 ## 선택 4. 코드와 산출물의 연결
 

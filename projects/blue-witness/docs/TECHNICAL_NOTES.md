@@ -8,7 +8,7 @@
 
 ## 2. 모델 성능과 실행 계약을 함께 관리
 
-학습 코드에서 좋은 결과를 얻어도 장치의 BGR/RGB, 0~255/정규화, letterbox 위치, grid decode가 다르면 검출이 어긋납니다. ONNX 입출력 이름·shape·dtype와 C++ 후처리를 맞추고, 내보내기 도구가 공통 실행 설정을 읽도록 구성했습니다. Nano는 비교 실험, Tiny는 최종 배포 모델로 구분합니다.
+학습 코드에서 좋은 결과를 얻어도 장치의 BGR/RGB, 0~255/정규화, letterbox 위치, grid decode가 다르면 검출이 어긋납니다. ONNX 입출력 이름·shape·dtype와 C++ 후처리를 맞춥니다. 현재 로컬 export는 validation 추천값 또는 명시한 Confidence를 manifest에 기록하고, 팀 원격의 공통 header 연동과는 구분합니다. Nano는 비교 실험, Tiny는 최종 배포 모델입니다.
 
 ## 3. 촬영 callback에서 긴 작업 제거
 

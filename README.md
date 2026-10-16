@@ -12,7 +12,7 @@
 - **기술**: C/C++ · Raspberry Pi 5 · libcamera · YOLOX-Tiny · PyTorch/MPS · ONNX Runtime · FFmpeg · FastAPI · SQLite · Chrony · GitHub Actions
 - **평가 기록**: 전체 BBox 검증 12,873프레임의 대상 차종 유무 정답률 98.39%; 별도 test 묶음 1,633프레임에서 98.65%
 - **팀 통합 검증**: 테스트베드 실제 충돌 27회 시나리오 성공, 사고·목격 영상 81건 서버 저장 확인
-- **공개 코드 재검증**: 서버 Python 72개·웹 JavaScript 51개·모델 실행 계약 4개 테스트 및 시나리오 CSV 검증 통과
+- **로컬 최신본 검증**: 서버 Python 64개·웹 JavaScript 36개·모델 학습 파이프라인 30개 테스트 통과. 원격 전용 회귀 검사와의 차이도 별도 기록
 
 [프로젝트 상세 및 기여](projects/blue-witness/README.md) · [모델 학습](projects/blue-witness/ml/README.md) · [전체 Fail-safe 설계](projects/blue-witness/docs/FAILSAFE.md) · [코드·기여 근거](projects/blue-witness/docs/CODE_GUIDE.md) · [검증 및 한계](projects/blue-witness/docs/CODE_REVIEW.md)
 

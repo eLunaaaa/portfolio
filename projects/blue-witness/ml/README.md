@@ -2,6 +2,8 @@
 
 [프로젝트 개요](../README.md) · [원본 학습 도구](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/model_training)
 
+현재 포함 코드는 로컬 `ACE_Ai/vehicle_model` 기준입니다. GitHub 정리본과 다른 학습·export 선택은 [로컬 갱신 기록](../docs/LOCAL_SNAPSHOT.md)에 구분했습니다.
+
 ## 담당한 흐름
 
 촬영 영상을 프레임으로 등록하고, 작업자별 BBox 결과를 병합·검수한 뒤 데이터셋 버전을 확정합니다. COCO 변환 → 2-class 변환 → YOLOX 학습 → 평가 → ONNX 내보내기를 하나의 도구 흐름으로 구성했습니다. 라벨 검수는 동료와 영상 단위로 분담했습니다.
@@ -27,6 +29,7 @@
 | 학습 구조 | YOLOX-Tiny, 640×480, 2 classes |
 | 데이터 분리 목표 | train 70% / validation 15% / test 15%, 촬영 묶음 단위이므로 실제 프레임 비율은 달라질 수 있음 |
 | 기본 학습 설정 | 최대 100 epochs, batch 8, SGD momentum 0.9, weight decay 0.0005, warmup 5 epochs |
+| 로컬 추가 실험 | 세션 가중 sampling 3배·6배, parent checkpoint 미세조정, backbone·BatchNorm 동결, 블러 검수 설정 |
 | 증강 설정 | 좌우 반전 확률 0.5, HSV·Mosaic·MixUp 비활성화 |
 | 재현 정보 | Python/NumPy/PyTorch seed, dataset/checkpoint hash, Git commit, 실행 장치·환경 |
 | 배포 평가 모델 | `tiny_blur_removed_v009_b8`, `dataset_v009`, 선택 checkpoint epoch 1 |
@@ -35,6 +38,8 @@
 | 배포 판정 | objectness × class score ≥ 0.60, class별 NMS IoU 0.65, 6프레임마다 추론, 최근 3회 중 2회 검출 |
 
 기본 설정의 100 epochs를 최종 모델이 100 epoch 학습됐다는 성과로 해석하지 않습니다. 실제 선택된 모델과 데이터 버전은 평가 명세로 확인합니다. 최종 Confidence 0.60 선정·공통 설정화는 팀의 후속 평가·통합 작업을 포함합니다.
+
+로컬 블러 검수 실험은 5 epochs·backbone 동결·warmup 0을 별도로 설정하고, 보존된 로컬 release manifest의 Confidence는 0.55입니다. 팀 평가 자료의 0.60과 서로 다른 버전·선정 단계이므로 하나로 덮어쓰지 않습니다. 로컬 export는 validation 결과 또는 명시값을 기록합니다.
 
 ## 학습 실행 흐름
 

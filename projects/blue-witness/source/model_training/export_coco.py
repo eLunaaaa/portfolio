@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""@file export_coco.py
-@brief 수동 검수가 끝난 frame을 누수 없는 불변 COCO 데이터셋 버전으로 내보낸다.
-
-session과 source_group의 연결 컴포넌트를 하나의 split 단위로 묶고 train/val/test에
-배정한다. 승인 객체와 negative frame만 포함하고 rejected 및 final_test 자료는
-학습 데이터에서 제외한다. 이미지·annotation·class 계약·원본 추적 정보·통계와
-SHA를 새 dataset_vNNN에 기록하며 기존 버전은 절대 덮어쓰지 않는다.
-"""
+"""검수 완료 프레임을 누수 없는 불변 버전의 COCO 데이터셋으로 내보낸다."""
 
 from __future__ import annotations
 
@@ -39,33 +32,25 @@ from dataset_contracts import (
 SPLITS = ("train", "val", "test")
 
 
-# ============================================================================
-# 원본 계열을 보존하는 split 컴포넌트 구성
-# ============================================================================
-
 class UnionFind:
     """세션과 소스 그룹의 연결 관계를 하나의 분할 컴포넌트로 묶는다."""
 
     def __init__(self) -> None:
-        """각 session/source key가 처음에는 자기 자신을 부모로 갖도록 준비한다."""
         self.parent: dict[str, str] = {}
 
     def find(self, value: str) -> str:
-        """경로 압축을 적용해 값이 속한 연결 컴포넌트의 대표 key를 반환한다."""
         self.parent.setdefault(value, value)
         if self.parent[value] != value:
             self.parent[value] = self.find(self.parent[value])
         return self.parent[value]
 
     def union(self, left: str, right: str) -> None:
-        """두 key의 대표를 합쳐 같은 원본 계열이 서로 다른 split으로 새지 않게 한다."""
         left_root, right_root = self.find(left), self.find(right)
         if left_root != right_root:
             self.parent[right_root] = left_root
 
 
 def _components(frames: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    """session과 source_group 연결 관계를 split 배정 최소 단위로 묶는다."""
     union_find = UnionFind()
     for frame in frames:
         union_find.union(f"session:{frame['session_id']}", f"source:{frame['source_group_id']}")
@@ -76,32 +61,29 @@ def _components(frames: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]
     return dict(components)
 
 
-# -----------------------------------------------------------------------------
-# 기능: 누수를 막으면서 클래스·인스턴스·인코딩 계약을 만족하도록 컴포넌트를 배치한다.
-#
-# 동작 방법:
-#   1. 누수를 막으면서 클래스·인스턴스·인코딩 계약을 만족하도록 컴포넌트를 배치한다
-#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
-#
-# 사용 이유/연결: 수동 검수 결과를 입력으로 받아 validate_dataset.py와 train.py에 전달한다.
-#
-# 입력:
-#   components (dict[str, list[dict[str, Any]]]) - 이 함수의 components 처리에 사용하는 값.
-#   annotations (dict[str, dict[str, Any]]) - 이 함수의 annotations 처리에 사용하는 값.
-#   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
-#
-# 반환: dict[str, str] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def _assign_splits(
     components: dict[str, list[dict[str, Any]]],
     annotations: dict[str, dict[str, Any]],
     settings: dict[str, Any],
 ) -> dict[str, str]:
+    """누수를 막으면서 클래스·인스턴스·인코딩 계약을 만족하도록 컴포넌트를 배치한다."""
     if len(components) < len(SPLITS):
         raise DatasetContractError(
             f"누수 없이 3개 split을 만들려면 독립 컴포넌트가 최소 3개 필요합니다. 현재 {len(components)}개"
         )
     export = settings["dataset_export"]
+    # 기존 평가 split을 유지하거나 보강 session을 train에만 넣을 때 사용한다.
+    # session/source 연결 컴포넌트 전체에 적용해 같은 장면이 갈라지지 않게 한다.
+    session_overrides = export.get("session_split_overrides", {})
+    if not isinstance(session_overrides, dict) or any(value not in SPLITS for value in session_overrides.values()):
+        raise DatasetContractError("session_split_overrides는 session ID와 train/val/test의 매핑이어야 합니다.")
+    component_overrides: dict[str, str] = {}
+    for key, component_frames in components.items():
+        requested = {session_overrides[frame["session_id"]] for frame in component_frames if frame["session_id"] in session_overrides}
+        if len(requested) > 1:
+            raise DatasetContractError(f"연결된 촬영 컴포넌트의 고정 split이 충돌합니다: {key}")
+        if requested:
+            component_overrides[key] = next(iter(requested))
     ratios = {name: float(export[f"{name}_ratio"]) for name in SPLITS}
     required_profiles = {
         name
@@ -109,6 +91,7 @@ def _assign_splits(
         if bool(profile.get("required_in_every_split", False))
     }
     required_classes = {item["name"] for item in settings["classes"]}
+    required_tags = set(export.get("required_condition_tags_in_every_split", []))
     required_instances = {
         instance
         for item in settings["classes"]
@@ -148,19 +131,25 @@ def _assign_splits(
         class_counts_by_split = {name: Counter() for name in SPLITS}
         instance_counts_by_split = {name: Counter() for name in SPLITS}
         assignment: dict[str, str] = {}
+        condition_tags_by_split: dict[str, set[str]] = {name: set() for name in SPLITS}
         for key in keys:
-            split = min(
+            split = component_overrides.get(key) or min(
                 SPLITS,
                 key=lambda name: counts[name] / max(ratios[name] * total, 1.0) + rng.random() * 0.02,
             )
             assignment[key] = split
             counts[split] += len(components[key])
             profiles[split].update(frame["encoding_profile"] for frame in components[key])
+            for frame in components[key]:
+                condition_tags_by_split[split].update(frame.get("condition_tags", []))
             class_counts_by_split[split].update(component_class_counts[key])
             instance_counts_by_split[split].update(component_instance_counts[key])
         if any(counts[name] == 0 for name in SPLITS):
             continue
         if any(not required_profiles.issubset(profiles[name]) for name in SPLITS):
+            continue
+        # 실제 시연 환경이 평가 split에도 존재해야 보강 효과를 확인할 수 있다.
+        if any(not required_tags.issubset(condition_tags_by_split[name]) for name in SPLITS):
             continue
         if any(not required_classes.issubset(class_counts_by_split[name]) for name in SPLITS):
             continue
@@ -192,12 +181,7 @@ def _assign_splits(
     return best[1]
 
 
-# ============================================================================
-# 불변 COCO 데이터셋 생성과 통계 기록
-# ============================================================================
-
 def _bbox_statistics(width_ratios: list[float], configured_bins: Any) -> dict[str, Any]:
-    """bbox 너비 비율의 범위·중앙값과 선택적 구간별 분포를 요약한다."""
     if not width_ratios:
         return {"count": 0, "min": None, "median": None, "max": None, "bins": None}
     result: dict[str, Any] = {
@@ -219,26 +203,8 @@ def _bbox_statistics(width_ratios: list[float], configured_bins: Any) -> dict[st
     return result
 
 
-# -----------------------------------------------------------------------------
-# 기능: 검수 상태를 검증하고 새 dataset_vNNN 디렉터리를 한 번만 생성한다.
-#
-# 동작 방법:
-#   1. frame manifest와 annotation의 frame_id 집합 및 모든 검수 상태를 확인한다.
-#   2. final_test와 rejected frame을 제외하고 development 자료만 export 대상으로 고른다.
-#   3. session/source_group 연결 컴포넌트를 만들어 같은 원본 계열의 split 누수를 막는다.
-#   4. class·instance·encoding profile이 모두 포함되도록 train/val/test를 배정한다.
-#   5. JPEG와 COCO annotation, classes, 추적 manifest와 통계를 staging에 생성한다.
-#   6. 파일별 SHA와 dataset SHA를 계산한 뒤 staging을 새 불변 버전으로 교체한다.
-#
-# 사용 이유/연결: 수동 검수 결과를 입력으로 받아 validate_dataset.py와 train.py에 전달한다.
-#
-# 입력:
-#   config_path (Path) - 경로·class·threshold 등 실행 계약이 기록된 YAML config 경로.
-#   requested_version (str | None) - 생성할 dataset_vNNN 이름. None이면 다음 번호를 자동 선택한다.
-#
-# 반환: 검증 가능한 COCO 파일이 모두 생성된 새 데이터셋 루트 Path를 반환한다.
-# -----------------------------------------------------------------------------
 def export_dataset(config_path: Path, requested_version: str | None) -> Path:
+    """검수 상태를 검증하고 새 dataset_vNNN 디렉터리를 한 번만 생성한다."""
     settings = load_settings(config_path)
     work_dir = resolve_project_path(config_path, settings["paths"]["work_dir"])
     datasets_dir = resolve_project_path(config_path, settings["paths"]["datasets_dir"])
@@ -493,7 +459,6 @@ def export_dataset(config_path: Path, requested_version: str | None) -> Path:
 
 
 def parse_args() -> argparse.Namespace:
-    """내보낼 config와 선택적 dataset_vNNN 이름을 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--dataset-version", default=None)
@@ -501,7 +466,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """COCO 데이터셋 export를 실행하고 생성된 불변 버전 경로를 출력한다."""
     args = parse_args()
     try:
         destination = export_dataset(args.config.resolve(), args.dataset_version)

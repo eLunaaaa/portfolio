@@ -16,6 +16,8 @@
 
 [팀 원본 저장소](https://github.com/kingwooseok/2026ESWContest_mobility_ACE) · [정리 기준 버전 `5148804`](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804)
 
+서버·모델 학습 소스는 2026-10-16에 확인한 **로컬 개발본**으로 갱신했습니다. 서버는 `Desktop/embeded_software_server/backend`, 학습은 `Desktop/ACE_Ai/vehicle_model`이 기준입니다. 팀 런타임·측정 자료·Time Sync는 기존 고정 버전, CI/CD는 개인 작업 시점 스냅샷을 유지합니다. [로컬 갱신 차이](docs/LOCAL_SNAPSHOT.md)
+
 ## 설계 선택부터 보기
 
 **어떤 기능을 만들었는가보다 왜 그 구조를 택했는가**를 중심으로 정리했습니다. [설계 결정표](docs/design/DECISIONS.md)에서 대안·선택 이유·비용을 한눈에 보고, [모듈별 상세 설계](docs/design/README.md)에서 실제 코드·상태 전이·복구·시험으로 이어집니다.
@@ -74,6 +76,8 @@
 
 자동 BBox 초안은 정답으로 간주하지 않고 작업자의 승인·수정을 거칩니다. 차량 없음 프레임도 유지하고, 같은 촬영 세션·원본 계열을 서로 다른 split에 섞지 않도록 데이터셋을 구성합니다. 학습 설정·환경·seed·dataset/checkpoint hash를 실험별로 기록하고, ONNX checker와 PyTorch/ONNX 출력 비교 도구를 연결했습니다.
 
+로컬 실험에는 학습 split의 특정 촬영 세션을 더 자주 뽑는 sampling 가중치, 기존 checkpoint의 hash·class·해상도를 확인한 미세조정, backbone과 BatchNorm 상태 동결을 추가했습니다. 데이터 파일을 복제해 비율을 바꾸는 대신 학습 노출만 조절하는 선택입니다. 세션 3배·6배 설정과 블러 검수 실험을 코드·설정으로 남겼습니다.
+
 ![촬영·라벨 검수·데이터셋 분리·학습·ONNX 내보내기 흐름](media/training-flow.png)
 
 [학습 환경·설정·평가 상세](ml/README.md)
@@ -116,7 +120,7 @@ GitHub Actions에서 변경된 모듈의 검사·ARM64 빌드와 서버 검증�
 
 ## 검증과 공개 범위
 
-2026년 10월 16일 기준 버전에서 서버 Python 72개, 웹 JavaScript 51개, 모델 실행 계약 4개 테스트와 27회 시나리오 검증 스크립트를 다시 실행했습니다. 이번 정리에서 GPU 재학습·실장치 재시연·fleet 배포는 수행하지 않았습니다.
+2026년 10월 16일 로컬 소스 기준 서버 Python 64개·웹 JavaScript 36개·모델 학습 파이프라인 30개 시험을 확인했습니다. 학습 시험은 로컬 YOLOX·사전학습 의존성과 임시 fixture를 사용했고, 복제한 학습 코드로도 재실행했습니다. 팀 시나리오 CSV 검증 결과는 별도 유지합니다. 전체 GPU 재학습·실장치 재시연·fleet 배포는 하지 않았습니다. 원격에만 있는 회귀 개선·테스트와의 차이는 숨기지 않고 [비교 기록](reference/github-regressions/README.md)에 남겼습니다.
 
 [검증 명령·남은 한계](docs/CODE_REVIEW.md) · [구현 위치와 기여 커밋](docs/CODE_GUIDE.md) · [기술 선택과 트러블슈팅](docs/TECHNICAL_NOTES.md)
 

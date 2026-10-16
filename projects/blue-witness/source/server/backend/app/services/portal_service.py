@@ -216,6 +216,28 @@ def determine_merge_status(
     return "REGISTERED"
 
 
+def merged_input_vehicle_ids(merged_path: Path | None) -> list[str] | None:
+    """표시 중인 병합 버전의 실제 영상 차량만 집계함. 검정 대체 칸은 제외함.
+
+    수신 DB나 현재 제외 설정으로 추정하지 않아 지연 업로드·설정 변경에도
+    실제 재생 중인 파일과 수가 일치함. 기록이 없으면 미확인으로 반환함.
+    """
+    if merged_path is None:
+        return []
+    plan_path = merged_path.with_name(
+        merged_path.stem.replace("merged_", "merge_plan_", 1) + ".json"
+    )
+    try:
+        plan = json.loads(plan_path.read_text(encoding="utf-8"))
+        inputs = plan["inputs"]
+        if not isinstance(inputs, list):
+            return None
+        return sorted({item["vehicle_id"] for item in inputs
+                       if not item.get("is_placeholder", False) and item.get("video_path")})
+    except (OSError, ValueError, KeyError, TypeError, AttributeError):
+        return None
+
+
 def event_record_to_summary(
     record: EventRecord,
 ) -> EventSummary:
@@ -236,6 +258,7 @@ def event_record_to_summary(
         merged_path=merged_path,
     )
 
+    merged_ids = merged_input_vehicle_ids(merged_path)
     return EventSummary(
         event_id=record.event_id,
         accident_vehicle_id=(
@@ -248,6 +271,8 @@ def event_record_to_summary(
         evidence_count=(
             record.evidence_count
         ),
+        merged_evidence_count=None if merged_ids is None else len(merged_ids),
+        merged_vehicle_ids=merged_ids or [],
         evidence_vehicle_ids=list(
             record.evidence_vehicle_ids
         ),

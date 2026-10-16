@@ -6,11 +6,11 @@
 
 | 경로 | 범위 | 원본 기준 |
 |---|---|---|
-| server/ | 담당 백엔드·프런트엔드·테스트·DB schema·도구 | `5148804` 통합 코드 |
-| model_training/ | 촬영 등록·BBox 검수·COCO 변환·학습·평가·ONNX 도구·테스트 | `5148804` 통합 코드 |
+| server/ | 담당 백엔드·프런트엔드·테스트·DB schema·도구 | 2026-10-16 로컬 `embeded_software_server` |
+| model_training/ | 촬영 등록·BBox 검수·COCO 변환·학습·평가·ONNX 도구·테스트·실험 설정 | 2026-10-16 로컬 `ACE_Ai/vehicle_model` |
 | time_sync/ | 담당 C 상태 서비스·Makefile·systemd 배포 설정 | `5148804` 통합 코드 |
 | ai/contribution-patches/ | 본인 계정의 추론 threshold 변경 diff | `afca0e4`, `59253bd` |
-| ai/inference_config.h | 학습 내보내기·테스트에 필요한 최종 런타임 계약 | `5148804`, 팀 통합 의존성, 개인 단독 작성 아님 |
+| ai/inference_config.h | 팀 통합 버전의 런타임 설정 참고 | `5148804`, 현재 로컬 export가 import하는 파일은 아님 |
 | automation/ | 본인 작업 시점의 CI·수동 fleet CD 코드 | `bc6371a` — 최신 운영 버전이 아닌 역사적 설계 증거 |
 
 ‘내가 만든 부분’은 담당 모듈·설계 범위를 뜻하며 해당 파일 모든 줄의 단독 저작을 주장하지 않습니다. 파일별 원본 commit·SHA-256·출처 범위는 manifest에 기록합니다. 모델 학습의 공식 YOLOX, 공용 IPC·watchdog, Sensor·Filter·P2P·Uploader 본체, 팀원의 독립 모듈은 넣지 않았습니다. AI 촬영·Snapshot·영상 처리 본체는 팀 구현이므로 원본 링크로만 설명합니다.
@@ -35,14 +35,14 @@ python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 
 ## 학습 환경
 
-`model_training/requirements.txt`와 FFmpeg가 필요합니다. `third_party/YOLOX/`는 원본 저장소의 **동일 커밋·동일 패치 버전**을 별도 준비해야 합니다. 공식 upstream을 임의 최신 버전으로 받으면 `config_2class_tiny.yaml`의 source commit·패치 해시 검증과 맞지 않을 수 있습니다. 데이터·사전학습 checkpoint 역시 별도 준비가 필요합니다.
+`model_training/requirements.txt`와 FFmpeg가 필요합니다. 로컬 설정은 `source_dir: ../YOLOX`이므로 `source/YOLOX/` 위치에 **동일 커밋·동일 패치 버전**을 별도 준비해야 합니다. 최신 upstream 임의 버전으로 대체하면 source commit·patch hash가 맞지 않을 수 있습니다. 학습 데이터·사전학습 가중치·미세조정용 parent checkpoint도 별도 필요합니다.
 
 ```bash
 cd projects/blue-witness/source
-PYTHONPATH=model_training python -m unittest discover -s model_training/tests -p test_runtime_contract.py -v
+PYTHONPATH=model_training python -m unittest discover -s model_training/tests -v
 ```
 
-위 4개 계약 시험은 학습 프레임워크 전체 없이 설정 연동만 검사합니다. 전체 파이프라인 시험·학습은 원본의 YOLOX·checkpoint·데이터 준비를 먼저 완료해야 합니다.
+학습 framework·YOLOX·checkpoint 등 필요한 fixture를 준비한 뒤 실행합니다. 이번에는 로컬에 준비된 의존성으로 원본·복제 코드의 파이프라인 30개를 검증했습니다. 원격에만 있던 `runtime_contract.py`와 계약 시험은 현재 로컬 학습본에 없으므로 활성 소스에서 제거했습니다.
 
 ## Time Sync 빌드
 

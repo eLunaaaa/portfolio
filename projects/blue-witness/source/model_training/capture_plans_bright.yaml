@@ -1,0 +1,65 @@
+schema_version: 1
+plans:
+  bright_craft4_recordings:
+    source_directory: /Users/minseok/Desktop/ACE_Ai/밝은곳/craft4_recordings
+    encoding_profile: primary_2_5mbps
+    dataset_usage: development
+    session_defaults: {}
+    recordings:
+    - file: clip_20260821_162042.mp4
+      session_id: bright_craft4_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+    - file: clip_20260821_162105.mp4
+      session_id: bright_craft4_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+    - file: clip_20260821_162133.mp4
+      session_id: bright_craft4_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+  bright_craft6_recordings:
+    source_directory: /Users/minseok/Desktop/ACE_Ai/밝은곳/craft6_recordings
+    encoding_profile: primary_2_5mbps
+    dataset_usage: development
+    session_defaults: {}
+    recordings:
+    - file: clip_20260821_161208.mp4
+      session_id: bright_craft6_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+    - file: clip_20260821_161239.mp4
+      session_id: bright_craft6_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+    - file: clip_20260821_161345.mp4
+      session_id: bright_craft6_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+  bright_seongugi_recordings:
+    source_directory: /Users/minseok/Desktop/ACE_Ai/밝은곳/seongugi_recordings
+    encoding_profile: primary_2_5mbps
+    dataset_usage: development
+    session_defaults: {}
+    recordings:
+    - file: clip_20260819_173218.mp4
+      session_id: bright_seongugi_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+    - file: clip_20260819_173250.mp4
+      session_id: bright_seongugi_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []
+    - file: clip_20260819_173337.mp4
+      session_id: bright_seongugi_recordings
+      condition_tags:
+      - bright_environment
+      vehicle_instances: []

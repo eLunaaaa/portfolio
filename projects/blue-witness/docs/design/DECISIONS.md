@@ -11,6 +11,7 @@
 | 모든 주변 영상을 저장·전송하면 자원이 큼 | 전체 전송 / 단일 AI 선별 / 위치·화각 후 AI | 팀의 1차 Filter 뒤에 대상 차종 판정을 연결해 불필요한 영상 처리를 줄임 | 1차 선별에서 빠진 영상은 AI로 복구할 수 없음 | [AI 연동](AI_HANDOFF.md) |
 | 실장치와 학습 입력 불일치 | 일반 사전학습 모델 그대로 / 모형차 fine-tuning | 실제 촬영·라벨 검수·Tiny fine-tuning, 고정 전처리 계약 | 수집·검수 비용과 제한된 차종 범위 | [학습](MODEL_TRAINING.md) |
 | 연속 프레임 평가가 과대평가될 수 있음 | 프레임 무작위 / 촬영 묶음 분리 | 원본·촬영 세션 계열을 하나의 split으로 관리 | 목표 70/15/15의 정확한 프레임 비율을 포기 | [학습 split](MODEL_TRAINING.md) |
+| 특정 촬영 조건에서 약함 | 파일 복제 / 전체 재학습 / 학습 sampling·미세조정 | train session 가중치와 검증된 parent checkpoint로 보완 | 반복 sampling·기존 특징 고정에 따른 적응 한계 | [로컬 학습 선택](MODEL_TRAINING.md) |
 | 한 번의 검출 흔들림 | 단일 프레임 / 전 프레임 / 일정 간격 다수결 | 팀 런타임의 6프레임 sampling·최근 3회 중 2회 검출 | 짧게 보이는 대상의 미검출 가능성 | [AI 판정](AI_HANDOFF.md) |
 | 촬영 중 추론·저장이 오래 걸림 | callback에서 모두 수행 / 별도 Worker와 Snapshot | 긴 작업과 촬영을 분리하고 Snapshot 참조 수명 보호 | Queue·버퍼 수명 관리 복잡성, 약 422MiB 프레임 공간 | [AI 보존](AI_HANDOFF.md) |
 | 프로세스는 살아도 업무가 멈춤 | PID 감시 / 감시 thread heartbeat / 업무별 진행 감시 | 업무 진행 deadline이 살아 있을 때만 systemd watchdog 통지 | 정상 최대 작업 시간에 맞춘 기한 설계 필요 | [Fail-safe](../FAILSAFE.md) |

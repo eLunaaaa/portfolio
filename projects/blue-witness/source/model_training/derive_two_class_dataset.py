@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""@file derive_two_class_dataset.py
-@brief 검증된 3-class COCO 데이터셋을 같은 split을 유지한 2-class 데이터셋으로 파생한다.
-
-원본 이미지와 누수 방지 split은 그대로 복사하고 palisade_black과 other_vehicle의
-category만 other_vehicle로 합친다. 새 classes·annotation·summary·manifest SHA를
-다시 계산하며 원본 불변 버전은 수정하지 않는다. 2-class Nano/Tiny 비교 학습에서
-동일한 frame 구성을 사용하기 위한 변환 단계다.
-"""
+"""3-class 불변 COCO 데이터셋을 같은 split의 2-class 데이터셋으로 파생한다."""
 
 from __future__ import annotations
 
@@ -35,27 +28,12 @@ SOURCE_CLASSES = {0: "ioniq5_silver", 1: "palisade_black", 2: "other_vehicle"}
 TARGET_CLASS_IDS = {"ioniq5_silver": 0, "palisade_black": 1, "other_vehicle": 1}
 
 
-# -----------------------------------------------------------------------------
-# 기능: 이미지와 split을 유지하고 팰리세이드·기타 차량 라벨만 하나로 합친다.
-#
-# 동작 방법:
-#   1. 이미지와 split을 유지하고 팰리세이드·기타 차량 라벨만 하나로 합친다
-#   2. 중간 산출물의 계약을 검사하고 완료 결과만 다음 pipeline 단계에 전달한다.
-#
-# 사용 이유/연결: 3-class export 결과를 입력으로 받아 2-class 학습 단계에 전달한다.
-#
-# 입력:
-#   source_dataset (Path) - 이 함수의 source_dataset 처리에 사용하는 값.
-#   target_config (Path) - 이 함수의 target_config 처리에 사용하는 값.
-#   target_version (str) - 이 함수의 target_version 처리에 사용하는 값.
-#
-# 반환: Path 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def derive_dataset(
     source_dataset: Path,
     target_config: Path,
     target_version: str,
 ) -> Path:
+    """이미지와 split을 유지하고 팰리세이드·기타 차량 라벨만 하나로 합친다."""
     settings = load_settings(target_config)
     expected_classes = ["ioniq5_silver", "other_vehicle"]
     actual_classes = [item["name"] for item in settings["classes"]]
@@ -166,7 +144,6 @@ def derive_dataset(
 
 
 def parse_args() -> argparse.Namespace:
-    """원본 데이터셋과 파생할 2-class 버전을 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-dataset", type=Path, required=True)
     parser.add_argument("--target-config", type=Path, default=Path("config_2class_tiny.yaml"))
@@ -175,7 +152,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """2-class 파생 작업을 실행하고 사용자가 확인할 결과 경로를 출력한다."""
     arguments = parse_args()
     try:
         destination = derive_dataset(

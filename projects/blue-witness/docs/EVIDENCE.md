@@ -24,6 +24,8 @@
 
 실제 Git 기록에서 카메라·Snapshot·AI 런타임 본체와 공통 watchdog은 다른 팀원 기여가 중심입니다. 해당 코드를 본인 단독 구현으로 복제하지 않고 설계 인터페이스와 연동 근거로만 설명합니다. 담당 모듈에 후속 팀 수정이 존재하므로 [manifest](../source/PROVENANCE.json)는 ‘전체 파일 저자 증명’이 아니라 정확한 복제 출처 증명입니다.
 
+현재 서버와 학습 코드의 최신 출처는 [로컬 스냅샷](LOCAL_SNAPSHOT.md)입니다. 아직 원격 커밋에 없는 변경은 파일별 로컬 원본 hash로 연결하고 Git 이력의 기여 근거와 구분합니다. 부모 checkpoint·dataset·ONNX hash는 [로컬 release 명세](../source/model_training/experiment_evidence/blur_removed_v009_release_manifest.json)에 남겨 실험 설정과 연결했습니다.
+
 ## 수치의 재현 근거
 
 - 12,873프레임 결과: 원본 `selected_threshold_metrics.csv`의 전체 묶음. 임계값 선정에 쓰였으므로 독립 test 결과로 취급하지 않습니다.

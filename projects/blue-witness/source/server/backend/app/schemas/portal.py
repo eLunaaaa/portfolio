@@ -60,6 +60,8 @@ class EventSummary(BaseModel):
 
     evidence_count: int
     evidence_vehicle_ids: list[str]
+    merged_evidence_count: int | None = None
+    merged_vehicle_ids: list[str] = Field(default_factory=list)
 
     latest_evidence_received_at: (
         str | None

@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""@file train.py
-@brief 불변 COCO 데이터셋으로 YOLOX Nano/Tiny를 전이학습하고 재현 가능한 실험을 저장한다.
-
-config·YOLOX source·pretrained checkpoint·dataset SHA를 검증한 뒤 MPS 또는 CPU device를
-선택한다. 공식 YOLOX loss와 augmentation loader로 epoch를 수행하고 last/best
-checkpoint, 학습 log와 experiment manifest를 새 실험 디렉터리에 기록한다. sanity
-mode와 정식 학습이 같은 경로를 사용하므로 본 학습 전 pipeline을 빠르게 확인할 수 있다.
-"""
+"""검증된 dataset version으로 YOLOX-Nano를 MPS/CPU에서 전이학습한다."""
 
 from __future__ import annotations
 
@@ -36,6 +29,7 @@ from yolox_runtime import (
     build_yolox_model,
     import_yolox,
     load_pretrained_backbone,
+    load_trained_checkpoint,
     resolve_dataset_dir,
     select_device,
     validate_yolox_installation,
@@ -56,29 +50,13 @@ def configure_logging(log_path: Path) -> None:
 
 
 def seed_everything(seed: int) -> None:
-    """Python·NumPy·PyTorch 난수 seed를 맞춰 학습 재현성을 높인다."""
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
 
 
-# -----------------------------------------------------------------------------
-# 기능: 공식 YOLOX와 같은 BN/no-decay, weight/decay, bias 그룹의 SGD를 구성한다.
-#
-# 동작 방법:
-#   1. 공식 YOLOX와 같은 BN/no-decay, weight/decay, bias 그룹의 SGD를 구성한다
-#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
-#
-# 사용 이유/연결: 검증된 COCO 버전을 입력으로 받아 평가·ONNX export용 checkpoint를 만든다.
-#
-# 입력:
-#   model (torch.nn.Module) - 학습 또는 inference에 사용할 YOLOX model.
-#   learning_rate (float) - 이 함수의 learning_rate 처리에 사용하는 값.
-#   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
-#
-# 반환: torch.optim.Optimizer 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def build_optimizer(model: torch.nn.Module, learning_rate: float, settings: dict[str, Any]) -> torch.optim.Optimizer:
+    """공식 YOLOX와 같은 BN/no-decay, weight/decay, bias 그룹의 SGD를 구성한다."""
     batch_norm_weights, decay_weights, biases = [], [], []
     for module_name, module in model.named_modules():
         del module_name
@@ -100,23 +78,17 @@ def build_optimizer(model: torch.nn.Module, learning_rate: float, settings: dict
 
 
 # -----------------------------------------------------------------------------
-# 기능: crop/Mosaic/MixUp 없이 공식 COCODataset과 TrainTransform만 연결한다.
-#
+# 기능:
+#   공식 YOLOX 전처리와 train split을 연결하고 촬영 session별 sampling을 구성한다.
 # 동작 방법:
-#   1. crop/Mosaic/MixUp 없이 공식 COCODataset과 TrainTransform만 연결한다
-#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
-#
-# 사용 이유/연결: 검증된 COCO 버전을 입력으로 받아 평가·ONNX export용 checkpoint를 만든다.
-#
+#   COCO image ID 순서로 session 가중치를 대응시켜 WeightedRandomSampler에 전달한다.
+#   설정이 없으면 기존 shuffle을 사용하며 sanity 실행은 작은 고정 subset을 사용한다.
+# 사용 이유:
+#   실제 차량 장착·디오라마 자료의 학습 노출을 늘리면서 평가 데이터의 분포를 유지한다.
 # 입력:
-#   source_dir (Path) - 검증된 공식 YOLOX source 디렉터리.
-#   dataset_dir (Path) - 불변 COCO 데이터셋 버전의 루트 경로.
-#   input_size (tuple[int, int]) - 이 함수의 input_size 처리에 사용하는 값.
-#   training (dict[str, Any]) - 이 함수의 training 처리에 사용하는 값.
-#   batch_size (int) - 이 함수의 batch_size 처리에 사용하는 값.
-#   sanity_image_count (int | None) - 이 함수의 sanity_image_count 처리에 사용하는 값.
-#
-# 반환: torch.utils.data.DataLoader 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
+#   training의 session_sampling_weights는 session별 양수 상대 선택 가중치다.
+# 반환:
+#   한 epoch에 train 이미지 수만큼 추출하는 DataLoader. 중복 추출을 허용한다.
 # -----------------------------------------------------------------------------
 def create_training_loader(
     source_dir: Path,
@@ -126,6 +98,7 @@ def create_training_loader(
     batch_size: int,
     sanity_image_count: int | None,
 ) -> torch.utils.data.DataLoader:
+    """crop/Mosaic/MixUp 없이 공식 COCODataset과 TrainTransform만 연결한다."""
     import_yolox(source_dir)
     from yolox.data import COCODataset, TrainTransform
 
@@ -143,6 +116,22 @@ def create_training_loader(
         ),
         cache=False,
     )
+    session_weights = training.get("session_sampling_weights", {})
+    sampler = None
+    if session_weights and sanity_image_count is None:
+        # COCO 이미지 ID 순서와 Dataset 순서를 연결해 실제 촬영 session의
+        # 노출 빈도를 높인다. val/test 파일이나 bbox 정답은 변경하지 않는다.
+        if not isinstance(session_weights, dict):
+            raise DatasetContractError("session_sampling_weights는 session별 양수 가중치 객체여야 합니다.")
+        coco_images = read_json(dataset_dir / "annotations/instances_train.json")["images"]
+        images_by_id = {item["id"]: item for item in coco_images}
+        weights = [float(session_weights.get(images_by_id[image_id]["session_id"], 1.0)) for image_id in dataset.ids]
+        if any(not math.isfinite(weight) or weight <= 0 for weight in weights):
+            raise DatasetContractError("sampling 가중치는 유한한 양수여야 합니다.")
+        sampler = torch.utils.data.WeightedRandomSampler(
+            weights, num_samples=len(dataset), replacement=True,
+            generator=torch.Generator().manual_seed(int(training["random_seed"])),
+        )
     if sanity_image_count is not None:
         if not 20 <= sanity_image_count <= 50:
             raise DatasetContractError("overfit sanity image 수는 20~50이어야 합니다.")
@@ -152,37 +141,20 @@ def create_training_loader(
     return torch.utils.data.DataLoader(
         dataset,
         batch_size=batch_size,
-        shuffle=True,
+        shuffle=sampler is None,
+        sampler=sampler,
         num_workers=int(training["num_workers"]),
         drop_last=False,
     )
 
 
 def _git_commit(project_dir: Path) -> str | None:
-    """실험 manifest에 남길 Git commit을 읽고 저장소가 아니면 None을 반환한다."""
     result = subprocess.run(["git", "-C", str(project_dir), "rev-parse", "HEAD"], capture_output=True, text=True)
     return result.stdout.strip() if result.returncode == 0 else None
 
 
-# -----------------------------------------------------------------------------
-# 기능: 새 experiment를 생성하고 last/best checkpoint와 재현 정보를 함께 저장한다.
-#
-# 동작 방법:
-#   1. config와 YOLOX source/checkpoint SHA, dataset version·SHA와 class 순서를 검증한다.
-#   2. random seed를 고정하고 MPS 우선 device, Nano/Tiny 구조와 SGD optimizer를 준비한다.
-#   3. 공식 COCODataset loader로 train batch를 만들고 pretrained backbone weight를 적용한다.
-#   4. epoch마다 forward, YOLOX loss backward, optimizer update와 learning-rate schedule을 수행한다.
-#   5. 평균 loss가 가장 낮은 weight를 best.pt로, 매 epoch 최신 상태를 last.pt로 저장한다.
-#   6. 실행 인자, 환경, Git commit, dataset SHA와 checkpoint SHA를 experiment manifest에 기록한다.
-#
-# 사용 이유/연결: 검증된 COCO 버전을 입력으로 받아 평가·ONNX export용 checkpoint를 만든다.
-#
-# 입력:
-#   args (argparse.Namespace) - CLI에서 해석한 실행 인자 묶음.
-#
-# 반환: checkpoint와 log, 재현 manifest가 저장된 새 experiment 디렉터리 Path를 반환한다.
-# -----------------------------------------------------------------------------
 def train_model(args: argparse.Namespace) -> Path:
+    """새 experiment를 생성하고 last/best checkpoint와 재현 정보를 함께 저장한다."""
     config_path = args.config.resolve()
     settings = load_settings(config_path)
     source_dir, pretrained_checkpoint = validate_yolox_installation(config_path, settings)
@@ -212,8 +184,22 @@ def train_model(args: argparse.Namespace) -> Path:
     device = select_device()
     class_names = [item["name"] for item in settings["classes"]]
     model_variant = str(settings["yolox"].get("model_variant", "nano"))
-    model = build_yolox_model(source_dir, len(class_names), model_variant)
-    transfer = load_pretrained_backbone(model, pretrained_checkpoint)
+    initial_checkpoint = training.get("initial_checkpoint")
+    if initial_checkpoint:
+        # 공식 사전학습의 backbone만 가져오는 경로와 달리 학습된 head까지 보존한다.
+        # 새 데이터셋으로 미세조정하므로 optimizer/epoch는 새 실험에서 시작한다.
+        initial_path = (config_path.parent / initial_checkpoint).resolve()
+        expected_sha = training.get("initial_checkpoint_sha256")
+        if not expected_sha or sha256_file(initial_path) != expected_sha:
+            raise DatasetContractError("미세조정 initial checkpoint SHA가 설정과 다릅니다.")
+        model, parent_checkpoint = load_trained_checkpoint(source_dir, initial_path, len(class_names), model_variant)
+        if parent_checkpoint.get("classes") != class_names or parent_checkpoint.get("input_size") != list(input_size):
+            raise DatasetContractError("미세조정 checkpoint의 클래스 순서 또는 입력 크기가 다릅니다.")
+        transfer = {"initial_checkpoint": str(initial_path), "sha256": expected_sha,
+                    "epoch": parent_checkpoint.get("epoch"), "mode": "full_model_finetune"}
+    else:
+        model = build_yolox_model(source_dir, len(class_names), model_variant)
+        transfer = load_pretrained_backbone(model, pretrained_checkpoint)
     model.to(device).train()
     learning_rate = float(training["learning_rate_per_image"]) * batch_size
     optimizer = build_optimizer(model, learning_rate, training)
@@ -272,6 +258,10 @@ def train_model(args: argparse.Namespace) -> Path:
         for parameter in model.backbone.parameters():
             parameter.requires_grad = not backbone_frozen
         model.train()
+        if backbone_frozen and training.get("freeze_backbone_batch_norm", False):
+            # requires_grad만 끄면 BatchNorm 통계는 계속 변한다. 특징 추출기를
+            # 온전히 보존하는 미세조정에서는 running mean/variance도 고정한다.
+            model.backbone.eval()
         epoch_losses = Counter()
         batch_count = 0
         for images, targets, _, _ in loader:
@@ -294,6 +284,10 @@ def train_model(args: argparse.Namespace) -> Path:
         }
         last_path = experiment_dir / "checkpoints" / "last.pth"
         torch.save(checkpoint_state, last_path)
+        if initial_checkpoint:
+            # 단기 미세조정은 epoch별 후보를 보존해 필수 장면과 기존 성능을
+            # 함께 확인한 뒤 선택할 수 있게 한다. 정식 재학습 경로는 그대로 둔다.
+            torch.save(checkpoint_state, experiment_dir / "checkpoints" / f"epoch_{epoch:03d}.pth")
         if args.sanity_image_count is not None:
             selection_metric = record["total_loss"]
             is_best = selection_metric < best_metric
@@ -313,7 +307,6 @@ def train_model(args: argparse.Namespace) -> Path:
 
 
 def parse_args() -> argparse.Namespace:
-    """학습 데이터셋, epoch, batch size와 실행 mode를 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--dataset-version", required=True)
@@ -327,7 +320,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """학습을 실행하고 설정·데이터·device 오류를 CLI 실패로 보고한다."""
     try:
         output = train_model(parse_args())
     except (DatasetContractError, OSError, RuntimeError, ValueError) as error:

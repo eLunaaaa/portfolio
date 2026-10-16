@@ -1,30 +1,33 @@
 # 코드·측정 자료 검증 기록
 
-기준: 팀 저장소 `5148804`, 확인일 2026-10-16. 개발 중인 서버·운영 DB·영상·인증서를 변경하지 않고 별도 checkout에서 검증했습니다.
+기준: 2026-10-16 로컬 서버·모델 학습 코드. 개발 폴더의 운영 DB·영상·인증서를 변경하지 않고 포트폴리오 복제본과 임시 fixture에서 검증했습니다. [로컬 반영 차이](LOCAL_SNAPSHOT.md)
 
 ## 이번 정리에서 직접 실행한 검사
 
-포트폴리오에 코드를 복사한 뒤에도 **복제본 자체에서** 아래 Python·Node·모델 계약 시험을 다시 실행했습니다. 추가로 Shell 8개 문법, YAML 9개 파싱, Markdown 25개 문서의 로컬 링크 169개를 확인했습니다. source manifest에는 171개 코드·설정·자산·개인 patch의 원본 커밋과 파일 해시를 기록합니다. 일부 텍스트의 차이는 줄바꿈 정규화뿐임을 대조했습니다.
+현재 코드를 복사한 뒤 복제본에서 서버·웹 시험을 실행했습니다. 학습은 로컬 YOLOX·사전학습 자료를 fixture로 사용해 원본·복제 코드 양쪽에서 확인했습니다. source manifest는 로컬 파일 hash와 기존 고정 커밋 출처를 구분합니다.
 
 | 검사 | 결과 |
 |---|---|
-| 서버 Python unittest | 72개 통과 |
-| 웹 Node.js 회귀 시험 | 51개 통과 |
-| 학습 도구의 runtime contract 시험 | 4개 통과 |
+| 로컬 서버 Python unittest | 64개 통과 |
+| 로컬 웹 Node.js 회귀 시험 | 36개 통과 |
+| 로컬 학습 파이프라인 | 30개 통과, 복제 코드로도 재실행 |
 | 27회 시나리오 검증 스크립트 | 27회·저장 영상 81건·복구 영상 12건·공개 체크섬 및 모델/버전 hash 대조 통과 |
 
-아래는 팀 원본 저장소에서 실행하는 명령입니다. Python 서버 의존성·Node.js·FFmpeg 등이 준비돼 있어야 합니다.
+아래 명령은 포트폴리오의 `projects/blue-witness/source`에서 시작합니다. 학습 시험에는 `../YOLOX`·사전학습 fixture가 별도 필요합니다.
 
 ```bash
 cd server/backend
 python -m unittest discover -s tests
 cd ../..
 node --test server/backend/tests/*.cjs
-PYTHONPATH=model_training python -m unittest discover -s model_training/tests -p test_runtime_contract.py -v
-python docs/measurements/20261008-scenarios/verify.py
+PYTHONPATH=model_training python -m unittest discover -s model_training/tests -v
 ```
 
-서버 시험은 임시 DB·임시 미디어 fixture를 사용합니다. 시나리오 검증은 보관된 공개 자료의 일관성을 검사한 것이며 물리적 충돌을 새로 수행한 결과가 아닙니다. 학습 계약 시험 4개는 학습 파이프라인 전체 시험이나 모델 재학습을 의미하지 않습니다.
+서버 시험은 임시 DB·미디어 fixture를 사용합니다. 시나리오 검증은 원격 기준 자료를 앞선 정리에서 대조한 결과이며 새 충돌 시험이 아닙니다. 학습 시험은 임시 COCO·모델·export fixture를 포함하지만 전체 데이터 재학습이나 최종 release 전체 재검증을 의미하지 않습니다.
+
+## 원격 버전과의 비교 결과
+
+앞선 원격 `5148804`에서는 Python 72·Node 51·runtime contract 4개를 통과했습니다. 현재 로컬에는 일부 원격 수정·테스트가 없으며, 로컬 코드에 원격 Python 시험까지 섞은 74개 실행에서 실패 7·오류 3이 나왔습니다. 원격 전용 3개 파일은 [비교 자료](../reference/github-regressions/README.md)로 보존합니다. 로컬 자체 시험 통과를 모든 원격 회귀가 해결됐다는 뜻으로 바꾸지 않습니다.
 
 ## 측정 자료와 해석
 

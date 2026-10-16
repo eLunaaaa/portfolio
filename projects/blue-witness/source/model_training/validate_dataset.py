@@ -1,12 +1,5 @@
 #!/usr/bin/env python3
-"""@file validate_dataset.py
-@brief 생성된 불변 COCO 데이터셋의 파일·annotation·split·추적 계약을 독립적으로 재검증한다.
-
-manifest SHA, 이미지 decode와 크기, COCO 참조와 bbox, class-instance 관계, 중복 SHA,
-session/source_group/source_video 누수와 필수 encoding profile을 검사한다. 발견한 오류를
-모두 모아 한 번에 보고하며 하나라도 있으면 성공으로 처리하지 않는다. 학습 전에
-export 결과가 재현 가능하고 누수 없는지 확인하는 마지막 방어 단계다.
-"""
+"""버전 COCO 데이터셋의 SHA, 누수, 클래스, 인코딩 계약을 검증한다."""
 
 from __future__ import annotations
 
@@ -34,29 +27,14 @@ SPLITS = ("train", "val", "test")
 
 
 def _latest_dataset(datasets_dir: Path) -> Path:
-    """dataset_vNNN 중 번호가 가장 큰 불변 데이터셋 경로를 반환한다."""
     candidates = [path for path in datasets_dir.iterdir() if path.is_dir() and DATASET_VERSION_PATTERN.fullmatch(path.name)]
     if not candidates:
         raise DatasetContractError(f"검증할 dataset_vNNN 디렉터리가 없습니다: {datasets_dir}")
     return max(candidates, key=lambda path: int(DATASET_VERSION_PATTERN.fullmatch(path.name).group(1)))
 
 
-# -----------------------------------------------------------------------------
-# 기능: 모든 오류를 수집한 뒤 하나라도 있으면 성공으로 보고하지 않는다.
-#
-# 동작 방법:
-#   1. 필수 field, type, 값 범위와 상호 관계를 순서대로 검사한다.
-#   2. 계약이 맞으면 후속 처리를 허용하고 위반 시 구체적인 예외로 중단한다.
-#
-# 사용 이유/연결: COCO export 직후, 학습 시작 전에 데이터 무결성을 확인한다.
-#
-# 입력:
-#   config_path (Path) - 경로·class·threshold 등 실행 계약이 기록된 YAML config 경로.
-#   requested_dir (Path | None) - 이 함수의 requested_dir 처리에 사용하는 값.
-#
-# 반환: dict[str, Any] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def validate_dataset(config_path: Path, requested_dir: Path | None) -> dict[str, Any]:
+    """모든 오류를 수집한 뒤 하나라도 있으면 성공으로 보고하지 않는다."""
     settings = load_settings(config_path)
     datasets_dir = resolve_project_path(config_path, settings["paths"]["datasets_dir"])
     dataset_dir = requested_dir.resolve() if requested_dir else _latest_dataset(datasets_dir)
@@ -218,7 +196,6 @@ def validate_dataset(config_path: Path, requested_dir: Path | None) -> dict[str,
 
 
 def parse_args() -> argparse.Namespace:
-    """검증할 config와 선택적 데이터셋 경로를 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--dataset-dir", type=Path, default=None)
@@ -226,7 +203,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """데이터셋 계약 검증 결과를 출력하고 성공 여부를 종료 코드로 반환한다."""
     args = parse_args()
     try:
         report = validate_dataset(args.config.resolve(), args.dataset_dir)

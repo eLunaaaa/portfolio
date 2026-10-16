@@ -87,19 +87,6 @@ def get_user_deletion_target(
     )
 
 
-def list_event_file_paths(event_id: str) -> list[str]:
-    """삭제 전에 사고에 연결된 실제 원본 경로를 조회함."""
-    connection = connect_database()
-    try:
-        rows = connection.execute(
-            "SELECT file_path FROM evidence WHERE event_id = ?",
-            (event_id,),
-        ).fetchall()
-        return [row["file_path"] for row in rows]
-    finally:
-        connection.close()
-
-
 def delete_event_records(
     event_id: str,
 ) -> dict[str, int]:

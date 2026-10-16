@@ -1,0 +1,58 @@
+{
+  "architecture_commit": "419778480ab6ec0590e5d3831b3afb3b46ab2aa3",
+  "architecture_source": "Megvii-BaseDetection/YOLOX 0.3.0",
+  "bbox_representation": "raw YOLOX grid offsets/log-size; decode required",
+  "checkpoint_sha256": "e8ab97c2f5fadd10ff046350c54d56158830fbaee86eedb2897b951e546443fc",
+  "classes": [
+    "ioniq5_silver",
+    "other_vehicle"
+  ],
+  "confidence_threshold": 0.55,
+  "confidence_threshold_source": "explicit_validation_review",
+  "dataset_sha256": "8790276f423e2f724331f85844e6716aa2359aa3cf72d72acbd2a6b0100a2a60",
+  "dataset_version": "dataset_v009",
+  "decode": {
+    "decoded_bbox": "pixel cx,cy,w,h",
+    "grid_order": "stride 8 then 16 then 32; row-major",
+    "strides": [
+      8,
+      16,
+      32
+    ]
+  },
+  "input_color": "BGR",
+  "input_dtype": "float32",
+  "input_layout": "NCHW",
+  "input_shape": [
+    1,
+    3,
+    480,
+    640
+  ],
+  "model_name": "vehicle_detector_yolox_tiny",
+  "nms_included": false,
+  "nms_iou_threshold": 0.65,
+  "objectness_and_class_scores": "sigmoid probabilities",
+  "onnx_sha256": "10d95656c33a0241a24f9f999178e48f31c07709382526f1b033478a63621462",
+  "output_fields": [
+    "tx",
+    "ty",
+    "tw",
+    "th",
+    "objectness",
+    "class_score_0",
+    "class_score_1"
+  ],
+  "output_shape": [
+    1,
+    6300,
+    7
+  ],
+  "output_tensor_name": "raw_predictions",
+  "preprocessing": {
+    "normalization": "none; uint8 0..255 values cast to float32",
+    "pad_value": 114,
+    "resize": "top_left_letterbox"
+  },
+  "version": 1
+}

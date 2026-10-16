@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
-"""@file evaluate.py
-@brief 학습 checkpoint의 COCO 성능과 배포 confidence threshold별 오류를 평가한다.
-
-전체 흐름
-1. 불변 데이터셋과 checkpoint 계약을 교차 확인한다.
-2. JPEG 또는 추적된 원본 MP4 frame에 동일한 YOLOX 전처리와 inference를 수행한다.
-3. COCO AP와 class별 지표를 계산한다.
-4. confidence sweep으로 TP·FP·FN, class 혼동, 조건별 오류를 집계한다.
-5. Validation에서는 추천 threshold를 만들고 Test에서는 이미 선택된 threshold만 검증한다.
-
-Test 결과를 보며 threshold를 다시 고르는 데이터 누수를 막기 위해 Val과 Test의
-역할을 분리한다. 결과는 후속 ONNX release manifest에 연결되는 JSON report다.
-"""
+"""학습 checkpoint의 COCO AP와 threshold별 오류를 Validation/Test에서 평가한다."""
 
 from __future__ import annotations
 
@@ -41,12 +29,7 @@ from yolox_runtime import (
 )
 
 
-# ============================================================================
-# bbox matching과 입력 frame 로딩
-# ============================================================================
-
 def calculate_iou(left: list[float], right: list[float]) -> float:
-    """두 xywh bbox의 교집합 대비 합집합 비율을 계산한다."""
     left_x2, left_y2 = left[0] + left[2], left[1] + left[3]
     right_x2, right_y2 = right[0] + right[2], right[1] + right[3]
     intersection = max(0.0, min(left_x2, right_x2) - max(left[0], right[0])) * max(
@@ -56,26 +39,10 @@ def calculate_iou(left: list[float], right: list[float]) -> float:
     return intersection / union if union > 0 else 0.0
 
 
-# -----------------------------------------------------------------------------
-# 기능: score 순서로 class와 무관한 IoU matching을 수행해 confusion 원인을 보존한다.
-#
-# 동작 방법:
-#   1. 모델 입력 또는 prediction tensor를 설정된 계약에 맞게 처리한다.
-#   2. confidence와 좌표 정보를 검증 가능한 detection 목록으로 변환한다.
-#
-# 사용 이유/연결: 학습 checkpoint를 입력으로 받고 결과를 threshold 선택과 ONNX export에 전달한다.
-#
-# 입력:
-#   ground_truth (list[dict[str, Any]]) - 이 함수의 ground_truth 처리에 사용하는 값.
-#   detections (list[dict[str, Any]]) - 이 함수의 detections 처리에 사용하는 값.
-#   iou_threshold (float) - 이 함수의 iou_threshold 처리에 사용하는 값.
-#
-# 반환: tuple[list[tuple[dict[str, Any], dict[str, Any]]], list[dict[str, Any]], list[dict[str,
-#   Any]]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def match_detections(
     ground_truth: list[dict[str, Any]], detections: list[dict[str, Any]], iou_threshold: float
 ) -> tuple[list[tuple[dict[str, Any], dict[str, Any]]], list[dict[str, Any]], list[dict[str, Any]]]:
+    """score 순서로 class와 무관한 IoU matching을 수행해 confusion 원인을 보존한다."""
     remaining = set(range(len(ground_truth)))
     matches: list[tuple[dict[str, Any], dict[str, Any]]] = []
     unmatched_detections: list[dict[str, Any]] = []
@@ -93,7 +60,6 @@ def match_detections(
 def _read_source_frame(
     dataset_dir: Path, split: str, image: dict[str, Any], trace: dict[str, Any], input_source: str
 ) -> np.ndarray:
-    """평가 설정에 따라 export JPEG 또는 추적된 원본 MP4 frame을 읽는다."""
     if input_source == "jpeg":
         frame = cv2.imread(str(dataset_dir / "images" / split / image["file_name"]))
     else:
@@ -108,28 +74,6 @@ def _read_source_frame(
     return frame
 
 
-# -----------------------------------------------------------------------------
-# 기능: JPEG 또는 원본 MP4를 같은 frame_id 계약으로 추론해 COCO와 상세 결과를 함께 만든다.
-#
-# 동작 방법:
-#   1. 모델 입력 또는 prediction tensor를 설정된 계약에 맞게 처리한다.
-#   2. confidence와 좌표 정보를 검증 가능한 detection 목록으로 변환한다.
-#
-# 사용 이유/연결: 학습 checkpoint를 입력으로 받고 결과를 threshold 선택과 ONNX export에 전달한다.
-#
-# 입력:
-#   model (torch.nn.Module) - 학습 또는 inference에 사용할 YOLOX model.
-#   device (torch.device) - tensor 연산을 수행할 PyTorch device.
-#   dataset_dir (Path) - 불변 COCO 데이터셋 버전의 루트 경로.
-#   split (str) - 이 함수의 split 처리에 사용하는 값.
-#   input_size (tuple[int, int]) - 이 함수의 input_size 처리에 사용하는 값.
-#   minimum_confidence (float) - 이 함수의 minimum_confidence 처리에 사용하는 값.
-#   nms_threshold (float) - 이 함수의 nms_threshold 처리에 사용하는 값.
-#   input_source (str) - 이 함수의 input_source 처리에 사용하는 값.
-#
-# 반환: tuple[COCO, list[dict[str, Any]], dict[int, list[dict[str, Any]]], dict[int, dict[str,
-#   Any]]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def collect_predictions(
     model: torch.nn.Module,
     device: torch.device,
@@ -140,6 +84,7 @@ def collect_predictions(
     nms_threshold: float,
     input_source: str,
 ) -> tuple[COCO, list[dict[str, Any]], dict[int, list[dict[str, Any]]], dict[int, dict[str, Any]]]:
+    """JPEG 또는 원본 MP4를 같은 frame_id 계약으로 추론해 COCO와 상세 결과를 함께 만든다."""
     annotation_path = dataset_dir / "annotations" / f"instances_{split}.json"
     coco = COCO(str(annotation_path))
     manifest = read_json(dataset_dir / "dataset_manifest.json")
@@ -171,26 +116,6 @@ def collect_predictions(
     return coco, coco_results, details, image_context
 
 
-# ============================================================================
-# COCO 지표와 배포 threshold 평가
-# ============================================================================
-
-# -----------------------------------------------------------------------------
-# 기능: COCO evaluator로 전체 및 class별 AP 지표를 계산한다.
-#
-# 동작 방법:
-#   1. COCO evaluator로 전체 및 class별 AP 지표를 계산한다
-#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
-#
-# 사용 이유/연결: 학습 checkpoint를 입력으로 받고 결과를 threshold 선택과 ONNX export에 전달한다.
-#
-# 입력:
-#   coco (COCO) - 이 함수의 coco 처리에 사용하는 값.
-#   results (list[dict[str, Any]]) - 이 함수의 results 처리에 사용하는 값.
-#   class_names (list[str]) - 이 함수의 class_names 처리에 사용하는 값.
-#
-# 반환: dict[str, Any] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def _coco_metrics(coco: COCO, results: list[dict[str, Any]], class_names: list[str]) -> dict[str, Any]:
     if not results:
         return {"map50": 0.0, "map50_95": 0.0, "per_class": {name: {"ap50": 0.0, "ap50_95": 0.0} for name in class_names}}
@@ -216,26 +141,6 @@ def _coco_metrics(coco: COCO, results: list[dict[str, Any]], class_names: list[s
     }
 
 
-# -----------------------------------------------------------------------------
-# 기능: 하나의 confidence threshold에서 TP·FP·FN과 혼동 유형을 집계한다.
-#
-# 동작 방법:
-#   1. 하나의 confidence threshold에서 TP·FP·FN과 혼동 유형을 집계한다
-#   2. 입력 계약을 유지한 결과를 만들어 호출한 pipeline 단계에 반환한다.
-#
-# 사용 이유/연결: 학습 checkpoint를 입력으로 받고 결과를 threshold 선택과 ONNX export에 전달한다.
-#
-# 입력:
-#   coco (COCO) - 이 함수의 coco 처리에 사용하는 값.
-#   predictions (dict[int, list[dict[str, Any]]]) - 이 함수의 predictions 처리에 사용하는 값.
-#   threshold (float) - 이 함수의 threshold 처리에 사용하는 값.
-#   iou_threshold (float) - 이 함수의 iou_threshold 처리에 사용하는 값.
-#   class_names (list[str]) - 이 함수의 class_names 처리에 사용하는 값.
-#   image_context (dict[int, dict[str, Any]]) - 이 함수의 image_context 처리에 사용하는 값.
-#   priority_class_ids (set[int]) - 이 함수의 priority_class_ids 처리에 사용하는 값.
-#
-# 반환: dict[str, Any] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-# -----------------------------------------------------------------------------
 def _threshold_metrics(
     coco: COCO,
     predictions: dict[int, list[dict[str, Any]]],
@@ -332,30 +237,6 @@ def _threshold_metrics(
     }
 
 
-# -----------------------------------------------------------------------------
-# 기능: Validation은 threshold를 탐색하고 Test는 설정된 threshold 없이 선택하지 않는다.
-#
-# 동작 방법:
-#   1. config, YOLOX source, dataset SHA와 checkpoint의 class·입력 크기를 교차 검증한다.
-#   2. MPS 우선 device에 모델을 올리고 전체 split의 prediction을 한 번 수집한다.
-#   3. COCO mAP50/mAP50-95와 class별 AP를 계산한다.
-#   4. Validation에서는 설정 범위의 confidence를 순회해 recall·FP·FN·혼동을 비교한다.
-#   5. 우선 class의 최소 recall 조건을 만족하는 threshold 중 false positive가 적은 값을
-#      추천한다. Test에서는 Validation에서 고른 명시 threshold만 평가한다.
-#
-# 사용 이유/연결: 학습 checkpoint를 입력으로 받고 결과를 threshold 선택과 ONNX export에 전달한다.
-#
-# 입력:
-#   config_path (Path) - 경로·class·threshold 등 실행 계약이 기록된 YAML config 경로.
-#   dataset_version (str) - 평가할 불변 dataset_vNNN 이름.
-#   checkpoint_path (Path) - 학습 weight와 재현 metadata가 포함된 checkpoint 경로.
-#   split (str) - val 또는 test. 두 split의 threshold 선택 정책이 서로 다르다.
-#   input_size (tuple[int, int]) - 모델에 넣을 (height, width) 크기.
-#   input_source (str) - export JPEG와 원본 MP4 중 실제 추론에 사용할 입력 종류.
-#   confidence_threshold (float | None) - Test에서 사용할 확정값. Validation에서는 생략 가능하다.
-#
-# 반환: 모델·데이터 계약, COCO 지표, threshold sweep과 추천값이 포함된 report를 반환한다.
-# -----------------------------------------------------------------------------
 def evaluate_checkpoint(
     config_path: Path,
     dataset_version: str,
@@ -365,6 +246,7 @@ def evaluate_checkpoint(
     input_source: str,
     confidence_threshold: float | None = None,
 ) -> dict[str, Any]:
+    """Validation은 threshold를 탐색하고 Test는 설정된 threshold 없이 선택하지 않는다."""
     if split not in {"val", "test"}:
         raise DatasetContractError("평가 split은 val 또는 test여야 합니다.")
     settings = load_settings(config_path)
@@ -406,7 +288,7 @@ def evaluate_checkpoint(
     )
     thresholds = (
         np.arange(start, float(evaluation["confidence_sweep_end"]) + 1e-9, float(evaluation["confidence_sweep_step"]))
-        if split == "val" and confidence_threshold is None
+        if split == "val"
         else np.asarray([float(confidence_threshold)])
     )
     sweep = [
@@ -439,7 +321,6 @@ def evaluate_checkpoint(
 
 
 def parse_args() -> argparse.Namespace:
-    """평가할 checkpoint, split, 입력 원본과 threshold 조건을 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     parser.add_argument("--dataset-version", required=True)
@@ -454,7 +335,6 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """checkpoint 평가를 실행하고 생성된 JSON report 경로를 출력한다."""
     args = parse_args()
     try:
         report = evaluate_checkpoint(

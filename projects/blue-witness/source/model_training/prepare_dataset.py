@@ -1,17 +1,5 @@
 #!/usr/bin/env python3
-"""@file prepare_dataset.py
-@brief 정식 등록된 MP4를 추적 가능한 검수용 JPEG와 bbox 초안으로 변환한다.
-
-전체 흐름
-1. config와 recording manifest의 클래스·영상 계약을 검증한다.
-2. recording SHA index를 이용해 아직 처리하지 않은 MP4만 찾는다.
-3. 설정된 간격의 frame을 JPEG로 저장하고 원본 SHA·frame index·PTS를 기록한다.
-4. proposal model이 켜져 있으면 bbox와 안전하게 판단 가능한 label 초안을 만든다.
-5. frame manifest와 annotation을 원자적으로 저장해 수동 검수 단계에 전달한다.
-
-제안 결과는 정답이 아니므로 자동 승인하지 않는다. 기존 frame과 수동 검수 결과는
-증분 처리 과정에서 덮어쓰지 않으며 영상·모델 계약이 다르면 즉시 중단한다.
-"""
+"""녹화 MP4를 추적 가능한 JPEG 프레임과 검수 초안으로 변환한다."""
 
 from __future__ import annotations
 
@@ -22,6 +10,7 @@ from typing import Any
 
 import cv2
 import numpy as np
+import torch
 
 from dataset_contracts import (
     DatasetContractError,
@@ -37,11 +26,16 @@ from dataset_contracts import (
     validate_video_profile,
     write_jpeg,
 )
+from yolox_runtime import (
+    build_yolox_nano,
+    decode_raw_predictions,
+    filter_and_nms,
+    import_yolox,
+    load_official_checkpoint,
+    preprocess_frame,
+    validate_yolox_installation,
+)
 
-
-# ============================================================================
-# 검수용 bbox 초안 생성
-# ============================================================================
 
 class ProposalDetector:
     """공식 COCO YOLOX 또는 프로젝트 ONNX 모델로 검수 초안을 생성한다.
@@ -56,32 +50,11 @@ class ProposalDetector:
     RAW_YOLOX_OUTPUT = "yolox_raw_grid_offsets_objectness_class_scores"
     SUPPORTED_NORMALIZATIONS = {"zero_to_one", "none"}
 
-    # -----------------------------------------------------------------------------
-    # 기능: 설정된 proposal backend와 모델 계약을 검증해 detector를 준비한다.
-    #
-    #   제안 기능이 꺼져 있으면 모델을 읽지 않는다. 켜져 있으면 SHA, class 순서,
-    #   출력 형식을 먼저 확인해 잘못된 bbox 초안이 검수 데이터에 섞이지 않게 한다.
-    #
-    # 동작 방법:
-    #   1. 전달받은 설정과 경로의 계약을 확인한다.
-    #   2. 후속 method가 공유할 객체 상태와 외부 resource를 초기화한다.
-    #
-    # 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-    #
-    # 입력:
-    #   self (type 미지정) - 현재 객체의 설정과 실행 상태.
-    #   settings (dict[str, Any]) - 검증을 통과한 프로젝트 설정 객체.
-    #   config_path (Path) - 경로·class·threshold 등 실행 계약이 기록된 YAML config 경로.
-    #
-    # 반환: 반환값은 없으며 검증·저장 또는 객체 상태 변경을 완료한다.
-    #
-    # 상태 변화: 현재 객체의 실행·선택·검수 상태를 갱신하며 후속 method가 변경값을 공유한다.
-    # -----------------------------------------------------------------------------
     def __init__(self, settings: dict[str, Any], config_path: Path) -> None:
         config = settings["proposal_detector"]
         self.enabled = bool(config.get("enabled", False))
         self.net: Any | None = None
-        self.model: Any | None = None
+        self.model: torch.nn.Module | None = None
         if not self.enabled:
             return
         self.backend = str(config.get("backend", ""))
@@ -121,10 +94,6 @@ class ProposalDetector:
             raise DatasetContractError("제안 모델 confidence/NMS threshold는 0~1이어야 합니다.")
 
         if self.backend == "yolox_pytorch":
-            from yolox_runtime import (
-                build_yolox_nano, import_yolox, load_official_checkpoint,
-                validate_yolox_installation,
-            )
             source_dir, verified_checkpoint = validate_yolox_installation(config_path, settings)
             if model_path != verified_checkpoint:
                 raise DatasetContractError(
@@ -202,27 +171,12 @@ class ProposalDetector:
                 }
                 self.instance_to_project_class = instance_to_class
 
-    # -----------------------------------------------------------------------------
-    # 기능: 선택한 backend로 차량 후보를 찾고 프로젝트 bbox 초안으로 변환한다.
-    #
-    # 동작 방법:
-    #   1. 모델 입력 또는 prediction tensor를 설정된 계약에 맞게 처리한다.
-    #   2. confidence와 좌표 정보를 검증 가능한 detection 목록으로 변환한다.
-    #
-    # 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-    #
-    # 입력:
-    #   self (type 미지정) - 현재 객체의 설정과 실행 상태.
-    #   frame (Any) - OpenCV가 BGR 순서로 decode한 영상 frame.
-    #   vehicle_instances_present (list[str] | None) - 이 함수의 vehicle_instances_present 처리에 사용하는 값.
-    #
-    # 반환: list[dict[str, Any]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-    # -----------------------------------------------------------------------------
     def detect(
         self,
         frame: Any,
         vehicle_instances_present: list[str] | None = None,
     ) -> list[dict[str, Any]]:
+        """선택한 backend로 차량 후보를 찾고 프로젝트 bbox 초안으로 변환한다."""
         if not self.enabled:
             return []
         if self.backend == "yolox_pytorch":
@@ -231,32 +185,16 @@ class ProposalDetector:
             return self._detect_trained_onnx(frame, vehicle_instances_present or [])
         return self._detect_onnx(frame)
 
-    # -----------------------------------------------------------------------------
-    # 기능: 학습된 YOLOX raw 출력을 해석해 bbox와 project class 초안을 만든다.
-    #
-    #   아이오닉처럼 class와 실제 차량이 일대일이면 instance도 채운다. 여러 차량을
-    #   묶은 other_vehicle은 잘못된 정답 전파를 막기 위해 instance만 비워 둔다.
-    #
-    # 동작 방법:
-    #   1. 모델 입력 또는 prediction tensor를 설정된 계약에 맞게 처리한다.
-    #   2. confidence와 좌표 정보를 검증 가능한 detection 목록으로 변환한다.
-    #
-    # 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-    #
-    # 입력:
-    #   self (type 미지정) - 현재 객체의 설정과 실행 상태.
-    #   frame (Any) - OpenCV가 BGR 순서로 decode한 영상 frame.
-    #   vehicle_instances_present (list[str]) - 이 함수의 vehicle_instances_present 처리에 사용하는 값.
-    #
-    # 반환: list[dict[str, Any]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-    # -----------------------------------------------------------------------------
     def _detect_trained_onnx(
         self,
         frame: Any,
         vehicle_instances_present: list[str],
     ) -> list[dict[str, Any]]:
-        from yolox_runtime import decode_raw_predictions, filter_and_nms, preprocess_frame
+        """학습된 YOLOX raw 출력을 해석해 bbox와 project class 초안을 만든다.
 
+        아이오닉처럼 class와 실제 차량이 일대일이면 instance도 채운다. 여러 차량을
+        묶은 other_vehicle은 잘못된 정답 전파를 막기 위해 instance만 비워 둔다.
+        """
         assert self.net is not None
         frame_height, frame_width = frame.shape[:2]
         prepared, scale = preprocess_frame(frame, (self.input_height, self.input_width))
@@ -302,34 +240,17 @@ class ProposalDetector:
             )
         return proposals
 
-    # -----------------------------------------------------------------------------
-    # 기능: 2-class 제안과 recording manifest를 조합해 안전한 정답만 미리 채운다.
-    #
-    #   Tiny의 other_vehicle에는 팰리세이드와 기타 차량 세 대가 함께 포함된다.
-    #   현재 녹화에 해당 후보가 정확히 한 대일 때만 3-class/instance로 변환하며,
-    #   여러 대가 등장하면 잘못된 자동 선별을 피하기 위해 둘 다 비워 둔다.
-    #
-    # 동작 방법:
-    #   1. Ioniq 제안은 프로젝트의 ioniq5_silver class와 instance로 직접 연결한다.
-    #   2. Tiny의 other_vehicle 제안은 recording manifest에 실제 등장한다고 기록된
-    #      팰리세이드·기타 차량 후보와 교차 확인한다.
-    #   3. 후보 instance가 정확히 하나일 때만 해당 프로젝트 class와 instance를 채운다.
-    #   4. 후보가 없거나 여러 대이면 오답 전파를 막기 위해 둘 다 미지정으로 남긴다.
-    #
-    # 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-    #
-    # 입력:
-    #   self (type 미지정) - 현재 객체의 설정과 실행 상태.
-    #   proposal_class (str) - 이 함수의 proposal_class 처리에 사용하는 값.
-    #   vehicle_instances_present (list[str]) - 이 함수의 vehicle_instances_present 처리에 사용하는 값.
-    #
-    # 반환: tuple[str | None, str | None] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-    # -----------------------------------------------------------------------------
     def _resolve_project_label(
         self,
         proposal_class: str,
         vehicle_instances_present: list[str],
     ) -> tuple[str | None, str | None]:
+        """2-class 제안과 recording manifest를 조합해 안전한 정답만 미리 채운다.
+
+        2-class 모델의 other_vehicle에는 팰리세이드와 기타 차량 세 대가 함께 포함된다.
+        현재 녹화에 해당 후보가 정확히 한 대일 때만 3-class/instance로 변환하며,
+        여러 대가 등장하면 잘못된 자동 선별을 피하기 위해 둘 다 비워 둔다.
+        """
         matching_instances = [
             instance
             for instance in vehicle_instances_present
@@ -340,25 +261,8 @@ class ProposalDetector:
         vehicle_instance = matching_instances[0]
         return self.instance_to_project_class[vehicle_instance], vehicle_instance
 
-    # -----------------------------------------------------------------------------
-    # 기능: 공식 COCO 모델에서 car·bus·truck 후보 위치만 class-agnostic NMS로 남긴다.
-    #
-    # 동작 방법:
-    #   1. 모델 입력 또는 prediction tensor를 설정된 계약에 맞게 처리한다.
-    #   2. confidence와 좌표 정보를 검증 가능한 detection 목록으로 변환한다.
-    #
-    # 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-    #
-    # 입력:
-    #   self (type 미지정) - 현재 객체의 설정과 실행 상태.
-    #   frame (Any) - OpenCV가 BGR 순서로 decode한 영상 frame.
-    #
-    # 반환: list[dict[str, Any]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-    # -----------------------------------------------------------------------------
     def _detect_yolox_pytorch(self, frame: Any) -> list[dict[str, Any]]:
-        import torch
-        from yolox_runtime import preprocess_frame
-
+        """공식 COCO 모델에서 car·bus·truck 후보 위치만 class-agnostic NMS로 남긴다."""
         assert self.model is not None
         frame_height, frame_width = frame.shape[:2]
         prepared, scale = preprocess_frame(frame, (self.input_height, self.input_width))
@@ -404,22 +308,8 @@ class ProposalDetector:
             for index in kept
         ]
 
-    # -----------------------------------------------------------------------------
-    # 기능: 기존 decoded ONNX 계약을 사용하는 제안 경로를 호환용으로 유지한다.
-    #
-    # 동작 방법:
-    #   1. 모델 입력 또는 prediction tensor를 설정된 계약에 맞게 처리한다.
-    #   2. confidence와 좌표 정보를 검증 가능한 detection 목록으로 변환한다.
-    #
-    # 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-    #
-    # 입력:
-    #   self (type 미지정) - 현재 객체의 설정과 실행 상태.
-    #   frame (Any) - OpenCV가 BGR 순서로 decode한 영상 frame.
-    #
-    # 반환: list[dict[str, Any]] 형식의 처리 결과를 반환하며 의미는 기능 설명과 같다.
-    # -----------------------------------------------------------------------------
     def _detect_onnx(self, frame: Any) -> list[dict[str, Any]]:
+        """기존 decoded ONNX 계약을 사용하는 제안 경로를 호환용으로 유지한다."""
         assert self.net is not None
         frame_height, frame_width = frame.shape[:2]
         scale = min(self.input_width / frame_width, self.input_height / frame_height)
@@ -473,10 +363,6 @@ class ProposalDetector:
         ]
 
 
-# ============================================================================
-# 녹화 영상의 증분 frame 추출
-# ============================================================================
-
 def _timestamp_for_frame(
     frame_index: int,
     timestamps: list[float | None],
@@ -484,7 +370,6 @@ def _timestamp_for_frame(
     allow_fallback: bool,
     video_path: Path,
 ) -> tuple[float, str]:
-    """frame의 실제 PTS를 우선 반환하고 명시적으로 허용된 경우에만 FPS로 보간한다."""
     if frame_index < len(timestamps) and timestamps[frame_index] is not None:
         return float(timestamps[frame_index]), "ffprobe_best_effort_pts"
     if allow_fallback and fps > 0:
@@ -495,29 +380,9 @@ def _timestamp_for_frame(
     )
 
 
-# -----------------------------------------------------------------------------
-# 기능: 새 녹화만 추출하고 기존 프레임·검수 결과는 보존한다.
-#
-# 동작 방법:
-#   1. 기존 frame_manifest, annotations와 recording_index를 읽어 처리 완료 SHA를 만든다.
-#   2. recordings 디렉터리의 manifest와 실제 MP4 SHA·codec·해상도·FPS를 검증한다.
-#   3. 신규 영상만 OpenCV로 decode하고 설정된 frame 간격에 해당하는 JPEG를 저장한다.
-#   4. ffprobe PTS와 원본 recording 정보를 각 frame record에 연결한다.
-#   5. proposal detector가 켜져 있으면 bbox 초안을 만들되 상태는 draft 또는
-#      manual_review_required로 두어 사람이 반드시 확인하게 한다.
-#   6. 모든 처리가 끝난 뒤 frame·annotation·recording index를 원자적으로 교체한다.
-#
-# 사용 이유/연결: 정식 등록 녹화를 입력으로 받아 review_annotations.py의 검수 자료를 만든다.
-#
-# 입력:
-#   config_path (Path) - 경로·class·threshold 등 실행 계약이 기록된 YAML config 경로.
-#
-# 반환: (새로 추출한 frame 수, 이미 처리되어 건너뛴 recording 수)를 반환한다.
-# -----------------------------------------------------------------------------
-def prepare(config_path: Path, manual: bool = False) -> tuple[int, int]:
+def prepare(config_path: Path) -> tuple[int, int]:
+    """새 녹화만 추출하고 기존 프레임·검수 결과는 보존한다."""
     settings = load_settings(config_path)
-    if manual:
-        settings["proposal_detector"]["enabled"] = False
     recordings_dir = resolve_project_path(config_path, settings["paths"]["recordings_dir"])
     work_dir = resolve_project_path(config_path, settings["paths"]["work_dir"])
     frames_dir = work_dir / "frames"
@@ -608,7 +473,11 @@ def prepare(config_path: Path, manual: bool = False) -> tuple[int, int]:
                     "session_id": recording["session_id"],
                     "source_group_id": recording["source_group_id"],
                     "condition_tags": recording["condition_tags"],
-                    "vehicle_instances_present": list(recording.get("vehicle_instances_present", [])),
+                    # 검수자가 새 bbox를 그렸을 때 이 영상에 실제 차량이 하나뿐이면
+                    # class와 instance를 다시 입력하지 않아도 되도록 촬영 계약을 전달한다.
+                    "vehicle_instances_present": recording.get(
+                        "vehicle_instances_present", []
+                    ),
                     "class_name": None,
                     "vehicle_instance": None,
                     "source_video": str(video_path.resolve()),
@@ -656,23 +525,16 @@ def prepare(config_path: Path, manual: bool = False) -> tuple[int, int]:
     return added_frames, skipped_recordings
 
 
-# ============================================================================
-# CLI 진입점
-# ============================================================================
-
 def parse_args() -> argparse.Namespace:
-    """frame 추출과 proposal 설정을 담은 config 경로를 CLI에서 읽는다."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
-    parser.add_argument("--manual", action="store_true", help="제안 모델 없이 수동 박스 작업용 이미지 추출")
     return parser.parse_args()
 
 
 def main() -> int:
-    """증분 frame 추출을 실행하고 처리·건너뛴 녹화 수를 사용자에게 알린다."""
     args = parse_args()
     try:
-        added, skipped = prepare(args.config.resolve(), manual=args.manual)
+        added, skipped = prepare(args.config.resolve())
     except (DatasetContractError, OSError, RuntimeError, cv2.error) as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
