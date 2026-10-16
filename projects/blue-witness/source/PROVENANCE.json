@@ -310,102 +310,12 @@
       "exact_copy": true
     },
     {
-      "path": "docs/assets/accident-evidence-flow.png",
-      "sha256": "235d34be6e516166d7397858e6661b3ca5240fb32f3a688d98a23f24540485ac",
-      "bytes": 65137,
-      "source": "docs/assets/accident-evidence-flow.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "235d34be6e516166d7397858e6661b3ca5240fb32f3a688d98a23f24540485ac",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/accident-evidence-flow.svg",
-      "sha256": "4a151626d02e3eec429fd9203d83b4f07ed13f6619818190f1bad526550cdedd",
-      "bytes": 2621,
-      "source": "docs/assets/accident-evidence-flow.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "4a151626d02e3eec429fd9203d83b4f07ed13f6619818190f1bad526550cdedd",
-      "exact_copy": true
-    },
-    {
       "path": "docs/assets/ai-confidence-selection.png",
       "sha256": "afa1eff813ec7fea3ea7fc1f09954aefbe038ac4eede57d9fcc3ebeb2a44c694",
       "bytes": 90268,
       "source": "docs/assets/ai-confidence-selection.png",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "afa1eff813ec7fea3ea7fc1f09954aefbe038ac4eede57d9fcc3ebeb2a44c694",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/ci.png",
-      "sha256": "6298a67fec779d2cf3f70f0ead4d4591abfb276fbece2720971f0f92f53b7d74",
-      "bytes": 269335,
-      "source": "docs/assets/ci.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "6298a67fec779d2cf3f70f0ead4d4591abfb276fbece2720971f0f92f53b7d74",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-nm-backport.png",
-      "sha256": "95734b09dd97aa1671fba780db0323f6963610043e6b5fc18cde054426f18d67",
-      "bytes": 78116,
-      "source": "docs/assets/comms-nm-backport.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "95734b09dd97aa1671fba780db0323f6963610043e6b5fc18cde054426f18d67",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-nm-backport.svg",
-      "sha256": "6c73f1a16b60a2ae9ead1a0c747a209a4cffeafe641671e29ea52ace30378c50",
-      "bytes": 2186,
-      "source": "docs/assets/comms-nm-backport.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "6c73f1a16b60a2ae9ead1a0c747a209a4cffeafe641671e29ea52ace30378c50",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-nm-issue102-header-dark.jpg",
-      "sha256": "f8a4fc66848594923e23c3d7c4870494c86a62f9821b456e3735c4efa00540ff",
-      "bytes": 15189,
-      "source": "docs/assets/comms-nm-issue102-header-dark.jpg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "f8a4fc66848594923e23c3d7c4870494c86a62f9821b456e3735c4efa00540ff",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-nm-issue102-mitoyosh-dark.jpg",
-      "sha256": "e0adbefc18f4c3383c7e7861d783f0fe53802a563a5d8988aa322c2cf203751a",
-      "bytes": 34298,
-      "source": "docs/assets/comms-nm-issue102-mitoyosh-dark.jpg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "e0adbefc18f4c3383c7e7861d783f0fe53802a563a5d8988aa322c2cf203751a",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-nm-issue102-papinist-dark.jpg",
-      "sha256": "d6d231442c209fb61da9d7b0566b167c1c1072d2cd5e6fe8e41b1aaecb39fca6",
-      "bytes": 11138,
-      "source": "docs/assets/comms-nm-issue102-papinist-dark.jpg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "d6d231442c209fb61da9d7b0566b167c1c1072d2cd5e6fe8e41b1aaecb39fca6",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-p2p-flow.png",
-      "sha256": "ef17b00bd6464454e1e043e54759be87082bb7adb19d555eabcf2b6f1c7529e2",
-      "bytes": 85882,
-      "source": "docs/assets/comms-p2p-flow.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "ef17b00bd6464454e1e043e54759be87082bb7adb19d555eabcf2b6f1c7529e2",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/comms-p2p-flow.svg",
-      "sha256": "84661ee5ae76e35f4c10bc6e6f7bedf35854d66dbb5710f697afb2be41199b95",
-      "bytes": 3770,
-      "source": "docs/assets/comms-p2p-flow.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "84661ee5ae76e35f4c10bc6e6f7bedf35854d66dbb5710f697afb2be41199b95",
       "exact_copy": true
     },
     {
@@ -418,33 +328,6 @@
       "exact_copy": true
     },
     {
-      "path": "docs/assets/comms-time-sync.svg",
-      "sha256": "bc861a2c2a501971ab8cdf13c8f09d8fdf1d9d0cc93f313991be88a015e74726",
-      "bytes": 2959,
-      "source": "docs/assets/comms-time-sync.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "bc861a2c2a501971ab8cdf13c8f09d8fdf1d9d0cc93f313991be88a015e74726",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/demo-ai-detection.png",
-      "sha256": "c30c7aa99dc46cd88e5777edd1b2a9ff95ad23640cc29fe36d585ad5f4bc926c",
-      "bytes": 206399,
-      "source": "docs/assets/demo-ai-detection.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "c30c7aa99dc46cd88e5777edd1b2a9ff95ad23640cc29fe36d585ad5f4bc926c",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/deploy.png",
-      "sha256": "c6f7e8e00a7a310e422663a8ebdbd778b14b7142ea69160aee0b3701ecff3721",
-      "bytes": 310747,
-      "source": "docs/assets/deploy.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "c6f7e8e00a7a310e422663a8ebdbd778b14b7142ea69160aee0b3701ecff3721",
-      "exact_copy": true
-    },
-    {
       "path": "docs/assets/embedded-process-architecture.png",
       "sha256": "79277401dd6989b73750a51885b1401ac44115726525fcf95326fcdebc4f1fa6",
       "bytes": 221419,
@@ -454,84 +337,12 @@
       "exact_copy": true
     },
     {
-      "path": "docs/assets/embedded-process-architecture.svg",
-      "sha256": "1ce231e1d75fdf858abe5d398b9173556523521c1f16bc9c5f48f41ecac66aae",
-      "bytes": 8206,
-      "source": "docs/assets/embedded-process-architecture.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "1ce231e1d75fdf858abe5d398b9173556523521c1f16bc9c5f48f41ecac66aae",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/end-to-end.png",
-      "sha256": "230f1dde93f4334bdfab67790c75497940657adf3ef827430ac2d4b1fec5a9cc",
-      "bytes": 188642,
-      "source": "docs/assets/end-to-end.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "230f1dde93f4334bdfab67790c75497940657adf3ef827430ac2d4b1fec5a9cc",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/equipment.jpg",
-      "sha256": "04d037acb05f99ecd815617ed856ebcc25804c31ff88d7b38f5489c625ace516",
-      "bytes": 423893,
-      "source": "docs/assets/equipment.jpg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "04d037acb05f99ecd815617ed856ebcc25804c31ff88d7b38f5489c625ace516",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/imu-thresholds.png",
-      "sha256": "e4bef2d8629eec184b9956a53eabf52ec963e41f845fb66f5d047dca5400d92c",
-      "bytes": 225841,
-      "source": "docs/assets/imu-thresholds.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "e4bef2d8629eec184b9956a53eabf52ec963e41f845fb66f5d047dca5400d92c",
-      "exact_copy": true
-    },
-    {
       "path": "docs/assets/portal.png",
       "sha256": "2e05ee366eba5d142c179d379511e19005c857f464abe38a82b47bbde9ced008",
       "bytes": 280563,
       "source": "docs/assets/portal.png",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "2e05ee366eba5d142c179d379511e19005c857f464abe38a82b47bbde9ced008",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/resource-load.png",
-      "sha256": "b9a47649407a0c728b04923265f5dcbdadf68b3020315729c08a4b2fa53ee420",
-      "bytes": 243882,
-      "source": "docs/assets/resource-load.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "b9a47649407a0c728b04923265f5dcbdadf68b3020315729c08a4b2fa53ee420",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/road-simulation-example.png",
-      "sha256": "87ae4520383eb535788ab398f2c90ce1f79d13ecce8dc61b2bb13e3c1757d2be",
-      "bytes": 410133,
-      "source": "docs/assets/road-simulation-example.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "87ae4520383eb535788ab398f2c90ce1f79d13ecce8dc61b2bb13e3c1757d2be",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/road-simulation-results.png",
-      "sha256": "107c29e028b91971e80aeaf8b58d02855095768a3239bebbc5d923736f572a67",
-      "bytes": 195243,
-      "source": "docs/assets/road-simulation-results.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "107c29e028b91971e80aeaf8b58d02855095768a3239bebbc5d923736f572a67",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/slack.png",
-      "sha256": "1acd947784d8dc3cd9654b358237c182aa6eac8de413d86183a9ce270599d222",
-      "bytes": 333566,
-      "source": "docs/assets/slack.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "1acd947784d8dc3cd9654b358237c182aa6eac8de413d86183a9ce270599d222",
       "exact_copy": true
     },
     {
@@ -553,33 +364,6 @@
       "exact_copy": true
     },
     {
-      "path": "docs/assets/storage-upload-flow.svg",
-      "sha256": "fb0f7ccc53197a2ebbff729afbe838d7fbe41de6c39b10a850704beb98db5500",
-      "bytes": 3316,
-      "source": "docs/assets/storage-upload-flow.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "fb0f7ccc53197a2ebbff729afbe838d7fbe41de6c39b10a850704beb98db5500",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/tracking.png",
-      "sha256": "99af31944f1aec4c53ffe7b274b70878ac1499e7f9e630e32e7702c831af37cd",
-      "bytes": 1370068,
-      "source": "docs/assets/tracking.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "99af31944f1aec4c53ffe7b274b70878ac1499e7f9e630e32e7702c831af37cd",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/trello.png",
-      "sha256": "fb4d07558b2cb6a59745299e0025e3f9f4fa60f08ddae091e62254ea4979a5ec",
-      "bytes": 504108,
-      "source": "docs/assets/trello.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "fb4d07558b2cb6a59745299e0025e3f9f4fa60f08ddae091e62254ea4979a5ec",
-      "exact_copy": true
-    },
-    {
       "path": "docs/assets/vision-annotation.png",
       "sha256": "163ab1ae3dc8cbe34eef963e97c5ad06659a71a53a4d24f521f4c001be2d562c",
       "bytes": 1762826,
@@ -598,15 +382,6 @@
       "exact_copy": true
     },
     {
-      "path": "docs/assets/vision-event-flow.svg",
-      "sha256": "888e04b839f460f77d51de36da8d78c268b8b3d553cce0a63684dd37e70aae5d",
-      "bytes": 3597,
-      "source": "docs/assets/vision-event-flow.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "888e04b839f460f77d51de36da8d78c268b8b3d553cce0a63684dd37e70aae5d",
-      "exact_copy": true
-    },
-    {
       "path": "docs/assets/vision-frame-pool.png",
       "sha256": "2e64e5220e89a8cdb062939457697cbf000ab7fefeb3af68d86d1913c8273184",
       "bytes": 172224,
@@ -616,48 +391,12 @@
       "exact_copy": true
     },
     {
-      "path": "docs/assets/vision-frame-pool.svg",
-      "sha256": "cd4a3c4a9329550d007cb5bd3a56b70941f689150f62f537558d31ead1374848",
-      "bytes": 4801,
-      "source": "docs/assets/vision-frame-pool.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "cd4a3c4a9329550d007cb5bd3a56b70941f689150f62f537558d31ead1374848",
-      "exact_copy": true
-    },
-    {
       "path": "docs/assets/vision-training-flow.png",
       "sha256": "eba499e1f6d473505ed04b99fe89f5bebe289f18412b460eabebae05d1a8e748",
       "bytes": 69603,
       "source": "docs/assets/vision-training-flow.png",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "eba499e1f6d473505ed04b99fe89f5bebe289f18412b460eabebae05d1a8e748",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/vision-training-flow.svg",
-      "sha256": "ea9e983dae50bd40ee7d4ee350d83edce8c0dd88b02fbe58138a316add53982e",
-      "bytes": 2539,
-      "source": "docs/assets/vision-training-flow.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "ea9e983dae50bd40ee7d4ee350d83edce8c0dd88b02fbe58138a316add53982e",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/vision-two-stage.png",
-      "sha256": "5ba6c88fcc36137150428d90d3535857814f643c8c4ac3e9be7ba7a4e11ded6c",
-      "bytes": 121529,
-      "source": "docs/assets/vision-two-stage.png",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "5ba6c88fcc36137150428d90d3535857814f643c8c4ac3e9be7ba7a4e11ded6c",
-      "exact_copy": true
-    },
-    {
-      "path": "docs/assets/vision-two-stage.svg",
-      "sha256": "8b77fc3b17b13193a0b9b79e2f4a12ff7436bbc421c0bce39206ae1dceed7029",
-      "bytes": 2856,
-      "source": "docs/assets/vision-two-stage.svg",
-      "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
-      "upstream_sha256": "8b77fc3b17b13193a0b9b79e2f4a12ff7436bbc421c0bce39206ae1dceed7029",
       "exact_copy": true
     },
     {
@@ -1282,8 +1021,8 @@
     },
     {
       "path": "model_training/tests/test_pipeline.py",
-      "sha256": "7fbfbc98ed2f21a2ca91803cbaee9dab5dd8faacfe112283ad8c11eedf499d99",
-      "bytes": 62634,
+      "sha256": "eeed895676980a0b92d56155470cb0dba2fd661974a0a62030ec7d718a7ff88b",
+      "bytes": 64095,
       "source": "model_training/tests/test_pipeline.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "3c98e0ab7cd65fc88b980da1fe7093c194f2483e1a3e05cb7b97de80d728e08e",

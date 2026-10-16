@@ -59,6 +59,6 @@ input/output name·shape·dtype, Confidence·NMS를 장치와 맞춰야 합니�
 | export 평가 조건 불일치 | validation split·dataset SHA·해상도를 검사하고 threshold 명시·추천 출처 기록 |
 | 학습 중단 | 기존 실험 결과·manifest 보존. 임의 checkpoint 자동 resume를 주장하지 않음 |
 
-## 검증과 한계
+## 검증
 
 통합본의 모델 파이프라인·런타임 계약 44개를 검사합니다. CI에서는 포함된 YOLOX 소스로 임시 checkpoint를 생성하므로 개인 개발 경로나 비공개 가중치 없이 검사를 실행할 수 있습니다. 프레임 평가 수치는 당시 팀 모델 평가 자료로 연결합니다.

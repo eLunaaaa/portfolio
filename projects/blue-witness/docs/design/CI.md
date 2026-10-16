@@ -47,4 +47,4 @@ Pi 소스를 x86 host compiler로만 검사하면 ARM 라이브러리·ABI 문�
 
 ## 검증 범위
 
-여기에 보존한 YAML은 포트폴리오 루트의 `.github`가 아니라 참고 하위 폴더라 자동으로 실행되지 않습니다. Shell 문법과 YAML 형식은 정리 단계에서 확인하고, 실제 ARM64 빌드·Actions runner·artifact 승격 전체를 이번에 새로 운영 실행했다고 주장하지 않습니다.
+팀 ARM64 빌드 workflow는 source/automation에 보존했습니다. 이 포트폴리오의 루트 workflow는 서버·웹·모델·RTL 검사와 Linux C 모듈 빌드를 실행하며 [Actions 로그](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)를 제공합니다.

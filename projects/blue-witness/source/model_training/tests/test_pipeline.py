@@ -301,6 +301,29 @@ class DatasetPipelineTest(unittest.TestCase):
         loader = create_training_loader(
             source_dir, dataset_dir, (320, 416), settings["training"], 1, None
         )
+        # train에만 6배 가중치를 적용했을 때 실제 COCO 순서의 sampler와
+        # 재현 seed가 유지되는지 검사합니다. val/test 파일은 변경하지 않습니다.
+        train_images = train_coco["images"]
+        weighted_training = dict(settings["training"], session_sampling_weights={
+            train_images[0]["session_id"]: 6.0
+        })
+        weighted_loader = create_training_loader(
+            source_dir, dataset_dir, (320, 416), weighted_training, 1, None
+        )
+        self.assertIsInstance(weighted_loader.sampler, torch.utils.data.WeightedRandomSampler)
+        by_id = {item["id"]: item for item in train_images}
+        expected = [6.0 if by_id[image_id]["session_id"] == train_images[0]["session_id"] else 1.0
+                    for image_id in weighted_loader.dataset.ids]
+        self.assertEqual(weighted_loader.sampler.weights.tolist(), expected)
+        duplicate_loader = create_training_loader(
+            source_dir, dataset_dir, (320, 416), weighted_training, 1, None
+        )
+        self.assertEqual(list(weighted_loader.sampler), list(duplicate_loader.sampler))
+        invalid_training = dict(settings["training"], session_sampling_weights={
+            train_images[0]["session_id"]: float("nan")
+        })
+        with self.assertRaisesRegex(DatasetContractError, "유한한 양수"):
+            create_training_loader(source_dir, dataset_dir, (320, 416), invalid_training, 1, None)
         images, targets, _, _ = next(iter(loader))
         model.train()
         losses = model(images.float(), targets.float())
