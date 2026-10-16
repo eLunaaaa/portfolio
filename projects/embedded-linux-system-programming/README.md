@@ -1,11 +1,23 @@
 # 졸업연구 · 실시간 Linux 실험 환경 구성
 
-졸업연구에서 실험 환경 구성, PREEMPT_RT 실험 도구 설정, CPU affinity 적용과 관련 논문 리딩·정리를 담당했습니다.
+Raspberry Pi 5의 PREEMPT_RT Linux에서 일반 UDP·CPU 격리·XDP/AF_XDP 경로의 지연 특성을 비교하는 팀 졸업연구입니다. 전체 연구는 중요도별 패킷 처리 경로를 분리하는 혼합 중요도 아키텍처를 다룹니다.
+
+**개인 담당:** UDP 기준 실험 송수신 코드, 실험 환경 구성·PREEMPT_RT 도구 설정, CPU affinity 적용, 관련 논문 리딩·정리.
+
+| 먼저 확인할 내용 | 바로가기 |
+|---|---|
+| 직접 작성한 C 코드 | [송신기](source/udp_socket/src/sender.c) · [수신기](source/udp_socket/src/receiver.c) |
+| 설계 선택과 측정 한계 | [측정 설계](docs/DESIGN.md) |
+| 빌드·실행 방법 | [개인 코드 실행 안내](source/README.md) |
+| 원본과 개인 기여 근거 | [원본 저장소](https://github.com/kingwooseok/ACEteam_Bachelor_thesis) · [UDP 구현 커밋](https://github.com/kingwooseok/ACEteam_Bachelor_thesis/commit/05722a5) · [주석·설명 보강](https://github.com/kingwooseok/ACEteam_Bachelor_thesis/commit/440f477) |
+
+포트폴리오에는 개인 구현 시점 `440f477`의 UDP 모듈을 보존했습니다. 팀 최신 연구 구조는 `2048af3`에서 확인했으며, 이후의 드라이버·XDP·PHC 보정·분석 구현 전체를 개인 코드로 복사하지 않았습니다.
 
 ## 개인 기여
 
 | 담당 영역 | 수행한 작업 |
 |---|---|
+| UDP 기준 실험 구현 | 송신 sequence·시각 기록, 절대 시간 기반 주기 제어, 수신 시각 측정, tmpfs 선형 버퍼·종료 후 결과 저장 |
 | 실험 환경 구성 | Linux 실험 환경과 도구를 준비하고 실행 순서·설정 조건 정리 |
 | PREEMPT_RT 실험 도구 설정 | 실시간 Linux 환경에서 사용할 도구의 실행 조건 설정 및 확인 |
 | CPU 3번 고정 | CPU affinity를 적용해 지정 작업의 실행 CPU를 CPU 3으로 고정 |
@@ -13,7 +25,21 @@
 
 ## 사용 기술과 도구
 
-Embedded Linux · PREEMPT_RT · cyclictest · taskset · CPU affinity · Shell
+Embedded Linux · C · POSIX UDP socket · PREEMPT_RT · mmap/mlockall · cyclictest · taskset · CPU affinity · Shell
+
+## 코드에서 확인할 핵심
+
+| 파일 | 구현 내용 |
+|---|---|
+| [sender.c](source/udp_socket/src/sender.c) | CLI 검증, sequence·TX 시각, MONOTONIC 절대 sleep, UDP 송신 |
+| [receiver.c](source/udp_socket/src/receiver.c) | tmpfs 검증, mmap·메모리 잠금·pre-touch, recv 직후 RX 시각, 종료 후 파일 저장·fsync |
+| [protocol.h](source/udp_socket/include/protocol.h) | 16-byte wire header, 32-byte native 기록, endian 변환 |
+| [config.h](source/udp_socket/include/config.h) | port·payload·주기·샘플 수·출력 경로 기본값 |
+| [Makefile](source/udp_socket/Makefile) | 추가 라이브러리 없는 Linux C 빌드·경고 옵션 |
+
+같은 송수신기를 Vanilla·PREEMPT_RT·CPU isolation 조건에서 사용하고 외부 환경만 바꿉니다. 프로그램 차이와 커널·CPU 배치 차이가 뒤섞이지 않도록 하기 위한 기준선입니다. CPU affinity는 `taskset -c 3`으로 외부 적용하며 PTP 동기화도 별도 설정합니다.
+
+**성과 해석:** 이 페이지는 구현과 실험 구성 근거를 제공합니다. 커널 수신 전체 비용이나 실시간 최악 지연을 증명한 결과로 확대하지 않으며, 확인되지 않은 지연 개선 수치를 추가하지 않았습니다. 현재 Mac에서는 Linux 전용 기능의 실제 실행 검증을 할 수 없어 정적 점검만 수행했습니다.
 
 ## 기술적으로 수행한 내용
 

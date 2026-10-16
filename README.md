@@ -9,7 +9,7 @@
 | 프로젝트 | 핵심 담당 | 먼저 볼 자료 |
 |---|---|---|
 | [2026 임베디드 SW 경진대회 본선 · Blue Witness](projects/blue-witness/README.md) | AI 학습·서버·시간 동기화·전체 Fail-safe·CI/CD | [설계 선택](projects/blue-witness/docs/design/DECISIONS.md) · [모델 결과 분석](projects/blue-witness/analysis/README.md) · [코드](projects/blue-witness/source/README.md) |
-| [졸업연구 · 실시간 Linux 실험 환경](projects/embedded-linux-system-programming/README.md) | PREEMPT_RT 실험 세팅·CPU affinity·논문 정리 | [담당 작업](projects/embedded-linux-system-programming/README.md) |
+| [졸업연구 · 실시간 Linux 패킷 처리 실험](projects/embedded-linux-system-programming/README.md) | UDP 기준선 구현·PREEMPT_RT 실험 세팅·CPU affinity | [C 코드](projects/embedded-linux-system-programming/source/README.md) · [설계 선택](projects/embedded-linux-system-programming/docs/DESIGN.md) |
 | [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md) | PyTorch 학습·고정소수점 평가·RTL 생성·합성 | [구현과 평가](projects/configurable-cnn-rtl/README.md) |
 | [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | 연산 스케줄링·통신·인터럽트 | [시연과 구현](projects/arduino-load-balancer/README.md) |
 | [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | AI·RTOS·하드웨어·웹 통합 | [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md) |
@@ -43,12 +43,13 @@ MNIST 모델 구조·학습부터 Q3.4 출력 평가, Verilog 연산 모듈, RTL
 
 [프로젝트 상세와 코드](projects/configurable-cnn-rtl/README.md)
 
-## 졸업연구 · 실시간 Linux 실험 환경 구성
+## 졸업연구 · 실시간 Linux 패킷 처리 실험
 
-실험 환경과 PREEMPT_RT 도구 설정, CPU 3번 고정, 논문 리딩·정리를 담당했습니다.
+UDP 기준 실험 송수신기를 구현하고, PREEMPT_RT 도구 설정·CPU 3번 고정·논문 리딩을 담당했습니다.
 
-- **개인 기여**: 실험 세팅, PREEMPT_RT 실험 도구 설정, CPU affinity 적용, 관련 논문 정리
-- **기술·도구**: Embedded Linux · PREEMPT_RT · cyclictest · taskset · CPU affinity · Shell
+- **개인 기여**: UDP 송수신·측정 기록 구현, 실험 세팅, PREEMPT_RT 도구 설정, CPU affinity 적용, 관련 논문 정리
+- **기술·도구**: C · POSIX UDP · mmap/mlockall · Embedded Linux · PREEMPT_RT · cyclictest · taskset
+- **설계 포인트**: 송신 주기와 측정 시계 분리, 측정 구간의 파일 쓰기 제거, 동일 바이너리로 커널·CPU 조건 비교
 
 [담당 작업과 기술 구현](projects/embedded-linux-system-programming/README.md)
 
