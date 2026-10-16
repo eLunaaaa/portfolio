@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>Blue Witness · 로그인</title>
+  <link
+    rel="stylesheet"
+    href="/static/styles.css?v=blue-witness-logo-gap3-20261008"
+  >
+</head>
+<body class="centered-page login-page">
+  <main class="auth-shell">
+    <section class="brand-panel">
+      <p class="eyebrow brand-system-label">VEHICLE EVIDENCE SYSTEM</p>
+      <div class="brand-center">
+        <img
+          class="brand-logo"
+          src="/static/images/blue-witness-logo.png"
+          alt=""
+          width="500"
+          height="500"
+        >
+        <h1 class="blue-witness-name">Blue Witness</h1>
+        <p class="brand-subtitle">다중 시점 사고 증거 확인 서비스</p>
+        <p class="brand-benefit">여러 시점의 사고 영상을 한눈에</p>
+      </div>
+    </section>
+
+    <section class="auth-card">
+      <div class="tab-row">
+        <button
+          id="login-tab"
+          class="tab-button active"
+          type="button"
+        >
+          로그인
+        </button>
+
+        <button
+          id="register-tab"
+          class="tab-button"
+          type="button"
+        >
+          회원가입
+        </button>
+      </div>
+
+      <form id="login-form">
+        <label>
+          아이디
+          <input
+            id="login-username"
+            autocomplete="username"
+            required
+          >
+        </label>
+
+        <label>
+          비밀번호
+          <input
+            id="login-password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </label>
+
+        <button
+          class="primary-button"
+          type="submit"
+        >
+          로그인
+        </button>
+      </form>
+
+      <form
+        id="register-form"
+        class="hidden"
+      >
+        <label>
+          이름
+          <input
+            id="register-full-name"
+            required
+          >
+        </label>
+
+        <label>
+          아이디
+          <input
+            id="register-username"
+            autocomplete="username"
+            required
+          >
+        </label>
+
+        <label>
+          비밀번호
+          <input
+            id="register-password"
+            type="password"
+            minlength="10"
+            maxlength="128"
+            autocomplete="new-password"
+            required
+          >
+        </label>
+
+        <label>
+          비밀번호 확인
+          <input
+            id="register-password-confirm"
+            name="password_confirmation"
+            type="password"
+            minlength="10"
+            maxlength="128"
+            autocomplete="new-password"
+            required
+          >
+        </label>
+
+        <p
+          id="register-password-message"
+          class="form-message password-check-message"
+          aria-live="polite"
+        ></p>
+
+        <button
+          class="primary-button"
+          type="submit"
+        >
+          계정 만들기
+        </button>
+      </form>
+
+      <p
+        id="auth-message"
+        class="message"
+      ></p>
+    </section>
+  </main>
+
+    <script src="/static/common.js?v=8-8-mobile-1"></script>
+    <script src="/static/password-policy.js?v=1"></script>
+    <script src="/static/login.js?v=password-policy-1"></script>
+</body>
+</html>

@@ -1,0 +1,1122 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+
+  <title>내 사고 증거 확인</title>
+
+  <link
+    rel="stylesheet"
+    href="/static/styles.css?v=video-view-buttons-20261008"
+  >
+</head>
+
+<body class="portal-page">
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">
+        VEHICLE EVIDENCE PORTAL
+      </p>
+
+      <h1>
+        내 사고 증거 확인
+      </h1>
+    </div>
+
+    <div class="account-header-actions">
+    <a class="secondary-button" href="/account">내 정보</a>
+    <button
+      id="logout-button"
+      class="secondary-button"
+      type="button"
+    >
+      로그아웃
+    </button>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <!-- 사용자 요약 정보 -->
+    <section class="summary-grid">
+      <article class="summary-card user-summary-card">
+        <div class="user-summary-text">
+          <span>사용자</span>
+          <strong id="user-name">-</strong>
+        </div>
+        <a class="user-profile-photo" href="/account" aria-label="내 정보에서 프로필 사진 변경">
+          <img class="user-avatar" data-profile-image src="/api/v1/auth/profile/image" alt="내 프로필 사진">
+        </a>
+      </article>
+
+      <article class="summary-card">
+        <span>등록 차량</span>
+        <strong id="vehicle-count">0</strong>
+      </article>
+
+      <article class="summary-card">
+        <span>사고 기록</span>
+        <strong id="event-count">0</strong>
+      </article>
+    </section>
+
+    <!-- 등록 차량 목록 -->
+    <section class="panel">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">
+            MY VEHICLES
+          </p>
+
+          <h2>
+            등록 차량
+          </h2>
+        </div>
+
+        <button
+          id="open-vehicle-register-button"
+          class="primary-button"
+          type="button"
+        >
+          + 차량 등록
+        </button>
+      </div>
+
+      <div
+        id="vehicle-list"
+        class="card-grid vehicle-card-grid"
+      ></div>
+    </section>
+
+    <section class="panel" aria-labelledby="latest-incident-heading">
+      <div class="section-heading"><div><p class="eyebrow">LATEST ACCIDENT</p>
+        <h2 id="latest-incident-heading">가장 최근 사고</h2></div></div>
+      <div id="latest-incident-content"><p>사고 정보를 불러오는 중입니다.</p></div>
+    </section>
+
+    <!-- 사고 기록 목록 -->
+    <section class="panel">
+      <h2>
+        사고 기록
+      </h2>
+
+      <form id="incident-history-filters" class="incident-history-filters">
+        <div class="incident-query-fields">
+        <label for="incident-start-date"><span>시작일</span><input id="incident-start-date" type="date"></label>
+        <label for="incident-end-date"><span>종료일</span><input id="incident-end-date" type="date"></label>
+        <label for="incident-sort"><span>정렬</span><select id="incident-sort">
+          <option value="newest">최신순</option>
+          <option value="oldest">오래된순</option>
+        </select></label>
+        </div>
+        <div class="incident-query-buttons">
+        <button class="primary-button" type="submit">조회</button>
+        <button id="incident-reset" class="secondary-button" type="button">조건 초기화</button>
+        </div>
+      </form>
+      <div class="incident-history-options">
+        <label><input id="incident-show-id" type="checkbox">사고 ID 표시</label>
+        <label><input id="incident-detailed-time" type="checkbox">시간 자세히 표시</label>
+      </div>
+      <p id="incident-history-summary" aria-live="polite"></p>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th id="incident-id-heading" hidden>사고 ID</th>
+              <th>차량</th>
+              <th>발생 시각</th>
+              <th>증거 차량</th>
+              <th>병합 상태</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="event-table-body">
+          </tbody>
+        </table>
+      </div>
+      <div class="incident-history-actions">
+        <button id="incident-show-more" class="secondary-button" type="button" hidden>더 보기</button>
+        <button id="incident-collapse" class="secondary-button" type="button" hidden>접기</button>
+      </div>
+    </section>
+
+    <!-- 선택한 사고 상세 정보 -->
+    <section
+      id="event-detail-panel"
+      class="panel hidden"
+    >
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">
+            ACCIDENT DETAIL
+          </p>
+
+          <h2 id="detail-event-id">
+            -
+          </h2>
+        </div>
+
+        <span
+          id="detail-status"
+          class="status-badge"
+        >
+          -
+        </span>
+      </div>
+
+      <dl class="detail-list">
+        <div data-detail-flip-card>
+          <dt>
+            사고 차량
+          </dt>
+
+          <dd id="detail-vehicle-id">
+            <button id="detail-vehicle-flip" class="detail-flip-button" type="button" aria-pressed="false">
+              <span class="detail-flip-inner">
+                <span class="detail-flip-front">-</span>
+                <span class="detail-flip-back" aria-hidden="true">-</span>
+              </span>
+            </button>
+          </dd>
+        </div>
+
+        <div data-detail-flip-card>
+          <dt>
+            사고 발생 시각
+          </dt>
+
+          <dd id="detail-event-time">
+            <button id="detail-time-flip" class="detail-flip-button" type="button" aria-pressed="false">
+              <span class="detail-flip-inner">
+                <span class="detail-flip-front">-</span>
+                <span class="detail-flip-back" aria-hidden="true">-</span>
+              </span>
+            </button>
+          </dd>
+        </div>
+
+        <div>
+          <dt>
+            수집 영상 수
+          </dt>
+
+          <dd id="detail-evidence-count">
+            -
+          </dd>
+        </div>
+
+      </dl>
+
+      <!-- 사고 접근 코드 영역 -->
+      <div
+        id="unlock-area"
+        class="unlock-box"
+      >
+        <h3>
+          사고 접근 코드
+        </h3>
+
+        <p>
+          본인인증 후 발급받은 사고 접근 코드를
+          입력하면 병합 영상을 확인할 수 있습니다.
+        </p>
+
+        <div class="access-code-request-box">
+          <div>
+            <p class="section-eyebrow">
+              IDENTITY VERIFICATION
+            </p>
+
+            <h4>
+              사고 접근 코드 확인
+            </h4>
+
+            <p>
+              본인인증을 완료하면 5분 동안 확인할
+              수 있는 사고 접근 코드를 발급합니다.
+            </p>
+          </div>
+
+          <button
+            id="open-access-code-modal-button"
+            type="button"
+            class="secondary-button"
+          >
+            접근 코드 확인
+          </button>
+        </div>
+
+        <form id="access-code-form">
+          <input
+            id="access-code"
+            type="text"
+            placeholder="XXXX-XXXX-XXXX"
+            autocomplete="off"
+            required
+          >
+
+          <button
+            class="primary-button"
+            type="submit"
+          >
+            영상 잠금 해제
+          </button>
+        </form>
+      </div>
+
+<!-- 접근 코드 검증 후 표시할 병합 영상 -->
+<div
+  id="video-area"
+  class="hidden"
+>
+  <video
+    id="merged-video"
+    controls
+    playsinline
+    preload="metadata"
+  ></video>
+
+  <div class="video-view-controls">
+    <div class="video-view-buttons" role="group" aria-label="영상 모드" data-video-view-target="merged-video" aria-describedby="portal-video-view-message">
+      <button type="button" data-view="all" aria-pressed="true" disabled>전체 영상</button>
+      <button type="button" data-view="witness" aria-pressed="false" disabled>목격 차량 영상</button>
+      <button type="button" data-view="own" aria-pressed="false" disabled>내 차량 영상</button>
+    </div>
+    <p id="portal-video-view-message" role="status"></p>
+  </div>
+
+  <div class="incident-playback-actions" role="group" aria-label="영상 재생 방식">
+    <button type="button" class="small-button" data-video-target="merged-video" data-playback-mode="incident">사고 장면 보기 · 0.25배속</button>
+    <button type="button" class="small-button secondary" data-video-target="merged-video" data-playback-mode="original">원본 보기 · 1배속</button>
+  </div>
+
+  <div class="video-action-bar">
+    <div class="video-action-copy">
+      <strong>
+        다중 시점 통합 영상
+      </strong>
+
+      <span>
+        사고 접근 인증이 유효한 동안
+        영상을 다운로드할 수 있습니다.
+      </span>
+    </div>
+
+    <a
+      id="download-merged-video-button"
+      class="
+        small-button
+        download-video-button
+        is-disabled
+      "
+      href="#"
+      download
+      aria-disabled="true"
+    >
+      영상 다운로드
+    </a>
+  </div>
+</div>
+
+      <p
+        id="portal-message"
+        class="message"
+        aria-live="polite"
+      ></p>
+    </section>
+  </main>
+
+<!-- 차량 등록 팝업 -->
+<div
+  id="vehicle-register-modal"
+  class="modal-backdrop"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="vehicle-register-title"
+  hidden
+>
+  <section class="vehicle-register-modal-card">
+    <button
+      id="close-vehicle-register-button"
+      type="button"
+      class="modal-close-button"
+      aria-label="차량 등록 팝업 닫기"
+    >
+      ×
+    </button>
+
+    <p class="modal-eyebrow">
+      VEHICLE REGISTRATION
+    </p>
+
+    <h2 id="vehicle-register-title">
+      내 차량 등록
+    </h2>
+
+    <p class="modal-description">
+      차량번호와 별명을 입력하고,
+      차량 목록에서 차종을 선택해주세요.
+      내부 차량 ID는 서버가 자동으로 생성합니다.
+    </p>
+
+    <form id="vehicle-register-form">
+      <div class="vehicle-form-grid">
+        <label class="vehicle-form-field">
+          <span>
+            차량번호
+          </span>
+
+          <input
+            id="vehicle-license-plate"
+            type="text"
+            placeholder="예: 12가 3456"
+            maxlength="20"
+            autocomplete="off"
+            required
+          >
+        </label>
+
+        <label class="vehicle-form-field">
+          <span>
+            차량 별명
+          </span>
+
+          <input
+            id="vehicle-display-name"
+            type="text"
+            placeholder="예: 민석 차량"
+            maxlength="40"
+            autocomplete="off"
+            required
+          >
+        </label>
+
+        <label class="vehicle-form-field">
+          <span>
+            선택 차종
+          </span>
+
+          <input
+            id="vehicle-model"
+            type="text"
+            value="현대 아이오닉 5"
+            placeholder="차량을 선택해주세요"
+            maxlength="80"
+            autocomplete="off"
+            readonly
+            required
+          >
+        </label>
+      </div>
+
+      <!--
+        기본 모드와 직접 입력 모드를 전환함.
+      -->
+      <label class="vehicle-manual-toggle">
+        <input
+          id="vehicle-manual-mode"
+          type="checkbox"
+        >
+
+        <span class="vehicle-manual-check">
+          ✓
+        </span>
+
+        <span>
+          목록에 없는 차량 직접 입력
+        </span>
+      </label>
+
+      <!-- 현대차 사진 선택 영역 -->
+      <fieldset
+        id="vehicle-photo-fieldset"
+        class="vehicle-photo-fieldset"
+      >
+        <legend>
+          현대 차량 선택
+        </legend>
+
+        <p class="vehicle-selector-description">
+          등록할 차량과 같은 차종을 선택해주세요.
+        </p>
+
+        <div class="vehicle-photo-options">
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_solati"
+              data-vehicle-model="현대 쏠라티"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/solati.png"
+                alt="현대 쏠라티"
+                loading="lazy"
+              >
+
+              <small>
+                쏠라티
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_porter_two"
+              data-vehicle-model="현대 포터 II"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/porter2.png"
+                alt="현대 포터 II"
+                loading="lazy"
+              >
+
+              <small>
+                포터 II
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_nexo"
+              data-vehicle-model="현대 넥쏘"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/nexo.png"
+                alt="현대 넥쏘"
+                loading="lazy"
+              >
+
+              <small>
+                넥쏘
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_ioniq_five"
+              data-vehicle-model="현대 아이오닉 5"
+              checked
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/ioniq5.png"
+                alt="현대 아이오닉 5"
+              >
+
+              <small>
+                아이오닉 5
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_staria"
+              data-vehicle-model="현대 스타리아"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/staria.png"
+                alt="현대 스타리아"
+                loading="lazy"
+              >
+
+              <small>
+                스타리아
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_palisade"
+              data-vehicle-model="현대 팰리세이드"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/palisade.png"
+                alt="현대 팰리세이드"
+                loading="lazy"
+              >
+
+              <small>
+                팰리세이드
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_santafe"
+              data-vehicle-model="현대 싼타페"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/santafe.png"
+                alt="현대 싼타페"
+                loading="lazy"
+              >
+
+              <small>
+                싼타페
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_tucson"
+              data-vehicle-model="현대 투싼"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/tucson.png"
+                alt="현대 투싼"
+                loading="lazy"
+              >
+
+              <small>
+                투싼
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_kona_electric"
+              data-vehicle-model="현대 코나 일렉트릭"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/kona-electric.png"
+                alt="현대 코나 일렉트릭"
+                loading="lazy"
+              >
+
+              <small>
+                코나 일렉트릭
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_kona"
+              data-vehicle-model="현대 코나"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/kona.png"
+                alt="현대 코나"
+                loading="lazy"
+              >
+
+              <small>
+                코나
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_venue"
+              data-vehicle-model="현대 베뉴"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/venue.png"
+                alt="현대 베뉴"
+                loading="lazy"
+              >
+
+              <small>
+                베뉴
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_casper"
+              data-vehicle-model="현대 캐스퍼"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/casper.png"
+                alt="현대 캐스퍼"
+                loading="lazy"
+              >
+
+              <small>
+                캐스퍼
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_ioniq_six"
+              data-vehicle-model="현대 아이오닉 6"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/ioniq6.png"
+                alt="현대 아이오닉 6"
+                loading="lazy"
+              >
+
+              <small>
+                아이오닉 6
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_grandeur"
+              data-vehicle-model="현대 그랜저"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/grandeur.png"
+                alt="현대 그랜저"
+                loading="lazy"
+              >
+
+              <small>
+                그랜저
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_sonata"
+              data-vehicle-model="현대 쏘나타"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/sonata.png"
+                alt="현대 쏘나타"
+                loading="lazy"
+              >
+
+              <small>
+                쏘나타
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-photo-option">
+            <input
+              type="radio"
+              name="vehicle-photo-key"
+              value="hyundai_avante"
+              data-vehicle-model="현대 아반떼"
+            >
+
+            <span class="vehicle-photo-choice">
+              <img
+                src="/static/images/vehicles/hyundai/avante.png"
+                alt="현대 아반떼"
+                loading="lazy"
+              >
+
+              <small>
+                아반떼
+              </small>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <!-- 직접 입력 모드에서만 표시함 -->
+      <fieldset
+        id="vehicle-icon-fieldset"
+        class="vehicle-icon-fieldset"
+        hidden
+      >
+        <legend>
+          차량 아이콘
+        </legend>
+
+        <p class="vehicle-selector-description">
+          차량에 표시할 기본 아이콘을 선택해주세요.
+        </p>
+
+        <div class="vehicle-icon-options">
+          <label class="vehicle-icon-option">
+            <input
+              type="radio"
+              name="vehicle-icon-key"
+              value="sedan"
+              checked
+            >
+
+            <span class="vehicle-icon-choice">
+              <strong>
+                🚗
+              </strong>
+
+              <small>
+                승용차
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-icon-option">
+            <input
+              type="radio"
+              name="vehicle-icon-key"
+              value="suv"
+            >
+
+            <span class="vehicle-icon-choice">
+              <strong>
+                🚙
+              </strong>
+
+              <small>
+                SUV
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-icon-option">
+            <input
+              type="radio"
+              name="vehicle-icon-key"
+              value="van"
+            >
+
+            <span class="vehicle-icon-choice">
+              <strong>
+                🚐
+              </strong>
+
+              <small>
+                밴
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-icon-option">
+            <input
+              type="radio"
+              name="vehicle-icon-key"
+              value="pickup"
+            >
+
+            <span class="vehicle-icon-choice">
+              <strong>
+                🛻
+              </strong>
+
+              <small>
+                픽업
+              </small>
+            </span>
+          </label>
+
+          <label class="vehicle-icon-option">
+            <input
+              type="radio"
+              name="vehicle-icon-key"
+              value="truck"
+            >
+
+            <span class="vehicle-icon-choice">
+              <strong>
+                🚚
+              </strong>
+
+              <small>
+                트럭
+              </small>
+            </span>
+          </label>
+        </div>
+      </fieldset>
+
+      <p
+        id="vehicle-register-message"
+        class="message"
+        aria-live="polite"
+      ></p>
+
+      <div class="modal-action-row">
+        <button
+          id="cancel-vehicle-register-button"
+          type="button"
+          class="secondary-button"
+        >
+          취소
+        </button>
+
+        <button
+          id="submit-vehicle-register-button"
+          type="submit"
+          class="primary-button"
+        >
+          차량 등록
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
+
+<!-- 브라우저 기본 confirm 대신 포털의 다른 팝업과 같은 삭제 확인 창 -->
+<div id="vehicle-delete-modal" class="modal-backdrop"
+  role="dialog" aria-modal="true" aria-labelledby="vehicle-delete-title" hidden>
+  <section class="access-code-modal-card vehicle-delete-modal-card">
+    <button id="close-vehicle-delete-button" type="button"
+      class="modal-close-button" aria-label="삭제 확인 창 닫기">×</button>
+    <p class="modal-eyebrow">REMOVE VEHICLE</p>
+    <h2 id="vehicle-delete-title">차량을 내 목록에서 삭제할까요?</h2>
+    <p class="modal-description">
+      <strong id="vehicle-delete-plate"></strong> 차량의 내 계정 연결을 해제합니다.
+      기존 사고 기록과 영상은 삭제되지 않습니다.
+    </p>
+    <div class="modal-action-row">
+      <button id="cancel-vehicle-delete-button" type="button"
+        class="secondary-button">취소</button>
+      <button id="confirm-vehicle-delete-button" type="button"
+        class="primary-button">계속해서 확인</button>
+    </div>
+  </section>
+</div>
+
+<!-- 실제 인증기관 연동 전, 시연용 두 단계 차량 작업 확인 -->
+<div id="vehicle-verification-modal" class="modal-backdrop"
+  role="dialog" aria-modal="true" aria-labelledby="vehicle-verification-title" hidden>
+  <section class="access-code-modal-card vehicle-verification-card">
+    <button id="close-vehicle-verification-button" type="button"
+      class="modal-close-button" aria-label="확인 창 닫기">×</button>
+    <p class="modal-eyebrow">DEMO VERIFICATION</p>
+    <h2 id="vehicle-verification-title">차량 작업 확인</h2>
+    <p class="modal-description">이 단계는 시연용입니다. 실제 본인인증이나 차량 소유 증명은 수행하지 않습니다.</p>
+    <div id="vehicle-identity-stage">
+      <p>1단계 · 본인인증을 완료한 것으로 가정합니다.</p>
+      <button id="confirm-vehicle-identity-button" type="button"
+        class="primary-button full-width-button">본인인증 완료로 가정</button>
+    </div>
+    <div id="vehicle-ownership-stage" hidden>
+      <p>2단계 · 차량 인증을 완료한 것으로 가정합니다.</p>
+      <button id="confirm-vehicle-ownership-button" type="button"
+        class="primary-button full-width-button">차량 인증 완료로 가정</button>
+    </div>
+    <p id="vehicle-verification-message" class="message" aria-live="polite"></p>
+  </section>
+</div>
+
+  <!-- 본인인증·접근 코드 팝업 -->
+  <div
+    id="access-code-modal"
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="access-code-modal-title"
+    hidden
+  >
+    <section class="access-code-modal-card">
+      <button
+        id="close-access-code-modal-button"
+        type="button"
+        class="modal-close-button"
+        aria-label="접근 코드 팝업 닫기"
+      >
+        ×
+      </button>
+
+      <!-- 첫 화면: 시연용 본인인증 -->
+      <div id="identity-verification-stage">
+        <p class="modal-eyebrow">
+          DEMO IDENTITY VERIFICATION
+        </p>
+
+        <h2 id="access-code-modal-title">
+          본인인증이 필요합니다
+        </h2>
+
+        <p class="modal-description">
+          실제 서비스에서는 휴대폰 인증 등의
+          본인인증 절차가 진행됩니다.
+        </p>
+
+        <div class="demo-notice-box">
+          <strong>
+            시연용 본인인증
+          </strong>
+
+          <p>
+            현재 프로토타입에서는 실제 인증기관과
+            연결하지 않고 본인인증이 완료된 것으로
+            가정합니다.
+          </p>
+        </div>
+
+        <div class="modal-action-row">
+          <button
+            id="cancel-identity-verification-button"
+            type="button"
+            class="secondary-button"
+          >
+            취소
+          </button>
+
+          <button
+            id="confirm-identity-verification-button"
+            type="button"
+            class="primary-button"
+          >
+            본인인증 완료로 가정하고 확인
+          </button>
+        </div>
+      </div>
+
+      <!-- 두 번째 화면: 접근 코드와 카운트다운 -->
+      <div
+        id="issued-code-stage"
+        hidden
+      >
+        <p class="modal-eyebrow">
+          TEMPORARY ACCESS CODE
+        </p>
+
+        <h2>
+          사고 접근 코드가 발급되었습니다
+        </h2>
+
+        <p class="modal-description">
+          아래 코드는 5분 동안만 유효합니다.
+          코드를 복사한 후 팝업을 닫아주세요.
+        </p>
+
+        <div class="popup-code-box">
+          <span>
+            사고 접근 코드
+          </span>
+
+          <strong id="popup-access-code">
+            -
+          </strong>
+        </div>
+
+        <div class="popup-countdown-box">
+          <span>
+            남은 확인 시간
+          </span>
+
+          <strong id="popup-access-code-countdown">
+            05:00
+          </strong>
+        </div>
+
+        <p
+          id="popup-access-code-status"
+          class="modal-status-message"
+          aria-live="polite"
+        >
+          코드를 복사한 후 X 버튼으로
+          닫을 수 있습니다.
+        </p>
+
+        <button
+          id="copy-popup-access-code-button"
+          type="button"
+          class="primary-button full-width-button"
+        >
+          접근 코드 복사
+        </button>
+      </div>
+    </section>
+  </div>
+
+  <!--
+    로딩 순서가 중요함.
+
+    1. common.js:
+       apiRequest, setMessage, escapeHtml,
+       logoutAndRedirect를 제공함.
+
+    2. portal.js:
+       사용자·차량·사고 정보를 조회하고
+       사고 영상 기능을 처리함.
+
+    3. vehicle-registration.js:
+       차량 등록 팝업과 등록 API를 처리함.
+  -->
+
+  <script
+    src="/static/common.js?v=background-bottom-36"
+  ></script>
+
+  <script
+    src="/static/portal.js?v=video-views-20261008"
+  ></script>
+
+  <script
+    src="/static/vehicle-registration.js?v=background-bottom-36"
+  ></script>
+  <script src="/static/incident-playback.js?v=5"></script>
+  <script src="/static/video-views.js?v=3"></script>
+  <script src="/static/account-profile.js?v=1"></script>
+  <script src="/static/evidence-viewer.js?v=modal-cancel-37"></script>
+</body>
+</html>

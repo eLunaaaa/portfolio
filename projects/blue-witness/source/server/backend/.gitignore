@@ -1,0 +1,32 @@
+# Python 가상환경
+.venv/
+
+# Python 임시 파일
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# VS Code
+.vscode/
+
+# 환경변수 및 비밀값
+.env
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+
+# 로그
+logs/
+*.log
+
+# 원본 영상
+storage/originals/*
+!storage/originals/.gitkeep
+
+# 병합 영상
+storage/merged/*
+!storage/merged/.gitkeep

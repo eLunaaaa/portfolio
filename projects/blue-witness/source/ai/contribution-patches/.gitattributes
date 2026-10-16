@@ -1,0 +1,2 @@
+# unified diff의 빈 context 행은 공백 1개가 필요하므로 원문을 유지함.
+*.patch whitespace=-blank-at-eol

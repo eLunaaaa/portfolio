@@ -1,0 +1,79 @@
+# Python 가상환경
+.venv/
+venv/
+env/
+
+# Python 캐시
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# 환경변수와 비밀값
+.env
+.env.*
+!.env.example
+**/*cookie*.txt
+
+# 로컬 HTTPS 인증서와 개인키
+backend/certs/
+*.key
+
+# SQLite 실행 데이터
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+**/storage/database/*.db
+**/storage/database/*.db-wal
+**/storage/database/*.db-shm
+**/storage/database/*.sqlite
+**/storage/database/*.sqlite3
+
+# 수집 영상과 병합 결과
+backend/storage/
+**/storage/originals/
+**/storage/merged/
+**/merge_test/
+*.mp4
+*.mp4.part
+
+# 업로드 임시 파일
+*.part
+*.tmp
+
+# 로그
+*.log
+logs/
+
+# Cloudflare 인증 정보
+.cloudflared/
+cert.pem
+
+# 다운로드 시험 결과
+downloaded-merged.mp4
+download-headers.txt
+
+# 로컬 수동 시험 산출물
+/test.mp4
+/data/
+/backend/scripts/
+
+# 1단계에서 사용했던 구형 단일 파일 데모임.
+# 실제 서버 진입점은 backend/app/main.py임.
+/main.py
+/client.py
+
+# 테스트 도구가 만드는 보고서
+.coverage
+htmlcov/

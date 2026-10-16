@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>관리자 · 차량 통신 로그</title>
+  <link rel="stylesheet" href="/static/styles.css?v=communication-log-8">
+</head>
+<body>
+  <header class="topbar">
+    <div><p class="eyebrow">SERVER COMMUNICATION</p><h1>차량 통신 로그</h1></div>
+    <nav class="button-row" aria-label="관리자 화면 전환">
+      <a class="secondary-button" href="/admin">영상 관리</a>
+      <button id="refresh-button" class="secondary-button" type="button">새로고침</button>
+      <button id="logout-button" class="secondary-button" type="button">로그아웃</button>
+    </nav>
+  </header>
+  <main class="page-container">
+    <section class="panel">
+      <div class="section-heading"><h2>최근 차량 연결</h2><span>5초마다 갱신</span></div>
+      <p>최근 30초 안에 통신을 받으면 초록색으로 표시합니다. 통신 확인과 영상 저장 성공은 별개입니다.</p>
+      <div id="communication-peers" class="communication-peers"></div>
+    </section>
+    <section class="panel">
+      <div class="section-heading"><h2>최근 요청 기록</h2><span id="log-count"></span></div>
+      <div class="button-row log-filters">
+        <button id="all-logs-button" class="secondary-button" type="button">전체 로그</button>
+        <label for="log-vehicle">차량</label><select id="log-vehicle"><option value="">전체 차량</option></select>
+        <label for="log-kind">통신 종류</label>
+        <select id="log-kind">
+          <option value="">전체</option><option value="health">서버 상태 확인</option>
+          <option value="heartbeat">차량 연결 알림</option><option value="evidence_upload">영상 업로드</option>
+          <option value="evidence_status">저장 여부 확인</option><option value="time_sync">서버 시간 확인</option>
+        </select>
+        <label><input id="failures-only" type="checkbox"> 실패·미완료만 보기</label>
+      </div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>받은 시각 · 한국 시간</th><th>보낸 차량</th><th>내용</th><th>처리 결과</th><th>소요 시간</th></tr></thead>
+        <tbody id="communication-log-body"></tbody>
+      </table></div>
+      <p class="log-note">최근 2,000건을 보관하며 서버 재시작 시 초기화됩니다. 인증 없는 요청은 IP만으로 차량을 확정하지 않습니다. 서버에 도착하지 않은 네트워크·TLS 실패는 표시할 수 없습니다.</p>
+      <p id="admin-message" class="message" role="status"></p>
+    </section>
+  </main>
+  <script src="/static/common.js"></script>
+  <script src="/static/admin-logs.js?v=2"></script>
+</body>
+</html>

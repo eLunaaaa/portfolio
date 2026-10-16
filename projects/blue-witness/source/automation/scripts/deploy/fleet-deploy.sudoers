@@ -1,0 +1,4 @@
+# Pi 로그인 계정이 이미 설치된 fleet service만 비대화식으로 재시작하도록 허용한다.
+User_Alias FLEET_USERS = craft2, craft3, craft4, seongugi, craft6
+Cmnd_Alias FLEET_RESTART = /usr/bin/systemctl restart time_sync.service, /usr/bin/systemctl restart uploader.service, /usr/bin/systemctl restart video_processor.service, /usr/bin/systemctl restart p2p-go.service, /usr/bin/systemctl restart sensor@accident.service, /usr/bin/systemctl restart inference.service, /usr/bin/systemctl restart witness_filter.service, /usr/bin/systemctl restart p2p-client.service, /usr/bin/systemctl restart sensor@witness.service
+FLEET_USERS ALL=(root) NOPASSWD: FLEET_RESTART

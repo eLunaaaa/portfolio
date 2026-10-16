@@ -1,0 +1,13 @@
+diff --git a/ai/inference.cpp b/ai/inference.cpp
+index c896f65..a0f2318 100644
+--- a/ai/inference.cpp
++++ b/ai/inference.cpp
+@@ -103,7 +103,7 @@ extern "C" {
+ #define MODEL_OUTPUT_FIELDS (5U + MODEL_CLASS_COUNT)
+ #define MODEL_PREDICTION_COUNT 6300U
+ #define INFERENCE_FRAME_STEP 6U
+-#define INFERENCE_CONFIDENCE_THRESHOLD 0.70f
++#define INFERENCE_CONFIDENCE_THRESHOLD 0.55f
+ #define INFERENCE_NMS_IOU_THRESHOLD 0.65f
+ 
+ static volatile sig_atomic_t shutdown_requested = 0;

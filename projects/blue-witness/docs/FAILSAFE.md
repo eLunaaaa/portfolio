@@ -2,6 +2,12 @@
 
 [프로젝트 개요](../README.md) · [구현 위치와 기여 근거](CODE_GUIDE.md)
 
+## 모듈별로 설계 읽기
+
+[설계 결정표](design/DECISIONS.md) → [AI 인계](design/AI_HANDOFF.md) → [Time Sync](design/TIME_SYNC.md) → [Uploader 연동](design/UPLOADER_CONTRACT.md) → [서버](design/SERVER.md) → [CI](design/CI.md) → [CD](design/CD.md)
+
+단순 기능 목록보다 각 장애에서 **누가 감지하고, 어떤 상태를 보존하고, 어느 시점부터 재개하는지**를 코드와 연결해 설명합니다.
+
 ## 개인 역할과 목표
 
 **이민석은 시스템 전체의 Fail-safe 구조를 설계했습니다.** 카메라·AI·시간 동기화·IPC·업로더·서버를 연결하는 과정에서 ‘어떤 장애를 누가 감지하고, 무엇을 보존하며, 어느 단계부터 다시 시작할지’를 정리했습니다. 모듈별 세부 구현·후속 강화와 통합 시험은 팀과 함께 수행했습니다.

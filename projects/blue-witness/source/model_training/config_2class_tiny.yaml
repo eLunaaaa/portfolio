@@ -1,0 +1,98 @@
+schema_version: 2
+
+paths:
+  recordings_dir: data/recordings
+  work_dir: data/work
+  datasets_dir: data/datasets_2class
+
+classes:
+  - id: 0
+    name: ioniq5_silver
+    vehicle_instances: [ioniq5_silver]
+  - id: 1
+    name: other_vehicle
+    vehicle_instances: [palisade_black, other_car_1, other_car_2, other_car_3]
+
+encoding_profiles:
+  primary_2_5mbps:
+    codec: h264
+    width: 640
+    height: 480
+    fps: 30
+    target_bitrate_bps: 2500000
+    required_in_every_split: true
+  auxiliary_6mbps:
+    codec: h264
+    width: 640
+    height: 480
+    fps: 30
+    target_bitrate_bps: 6000000
+    required_in_every_split: false
+
+frame_extraction:
+  frame_interval: 5
+  jpeg_quality: 95
+  allow_fps_timestamp_fallback: false
+
+# 프레임 추출은 3-class 기본 config로 끝났으므로 이 실험 config에서는 사용하지 않는다.
+proposal_detector:
+  enabled: false
+
+dataset_export:
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  random_seed: 42
+  split_search_attempts: 20000
+  include_negatives: true
+
+summary:
+  bbox_width_ratio_bins: null
+
+yolox:
+  model_variant: tiny
+  source_dir: third_party/YOLOX
+  expected_commit: 419778480ab6ec0590e5d3831b3afb3b46ab2aa3
+  patched_file_sha256:
+    yolox/models/yolo_head.py: 829bf225ee18cf9814c72f0a857ffbc97f0036b2600a9dc64f013d13b1ce6467
+    yolox/models/losses.py: 185f452e157b9bd2431685f290d5383189937749b6c520914835e45644d05b5d
+    yolox/utils/boxes.py: 612ffd0ae6052c5c2c2f375e9e2daf2d1f5366ac6c0a6a453a01e0679b39fc05
+  pretrained_checkpoint: models/pretrained/yolox_tiny.pth
+  pretrained_sha256: 9de513de589ac98bb92d3bca53b5af7b9acfa9b0bacb831f7999d0f7afaee8f0
+
+training:
+  epochs: 100
+  batch_size: 8
+  num_workers: 0
+  learning_rate_per_image: 0.00015625
+  momentum: 0.9
+  weight_decay: 0.0005
+  warmup_epochs: 5
+  freeze_backbone_epochs: 0
+  mixed_precision: false
+  horizontal_flip_probability: 0.5
+  hsv_probability: 0.0
+  mosaic: false
+  mixup: false
+  sanity_image_count: 32
+  random_seed: 2026
+
+evaluation:
+  priority_classes: [ioniq5_silver]
+  coco_confidence_floor: 0.001
+  nms_iou_threshold: 0.65
+  matching_iou_threshold: 0.50
+  confidence_sweep_start: 0.10
+  confidence_sweep_end: 0.90
+  confidence_sweep_step: 0.05
+  minimum_target_recall: null
+
+export:
+  opset_version: 17
+  absolute_tolerance: null
+  relative_tolerance: null
+
+resolution_experiments:
+  - {width: 640, height: 480}
+  - {width: 512, height: 384}
+  - {width: 416, height: 320}

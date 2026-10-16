@@ -7,13 +7,18 @@
 | 항목 | 내용 |
 |---|---|
 | 분야 | 엣지 AI · 임베디드 Linux · 영상 처리 · 백엔드 · 개발 자동화 |
+| 대회 | 2026 임베디드 소프트웨어 경진대회 본선 참가 · [대회 참여 자료](docs/EVIDENCE.md) |
 | 장치 | Raspberry Pi 5, IMX219 카메라, 모형차 테스트베드 |
 | 기술 | C/C++, libcamera, FFmpeg, YOLOX-Tiny, PyTorch/MPS, ONNX Runtime, FastAPI, SQLite, Chrony, POSIX IPC, systemd, GitHub Actions |
-| 핵심 기여 | 전체 Fail-safe 설계, AI 실행·카메라 파이프라인, 모델 학습 도구, 증거 서버·웹, 시간 동기화 상태 서비스, CI·수동 장치 배포 흐름 |
+| 핵심 기여 | 전체 Fail-safe 설계, 차량 검출 모델 학습·AI 배포·검출 설정, 증거 서버·웹, 시간 동기화 상태 서비스, CI·수동 장치 배포 흐름 |
 | 시험 범위 | 모형차 테스트베드에서 차종 유무 판정과 다중 차량 영상 수집·동기화·저장 검증 |
-| 코드 공개 방식 | 팀 원본 저장소의 구현과 측정 자료를 고정 커밋으로 연결. 운영 DB·영상·인증 키·학습 데이터는 이 포트폴리오에 복제하지 않음 |
+| 코드 공개 방식 | 담당 모듈 소스를 source/에 포함하고 파일별 원본·해시·기여 범위를 명시. 팀 전용 모듈·운영 데이터·키·가중치·서드파티 본체는 제외 |
 
 [팀 원본 저장소](https://github.com/kingwooseok/2026ESWContest_mobility_ACE) · [정리 기준 버전 `5148804`](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804)
+
+## 설계 선택부터 보기
+
+**어떤 기능을 만들었는가보다 왜 그 구조를 택했는가**를 중심으로 정리했습니다. [설계 결정표](docs/design/DECISIONS.md)에서 대안·선택 이유·비용을 한눈에 보고, [모듈별 상세 설계](docs/design/README.md)에서 실제 코드·상태 전이·복구·시험으로 이어집니다.
 
 ## 개인 기여 범위
 
@@ -22,7 +27,7 @@
 | 담당 영역 | 수행한 작업 |
 |---|---|
 | 전체 Fail-safe 설계 | 프로세스·업무 스레드 정지 감지, systemd 재시작, 영상·큐 영속 보존, IPC·네트워크 재시도, ACK 유실·재시작 복구를 계층별로 연결하는 시스템 장애 대응 구조 설계 |
-| 카메라·AI 실행 | 사고차 영상 보존과 관측차 검출 프로세스, 촬영·분석·인계 분리, 사고 구간 Snapshot, ONNX 추론·영상 저장·IPC 인계 |
+| AI 학습·배포·설정 | 차량 검출 모델 학습·내보내기·배포와 검출 설정 변경. 촬영·Snapshot·inference 런타임 본체는 팀 구현으로 구분 |
 | 모델 학습 | 촬영 등록·프레임 추출·BBox 검수 도구, 데이터 버전·출처 관리, COCO 변환과 촬영 묶음별 분리, 2-class YOLOX-Tiny 학습·평가·ONNX 내보내기 |
 | 서버·웹 | FastAPI 업로드·ACK·증거 저장, SQLite 사건 관리, 시간 기준 FFmpeg 병합, 재병합·영상 모드, 사용자·차량·프로필·관리자 화면 |
 | Time Sync | Chrony 상태 조회 C 서비스, 상태 판정·오차·측정 시각을 제공하는 IPC, 스레드·타임아웃·서비스 운영 |
@@ -114,3 +119,16 @@ GitHub Actions에서 변경된 모듈의 검사·ARM64 빌드와 서버 검증�
 2026년 10월 16일 기준 버전에서 서버 Python 72개, 웹 JavaScript 51개, 모델 실행 계약 4개 테스트와 27회 시나리오 검증 스크립트를 다시 실행했습니다. 이번 정리에서 GPU 재학습·실장치 재시연·fleet 배포는 수행하지 않았습니다.
 
 [검증 명령·남은 한계](docs/CODE_REVIEW.md) · [구현 위치와 기여 커밋](docs/CODE_GUIDE.md) · [기술 선택과 트러블슈팅](docs/TECHNICAL_NOTES.md)
+
+## 포트폴리오 안에서 코드 읽기
+
+| 담당 모듈 | 코드 | 설계·장애 대응 설명 |
+|---|---|---|
+| 서버·웹 | [source/server/backend](source/server/backend) | [서버 상세](docs/design/SERVER.md) |
+| 모델 학습 | [source/model_training](source/model_training) | [학습 상세](docs/design/MODEL_TRAINING.md) |
+| Time Sync | [source/time_sync](source/time_sync) | [시간 상태 서비스 상세](docs/design/TIME_SYNC.md) |
+| AI 변경 | [설정·개인 patch](source/ai) | [AI 연동·보존 설계](docs/design/AI_HANDOFF.md) |
+| CI/CD | [개인 작업 시점의 자동화 코드](source/automation) | [CI 상세](docs/design/CI.md) · [CD 상세](docs/design/CD.md) |
+| 전체 Fail-safe | [서버 상태 검증 코드](source/server/backend/app/services/failsafe_verification.py) | [전체 설계](docs/FAILSAFE.md) · [Uploader 연동 계약](docs/design/UPLOADER_CONTRACT.md) |
+
+[코드 범위·빌드 의존성](source/README.md) · [파일별 출처 manifest](source/PROVENANCE.json) · [기여 및 대회 증빙 상태](docs/EVIDENCE.md)

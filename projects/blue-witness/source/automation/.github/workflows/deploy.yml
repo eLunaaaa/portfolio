@@ -1,0 +1,83 @@
+name: Deploy Pi fleet
+
+on:
+  workflow_dispatch:
+    inputs:
+      ci_run_id:
+        description: 'Successful CI run ID for this main commit'
+        required: true
+        type: string
+      full_rollout:
+        description: 'Deploy remaining four Pi nodes after craft3 canary passes'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  actions: read
+  contents: read
+
+concurrency:
+  group: fleet-deploy
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify CI run belongs to this main commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CI_RUN_ID: ${{ inputs.ci_run_id }}
+        run: |
+          [[ "$CI_RUN_ID" =~ ^[0-9]+$ ]]
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CI_RUN_ID" |
+            jq -e --arg sha "$GITHUB_SHA" \
+              '.name == "CI" and .event == "push" and .head_branch == "main" and .head_sha == $sha and .conclusion == "success"'
+      - uses: actions/download-artifact@v4
+        with:
+          run-id: ${{ inputs.ci_run_id }}
+          github-token: ${{ github.token }}
+          pattern: pi-*
+          path: artifact
+          merge-multiple: true
+      - name: Validate artifact and bundle
+        run: |
+          expected=(witness_aruco accident_aruco witness_filter broadcast_sender \
+            broadcast_receiver inference video_processor time_sync uploader \
+            p2p_go.sh p2p_client.sh)
+          for item in "${expected[@]}"; do
+            test -s "artifact/$item"
+            if [[ "$item" == *.sh ]]; then
+              bash -n "artifact/$item"
+            else
+              readelf -h "artifact/$item" | grep -q 'Machine:.*AArch64'
+            fi
+            chmod 0755 "artifact/$item"
+          done
+          tar -czf pi-release.tar.gz -C artifact .
+          echo "Prepared $(sha256sum pi-release.tar.gz)"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pi-release
+          path: pi-release.tar.gz
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    needs: prepare
+    runs-on: [self-hosted, linux, x64, fleet, deploy]
+    environment: pi-fleet
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: pi-release
+      - name: Canary, smoke test, optional fleet rollout
+        env:
+          FULL_ROLLOUT: ${{ inputs.full_rollout }}
+        run: bash scripts/deploy/deploy_fleet.sh pi-release.tar.gz "$FULL_ROLLOUT" "$GITHUB_RUN_ID"

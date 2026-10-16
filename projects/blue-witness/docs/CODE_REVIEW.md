@@ -4,6 +4,8 @@
 
 ## 이번 정리에서 직접 실행한 검사
 
+포트폴리오에 코드를 복사한 뒤에도 **복제본 자체에서** 아래 Python·Node·모델 계약 시험을 다시 실행했습니다. 추가로 Shell 8개 문법, YAML 9개 파싱, Markdown 25개 문서의 로컬 링크 169개를 확인했습니다. source manifest에는 171개 코드·설정·자산·개인 patch의 원본 커밋과 파일 해시를 기록합니다. 일부 텍스트의 차이는 줄바꿈 정규화뿐임을 대조했습니다.
+
 | 검사 | 결과 |
 |---|---|
 | 서버 Python unittest | 72개 통과 |
@@ -44,3 +46,11 @@ python docs/measurements/20261008-scenarios/verify.py
 - 시연용 신원·차량 확인 흐름은 외부 실명 인증이나 실제 차량 소유 증명 서비스가 아닙니다.
 - Private CA 배포·노드 키·self-hosted runner·권한 설정은 운영 절차가 필요하며 인증 정보를 포트폴리오에 공개하지 않습니다.
 - 모델 학습 원자료와 checkpoint가 포함되지 않아 포트폴리오 문서만으로 전체 학습을 즉시 재현할 수는 없습니다.
+
+## 모듈별 실행 가능 범위
+
+- 서버는 포함된 app·schema·frontend·tests로 임시 DB 기반 시험을 통과했습니다. 제조사 차량 이미지 일부는 미포함이라 원본 UI 자산 전체를 재배포한 것은 아닙니다.
+- 학습 코드는 포함하지만 서드파티 YOLOX·데이터·checkpoint는 외부 준비가 필요합니다.
+- Time Sync는 팀 공용 IPC·watchdog에 의존하므로 원본 트리에서 빌드합니다.
+- AI runtime 본체·Uploader·Sensor·Filter·P2P는 본인 작성 코드로 복제하지 않았습니다.
+- 자동화는 개인 작업 시점의 보존본이며 포트폴리오에서 Actions나 fleet 배포를 실행하지 않습니다.

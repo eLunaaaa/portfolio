@@ -1,0 +1,40 @@
+name: Pi component
+
+on:
+  workflow_call:
+    inputs:
+      component:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Pi / ${{ inputs.component }}
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install cross compiler and cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu cppcheck pkg-config libglib2.0-dev
+      - name: Restore Raspberry Pi sysroot
+        id: sdk-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: sdk
+          key: pi-sysroot-debian13-20260930-${{ runner.os }}
+      - name: Require prepared SDK
+        run: test '${{ steps.sdk-cache.outputs.cache-hit }}' = true
+      - name: Build, inspect, and test
+        shell: bash
+        run: bash scripts/ci/build-pi.sh '${{ inputs.component }}'
+      - name: Upload ARM64 binaries
+        uses: actions/upload-artifact@v4
+        with:
+          name: pi-${{ inputs.component }}
+          path: dist/${{ inputs.component }}/
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,28 @@
+[Unit]
+Description=Time synchronization status IPC service
+Wants=chrony.service
+After=chrony.service
+
+[Service]
+Type=simple
+User=@TIME_SYNC_USER@
+Group=@TIME_SYNC_GROUP@
+WorkingDirectory=@INSTALL_ROOT@
+Environment=HOME=@SERVICE_HOME@
+EnvironmentFile=@INSTALL_ROOT@/time_sync.env
+ExecStartPre=@EXEC_ROOT@/time_sync check
+ExecStart=@EXEC_ROOT@/time_sync
+Restart=on-failure
+RestartSec=5s
+WatchdogSec=15s
+NotifyAccess=main
+TimeoutStopSec=20s
+KillSignal=SIGTERM
+UMask=0027
+NoNewPrivileges=true
+PrivateTmp=false
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

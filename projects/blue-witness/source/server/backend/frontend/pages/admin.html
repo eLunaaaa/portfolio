@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>사고 증거 서버 관리자</title>
+  <link
+    rel="stylesheet"
+    href="/static/styles.css?v=video-view-buttons-20261008"
+  >
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <p class="eyebrow">EVIDENCE SERVER CONSOLE</p>
+      <h1>사고 증거 서버 관리</h1>
+    </div>
+
+    <div class="button-row">
+      <a class="secondary-button" href="/admin/logs">통신 로그</a>
+      <button
+        id="refresh-button"
+        class="secondary-button"
+        type="button"
+      >
+        새로고침
+      </button>
+
+      <button
+        id="logout-button"
+        class="secondary-button"
+        type="button"
+      >
+        로그아웃
+      </button>
+    </div>
+  </header>
+
+  <main class="page-container">
+    <section class="summary-grid">
+      <article class="summary-card">
+        <span>전체 사고</span>
+        <strong id="total-events">0</strong>
+      </article>
+
+      <article class="summary-card">
+        <span>전체 사용자</span>
+        <strong id="total-users">0</strong>
+      </article>
+
+      <article class="summary-card">
+        <span>온라인 차량</span>
+        <strong id="online-nodes">0</strong>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>사고 접수 현황</h2>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>사고 ID</th>
+              <th>사고 차량</th>
+              <th>발생 시각</th>
+              <th>영상 수</th>
+              <th>상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+
+          <tbody id="admin-event-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section
+      id="admin-video-panel"
+      class="panel hidden"
+    >
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">ADMIN VIDEO REVIEW</p>
+          <h2 id="admin-video-event-id">-</h2>
+        </div>
+
+        <button
+          id="close-admin-video-button"
+          class="secondary-button"
+          type="button"
+        >
+          닫기
+        </button>
+      </div>
+
+      <p class="admin-video-description">
+        관리자 로그인 권한으로 사고 접근 코드 없이
+        병합 영상을 확인합니다.
+      </p>
+
+      <video
+        id="admin-merged-video"
+        controls
+        playsinline
+        preload="metadata"
+      ></video>
+      <div class="video-view-controls">
+        <div class="video-view-buttons" role="group" aria-label="영상 모드" data-video-view-target="admin-merged-video" aria-describedby="admin-video-view-message">
+          <button type="button" data-view="all" aria-pressed="true" disabled>전체 영상</button>
+          <button type="button" data-view="witness" aria-pressed="false" disabled>목격 차량 영상</button>
+          <button type="button" data-view="own" aria-pressed="false" disabled>내 차량 영상</button>
+        </div>
+        <p id="admin-video-view-message" role="status"></p>
+      </div>
+      <div class="incident-playback-actions" role="group" aria-label="영상 재생 방식">
+        <button type="button" class="small-button" data-video-target="admin-merged-video" data-playback-mode="incident">사고 장면 보기 · 0.25배속</button>
+        <button type="button" class="small-button secondary" data-video-target="admin-merged-video" data-playback-mode="original">원본 보기 · 1배속</button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>차량 노드 상태</h2>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>차량 ID</th>
+              <th>IP 주소</th>
+              <th>버전</th>
+              <th>마지막 연결</th>
+              <th>상태</th>
+            </tr>
+          </thead>
+
+          <tbody id="node-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>사용자 관리</h2>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>아이디</th>
+              <th>이름</th>
+              <th>역할</th>
+              <th>차량 수</th>
+              <th>상태</th>
+              <th>관리</th>
+            </tr>
+          </thead>
+
+          <tbody id="user-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel danger-panel">
+      <h2>시연 데이터 정리</h2>
+
+      <p>
+        현재 관리자 계정과 DB 구조를 유지하고
+        사고·영상·차량·일반 사용자를 초기화합니다.
+      </p>
+
+      <div class="button-row">
+        <button
+          id="reset-demo-button"
+          class="danger-button"
+          type="button"
+        >
+          전체 시연 데이터 초기화
+        </button>
+
+        <button
+          id="purge-trash-button"
+          class="danger-button outline"
+          type="button"
+        >
+          서버 휴지통 완전 삭제
+        </button>
+      </div>
+    </section>
+
+    <p
+      id="admin-message"
+      class="message"
+    ></p>
+  </main>
+
+  <script src="/static/common.js?v=background-bottom-36"></script>
+  <script src="/static/admin.js?v=video-views-20261008"></script>
+  <script src="/static/incident-playback.js?v=5"></script>
+  <script src="/static/video-views.js?v=3"></script>
+  <script src="/static/evidence-viewer.js?v=modal-cancel-37"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+#ifndef ACE_INFERENCE_CONFIG_H
+#define ACE_INFERENCE_CONFIG_H
+
+/* C++ 추론기와 ONNX 내보내기가 함께 사용하는 영상 선별 설정. */
+#define INFERENCE_FRAME_STEP 6U
+#define INFERENCE_CONFIDENCE_THRESHOLD 0.60f
+#define INFERENCE_NMS_IOU_THRESHOLD 0.65f
+
+#endif

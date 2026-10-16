@@ -1,0 +1,27 @@
+name: Server integration
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  server:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install integration dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install -r server/backend/requirements.txt
+      - name: TLS startup with temporary certificate
+        run: bash scripts/ci/check-server-tls.sh
+      - name: Real FFmpeg merge fixture
+        env:
+          PYTHONPATH: server/backend
+        run: python3 scripts/ci/check-server-merge.py

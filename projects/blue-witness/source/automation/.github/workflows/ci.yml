@@ -1,0 +1,199 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  changes:
+    runs-on: ubuntu-24.04
+    outputs:
+      sensor: ${{ steps.filter.outputs.sensor }}
+      filter: ${{ steps.filter.outputs.filter }}
+      p2p: ${{ steps.filter.outputs.p2p }}
+      ai: ${{ steps.filter.outputs.ai }}
+      time_sync: ${{ steps.filter.outputs.time_sync }}
+      uploader: ${{ steps.filter.outputs.uploader }}
+      server: ${{ steps.filter.outputs.server }}
+      aruco: ${{ steps.filter.outputs.aruco }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check deployment configuration syntax
+        run: |
+          bash -n scripts/deploy/*.sh
+          /usr/sbin/visudo -cf scripts/deploy/fleet-deploy.sudoers
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            sensor:
+              - 'sensor/**'
+              - 'ipc/**'
+              - 'scripts/ci/build-pi.sh'
+              - 'scripts/setting/setup_sdk.sh'
+              - 'scripts/setting/project.conf'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/pi-component.yml'
+            filter:
+              - 'filter/**'
+              - 'ipc/**'
+              - 'scripts/ci/build-pi.sh'
+              - 'scripts/setting/setup_sdk.sh'
+              - 'scripts/setting/project.conf'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/pi-component.yml'
+            p2p:
+              - 'p2p/**'
+              - 'ipc/**'
+              - 'scripts/ci/build-pi.sh'
+              - 'scripts/setting/setup_sdk.sh'
+              - 'scripts/setting/project.conf'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/pi-component.yml'
+            ai:
+              - 'ai/**'
+              - 'ipc/**'
+              - 'scripts/ci/build-pi.sh'
+              - 'scripts/setting/setup_sdk.sh'
+              - 'scripts/setting/project.conf'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/pi-component.yml'
+            time_sync:
+              - 'time_sync/**'
+              - 'ipc/**'
+              - 'scripts/ci/build-pi.sh'
+              - 'scripts/setting/setup_sdk.sh'
+              - 'scripts/setting/project.conf'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/pi-component.yml'
+            uploader:
+              - 'uploader/**'
+              - 'ipc/**'
+              - 'scripts/ci/build-pi.sh'
+              - 'scripts/setting/setup_sdk.sh'
+              - 'scripts/setting/project.conf'
+              - '.github/workflows/ci.yml'
+              - '.github/workflows/pi-component.yml'
+            server:
+              - 'server/**'
+              - 'scripts/ci/check-server.sh'
+              - '.github/workflows/ci.yml'
+            aruco:
+              - 'aruco_BLE_(IN_windowsPC)/**'
+              - 'scripts/ci/check-aruco.sh'
+              - '.github/workflows/ci.yml'
+
+  sdk:
+    needs: changes
+    if: >-
+      github.ref == 'refs/heads/main' ||
+      needs.changes.outputs.sensor == 'true' ||
+      needs.changes.outputs.filter == 'true' ||
+      needs.changes.outputs.p2p == 'true' ||
+      needs.changes.outputs.ai == 'true' ||
+      needs.changes.outputs.time_sync == 'true' ||
+      needs.changes.outputs.uploader == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore SDK cache
+        id: sdk-cache
+        uses: actions/cache@v4
+        with:
+          path: sdk
+          key: pi-sysroot-debian13-20260930-${{ runner.os }}
+      - name: Download verified Pi OS sysroot once
+        if: steps.sdk-cache.outputs.cache-hit != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p sdk/sysroot
+          gh release download v1.1 --repo "$GITHUB_REPOSITORY" \
+            --pattern pi-sysroot-debian13-20260930.tar.gz --dir sdk
+          echo '2d9d2a4f6da9d77bd385a4525abaccbaa40c06c6909fe057c2bfcdeedb2f1d56  sdk/pi-sysroot-debian13-20260930.tar.gz' | sha256sum -c -
+          tar -xzf sdk/pi-sysroot-debian13-20260930.tar.gz -C sdk/sysroot
+          rm sdk/pi-sysroot-debian13-20260930.tar.gz
+
+  pi_sensor:
+    needs: [changes, sdk]
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.sensor == 'true'
+    uses: ./.github/workflows/pi-component.yml
+    with:
+      component: sensor
+    permissions:
+      contents: read
+
+  pi_filter:
+    needs: [changes, sdk]
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.filter == 'true'
+    uses: ./.github/workflows/pi-component.yml
+    with:
+      component: filter
+    permissions:
+      contents: read
+
+  pi_p2p:
+    needs: [changes, sdk]
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.p2p == 'true'
+    uses: ./.github/workflows/pi-component.yml
+    with:
+      component: p2p
+    permissions:
+      contents: read
+
+  pi_ai:
+    needs: [changes, sdk]
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.ai == 'true'
+    uses: ./.github/workflows/pi-component.yml
+    with:
+      component: ai
+    permissions:
+      contents: read
+
+  pi_time_sync:
+    needs: [changes, sdk]
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.time_sync == 'true'
+    uses: ./.github/workflows/pi-component.yml
+    with:
+      component: time_sync
+    permissions:
+      contents: read
+
+  pi_uploader:
+    needs: [changes, sdk]
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.uploader == 'true'
+    uses: ./.github/workflows/pi-component.yml
+    with:
+      component: uploader
+    permissions:
+      contents: read
+
+  server:
+    needs: changes
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.server == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r server/backend/requirements.txt
+      - name: Import, startup, database, health
+        run: bash scripts/ci/check-server.sh
+
+  aruco:
+    needs: changes
+    if: github.ref == 'refs/heads/main' || needs.changes.outputs.aruco == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r 'aruco_BLE_(IN_windowsPC)/requirements_ble.txt' opencv-contrib-python-headless numpy
+      - name: Offline configuration and protocol checks
+        run: bash scripts/ci/check-aruco.sh

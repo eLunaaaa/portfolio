@@ -6,7 +6,8 @@
 
 여러 Raspberry Pi 차량에서 사고 전후 영상을 확보하고, AI로 필요한 목격 영상을 선별해 시간축을 맞춰 웹에서 확인하는 팀 프로젝트입니다.
 
-- **개인 기여**: 전체 Fail-safe 설계, 카메라·AI 실행, 차량 검출 모델 학습 파이프라인, FastAPI 서버·웹, Chrony 상태 IPC, GitHub Actions CI·Pi 수동 배포 흐름 구축
+- **대회**: 2026 임베디드 소프트웨어 경진대회 본선 참가 · [대회 참여 자료](projects/blue-witness/docs/EVIDENCE.md)
+- **개인 기여**: 전체 Fail-safe 설계, 차량 검출 모델 학습·AI 배포·검출 설정, FastAPI 서버·웹, Chrony 상태 IPC, GitHub Actions CI·Pi 수동 배포 흐름 구축
 - **공동 작업**: 데이터 라벨 검수, 프로세스·통신 규약 통합, 실제 차량 시나리오 검증. 센서·V2V·위치 필터·업로더는 팀 모듈과 연동
 - **기술**: C/C++ · Raspberry Pi 5 · libcamera · YOLOX-Tiny · PyTorch/MPS · ONNX Runtime · FFmpeg · FastAPI · SQLite · Chrony · GitHub Actions
 - **평가 기록**: 전체 BBox 검증 12,873프레임의 대상 차종 유무 정답률 98.39%; 별도 test 묶음 1,633프레임에서 98.65%
@@ -14,6 +15,10 @@
 - **공개 코드 재검증**: 서버 Python 72개·웹 JavaScript 51개·모델 실행 계약 4개 테스트 및 시나리오 CSV 검증 통과
 
 [프로젝트 상세 및 기여](projects/blue-witness/README.md) · [모델 학습](projects/blue-witness/ml/README.md) · [전체 Fail-safe 설계](projects/blue-witness/docs/FAILSAFE.md) · [코드·기여 근거](projects/blue-witness/docs/CODE_GUIDE.md) · [검증 및 한계](projects/blue-witness/docs/CODE_REVIEW.md)
+
+[담당 모듈 소스](projects/blue-witness/source/README.md) · [모듈별 상세 설계](projects/blue-witness/docs/design/README.md) · [기여·대회·측정 증빙](projects/blue-witness/docs/EVIDENCE.md)
+
+**설계 포인트:** [대안 비교·선택 이유·트레이드오프](projects/blue-witness/docs/design/DECISIONS.md)를 먼저 정리하고, 각 결정을 실제 코드·시험과 연결했습니다.
 
 ## Configurable CNN Training and RTL · CNN 학습·RTL 자동화
 

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>내 정보</title>
+  <link rel="stylesheet" href="/static/styles.css?v=password-policy-22">
+</head>
+<body class="account-page">
+  <header class="topbar">
+    <div><p class="eyebrow">MY ACCOUNT</p><h1>내 정보</h1></div>
+    <div class="account-header-actions">
+      <a class="secondary-button" href="/portal">내 사고 기록</a>
+      <button id="account-logout" class="secondary-button" type="button">로그아웃</button>
+    </div>
+  </header>
+  <main class="page-container account-settings">
+    <section class="panel">
+      <h2>프로필</h2>
+      <div class="account-profile-heading">
+        <img id="profile-preview" class="user-avatar large-avatar" data-profile-image src="/api/v1/auth/profile/image" alt="내 프로필 사진">
+        <div><h3 id="account-full-name">-</h3><p id="account-username">-</p></div>
+      </div>
+      <form id="profile-photo-form">
+        <label for="profile-file">사진 선택
+          <input id="profile-file" name="file" type="file" accept="image/png,image/jpeg,image/webp" required>
+        </label>
+        <p class="account-help">PNG, JPG, WEBP · 최대 5MB, 1,600만 화소. 사진은 작은 프로필 이미지로 저장됩니다.</p>
+        <button class="primary-button" type="submit">프로필 사진 저장</button>
+      </form>
+      <p id="profile-photo-message" class="message" aria-live="polite"></p>
+    </section>
+    <section class="panel">
+      <h2>비밀번호 변경</h2>
+      <p class="account-help">변경하면 모든 기기에서 로그아웃됩니다. 새 비밀번호로 다시 로그인해주세요.</p>
+      <form id="account-password-form">
+        <label for="current-password">현재 비밀번호
+          <input id="current-password" type="password" autocomplete="current-password" maxlength="128" required>
+        </label>
+        <label for="new-password">새 비밀번호
+          <input id="new-password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+        </label>
+        <label for="confirm-password">새 비밀번호 확인
+          <input id="confirm-password" type="password" autocomplete="new-password" minlength="10" maxlength="128" required>
+        </label>
+        <button class="primary-button" type="submit">비밀번호 변경</button>
+      </form>
+      <p id="account-password-message" class="message" aria-live="polite"></p>
+    </section>
+  </main>
+  <script src="/static/common.js"></script>
+  <script src="/static/password-policy.js?v=1"></script>
+  <script src="/static/account-profile.js?v=2"></script>
+</body>
+</html>
