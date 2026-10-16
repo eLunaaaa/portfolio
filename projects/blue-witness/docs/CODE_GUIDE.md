@@ -8,6 +8,7 @@
 
 | 영역 | 원본 구현 | 읽을 부분 |
 |---|---|---|
+| 전체 Fail-safe 설계 | [공통 watchdog](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/ipc/runtime_watchdog.h) · [영상 인계](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/ai/evidence_handoff.h) · [Uploader](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/uploader) | 본인은 전체 장애 대응 구조 설계 담당. 각 모듈 구현은 팀과 통합 |
 | 관측차 AI | [ai/inference.cpp](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/ai/inference.cpp) | 촬영·Snapshot, 전처리·ONNX 추론, 시계열 판정, 영상 저장 |
 | 사고차 카메라 | [ai/video_processor.cpp](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/ai/video_processor.cpp) | Sensor 사고 시각과 8+2초 구간 확보 |
 | 영상 인계 | [ai/evidence_handoff.h](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/blob/5148804/ai/evidence_handoff.h) | `.part`·`.handoff`, 재시도·재시작 복원 |
@@ -41,5 +42,7 @@
 | 실제 P2P 연결 smoke check | [bc6371a](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/commit/bc6371a) |
 
 ## 공동 구현·후속 개선
+
+전체 Fail-safe 설계 기여는 프로젝트 담당자의 역할 설명을 기준으로 명시했습니다. 아래 모듈의 코드 소유·단독 작성과는 구분하며, 특정 한 커밋만으로 전체 설계 저자를 입증한다고 주장하지 않습니다. [설계 범위](FAILSAFE.md)
 
 V2V·Sensor·위치/화각 Filter·Uploader 전체는 본인 단독 기여에서 제외합니다. 최신 구현의 SDK·컴파일러 정렬, CI 캐시·시간 제한, fleet 복원·P2P 재연결 보완, 서버 비동기 UI 회귀 수정과 최종 Confidence 0.60 통일은 팀 후속 변경을 포함합니다. 최종 상태를 설명할 때는 ‘팀 기준 구현’, 기여를 설명할 때는 위 개인 작업으로 구분합니다.
