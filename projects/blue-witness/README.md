@@ -1,6 +1,21 @@
-# Blue Witness
+# 2026 임베디드 소프트웨어 경진대회 본선 · Blue Witness
 
 **여러 시점의 사고 영상을 한눈에** — 사고 차량과 주변 차량의 영상을 모아 촬영 시각에 맞춰 병합하고, 웹에서 사고 전후 장면을 확인하는 임베디드 팀 프로젝트입니다.
+
+## 처음 읽는 분께
+
+이민석 담당: **차량 검출 모델 학습, 서버·웹, 시간 동기화 상태 서비스, 전체 Fail-safe 설계, CI/CD 구축**.
+
+| 확인할 내용 | 바로가기 |
+|---|---|
+| 왜 이 구조를 선택했는가 | [대안·선택 이유·트레이드오프](docs/design/DECISIONS.md) |
+| AI는 얼마나 정확했는가 | [12,873프레임 결과·그래프·재계산](analysis/README.md) |
+| 서버와 웹에서 무엇을 구현했는가 | [서버 코드](source/server/README.md) · [서버 설계](docs/design/SERVER.md) |
+| 학습 파이프라인은 어떻게 만들었는가 | [학습 코드](source/model_training/README.md) · [학습 설계](docs/design/MODEL_TRAINING.md) |
+| 장애와 시간 오차는 어떻게 처리했는가 | [Fail-safe](docs/FAILSAFE.md) · [Time Sync 코드](source/time_sync/README.md) |
+| 자동화 코드는 어디에 있는가 | [CI/CD 코드](source/automation/README.md) · [CI 설계](docs/design/CI.md) |
+
+설명은 `docs/`, 실행·구현 코드는 모듈별 `source/`, 평가 CSV·분석 코드는 `analysis/`로 구분했습니다. 처음에는 위 링크만 읽고, 세부 구현이 궁금할 때 소스를 확인하면 됩니다.
 
 ## 제출용 프로젝트 요약
 

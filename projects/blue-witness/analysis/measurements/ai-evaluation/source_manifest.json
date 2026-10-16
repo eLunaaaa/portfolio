@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "data_role": "testbed_bbox_evaluation",
+  "selected_confidence": 0.6,
+  "runtime_frame_step": 6,
+  "model_run": "tiny_blur_removed_v009_b8",
+  "checkpoint_sha256": "e8ab97c2f5fadd10ff046350c54d56158830fbaee86eedb2897b951e546443fc",
+  "annotations_sha256": "3899dc3a7c460fc1e10c1b2ff015b5e1c949e48fefcb0a6cde8bf522266761d1",
+  "dataset_sha256": "8790276f423e2f724331f85844e6716aa2359aa3cf72d72acbd2a6b0100a2a60",
+  "source_files": [
+    {
+      "name": "evaluation_conditions.csv",
+      "sha256": "2e0fa36beac5b154ddf2959406b3c35f0b17e23c51446054a38b3c1912419c31"
+    },
+    {
+      "name": "threshold_metrics.csv",
+      "sha256": "c26c3bfe805893b53fc4d3374e352935bf72f49d62e7a5ce7475ba39b5dca435"
+    },
+    {
+      "name": "frame_results_055_075.csv",
+      "sha256": "cdae4245e686eb5b172978ef284e7478342905c4883094fceaa66e796f99c5e2"
+    }
+  ],
+  "processing": [
+    "evaluation_metadata_normalization",
+    "confidence_0.60_presence_recalculation",
+    "source_counts_reconciliation"
+  ],
+  "published_files": [
+    {
+      "name": "evaluation_conditions.csv",
+      "sha256": "aa64a61c28b6dac35deb3450a077a9d157078d896939c40120cce0c14fe7e432"
+    },
+    {
+      "name": "threshold_metrics.csv",
+      "sha256": "aa9757f0795272ec73cb3697d9142e5b95b6906ed1c0d8f50219ceca1623554b"
+    },
+    {
+      "name": "frame_results.csv",
+      "sha256": "fb67df216063c1feeb16ead4550d2c66650beb2c0ac0cba6b46acca1aabf2180"
+    },
+    {
+      "name": "selected_threshold_metrics.csv",
+      "sha256": "10136688af2e255a87610fefea5282f6b38c1cc80f03778400ea33fee61aebed"
+    },
+    {
+      "name": "index.html",
+      "sha256": "35cf3f25282500cb9f2a4219ca761cdb98701ad400eea63e3f0192c7ee511eeb"
+    },
+    {
+      "name": "README.md",
+      "sha256": "ea6dfffeed24a546a6d64eed325d208e50822608ea6b4435849bd2d6c19b9fb4"
+    },
+    {
+      "name": "render.py",
+      "sha256": "dfcef60461c249443e899c128dd1bac7426930bce3d8b82b7c6ee512c1a658ee"
+    },
+    {
+      "name": "../../assets/ai-confidence-selection.png",
+      "sha256": "afa1eff813ec7fea3ea7fc1f09954aefbe038ac4eede57d9fcc3ebeb2a44c694"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+item,value
+model_run,tiny_blur_removed_v009_b8
+checkpoint_epoch,1
+annotations_sha256,3899dc3a7c460fc1e10c1b2ff015b5e1c949e48fefcb0a6cde8bf522266761d1
+checkpoint_sha256,e8ab97c2f5fadd10ff046350c54d56158830fbaee86eedb2897b951e546443fc
+manifest_sha256,31c87b25306f9eb96ae0a897eaf063bd30654ff5b8f3ffd62c123dc0d65c46fa
+minimum_score,0.001
+nms_iou,0.65
+dataset_version,dataset_v009
+dataset_sha256,8790276f423e2f724331f85844e6716aa2359aa3cf72d72acbd2a6b0100a2a60
+model_type,YOLOX Tiny 2class
+class_0,ioniq5_silver
+class_1,"other_vehicle (palisade_black, other_car_1/2/3)"
+input,BGR float32 NCHW 1x3x480x640; 0..255; top-left letterbox 114
+confidence,objectness * class score; score >= threshold
+nms,same-class NMS IoU 0.65
+bbox_matching,IoU >= 0.50; score순 1:1 매칭; 오분류는 정답 class FN + 예측 class FP
+presence,정답/예측 아이오닉이 한 개 이상인지; bbox IoU는 유무 판정에 사용하지 않음
+evaluation_frame_interval,5
+percentage_units,_pct 열은 0..100; 빈 칸은 정의할 수 없는 분모 또는 해당 없음
+fpr_definition,FP / (FP + TN) * 100; 1-precision과 다름
+accuracy_definition,(TP + TN) / total_count * 100; bbox에는 TN/accuracy 정의하지 않음
+evaluation_purpose,테스트베드에서 검증용으로 촬영하고 BBox 정답을 표시한 영상의 프레임 평가
+selected_confidence,0.60
+runtime_frame_step,6
+runtime_vote,최근 3회 추론 중 2회 이상 대상 차종 검출
+group_all,전체 검증 프레임 12873장
+group_testbed,테스트베드 촬영 검증 3314장
+group_val,검증 묶음 val 1358장
+group_test,시험 묶음 test 1633장
+evaluation_group,reference·testbed·val·test는 평가 프레임 묶음 식별자
+threshold_grid,"0.001 및 0.01~1.00, 0.01 간격"

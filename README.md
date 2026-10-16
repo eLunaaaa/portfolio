@@ -2,7 +2,20 @@
 
 전자공학 기반의 임베디드 시스템 프로젝트 포트폴리오입니다.
 
-## Blue Witness · 다중 시점 사고 증거 수집 서비스
+## 프로젝트 빠르게 보기
+
+프로젝트 이름을 누르면 **담당 범위 → 설계 선택 → 구현 코드 → 검증 결과** 순서로 확인할 수 있습니다.
+
+| 프로젝트 | 핵심 담당 | 먼저 볼 자료 |
+|---|---|---|
+| [2026 임베디드 SW 경진대회 본선 · Blue Witness](projects/blue-witness/README.md) | AI 학습·서버·시간 동기화·전체 Fail-safe·CI/CD | [설계 선택](projects/blue-witness/docs/design/DECISIONS.md) · [모델 결과 분석](projects/blue-witness/analysis/README.md) · [코드](projects/blue-witness/source/README.md) |
+| [졸업연구 · 실시간 Linux 실험 환경](projects/embedded-linux-system-programming/README.md) | PREEMPT_RT 실험 세팅·CPU affinity·논문 정리 | [담당 작업](projects/embedded-linux-system-programming/README.md) |
+| [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md) | PyTorch 학습·고정소수점 평가·RTL 생성·합성 | [구현과 평가](projects/configurable-cnn-rtl/README.md) |
+| [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | 연산 스케줄링·통신·인터럽트 | [시연과 구현](projects/arduino-load-balancer/README.md) |
+| [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | AI·RTOS·하드웨어·웹 통합 | [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md) |
+| [스마트 우산꽂이](projects/smart-umbrella-stand/README.md) | STM32 제어·SPI·날씨·상태 표시 | [시연과 구현](projects/smart-umbrella-stand/README.md) |
+
+## 2026 임베디드 소프트웨어 경진대회 본선 · Blue Witness
 
 여러 Raspberry Pi 차량에서 사고 전후 영상을 확보하고, AI로 필요한 목격 영상을 선별해 시간축을 맞춰 웹에서 확인하는 팀 프로젝트입니다.
 
@@ -30,7 +43,7 @@ MNIST 모델 구조·학습부터 Q3.4 출력 평가, Verilog 연산 모듈, RTL
 
 [프로젝트 상세와 코드](projects/configurable-cnn-rtl/README.md)
 
-## Embedded Linux Experiment Setup · 졸업연구 실험 환경 구성
+## 졸업연구 · 실시간 Linux 실험 환경 구성
 
 실험 환경과 PREEMPT_RT 도구 설정, CPU 3번 고정, 논문 리딩·정리를 담당했습니다.
 

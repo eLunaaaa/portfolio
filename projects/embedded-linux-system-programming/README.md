@@ -1,4 +1,4 @@
-# Embedded Linux Experiment Setup
+# 졸업연구 · 실시간 Linux 실험 환경 구성
 
 졸업연구에서 실험 환경 구성, PREEMPT_RT 실험 도구 설정, CPU affinity 적용과 관련 논문 리딩·정리를 담당했습니다.
 
