@@ -16,10 +16,13 @@ case "$component" in
   filter)
     sources=(filter/*.c ipc/ipc.c)
     make -C filter
+    env -u CC -u CXX -u PKG_CONFIG_SYSROOT_DIR -u PKG_CONFIG_LIBDIR \
+      make -C filter test HOST_CC=gcc
     binaries=(witness_filter)
     ;;
   p2p)
     sources=(p2p/*.c p2p/btp/*.c p2p/denm/*.c ipc/ipc.c)
+    bash p2p/tests/test_go_reconnect.sh
     make -C p2p all
     binaries=(broadcast_sender broadcast_receiver)
     for launcher in p2p_go.sh p2p_client.sh; do
@@ -30,12 +33,13 @@ case "$component" in
     sources=(ai/*.cpp ipc/ipc.c)
     ort_root=${ONNXRUNTIME_ROOT:-${RUNNER_TEMP:-/tmp}/onnxruntime-linux-aarch64-1.29.0}
     if [[ ! -f "$ort_root/include/onnxruntime_cxx_api.h" || ! -f "$ort_root/lib/libonnxruntime.so" ]]; then
-      curl -fL --retry 3 \
+      curl -fL --connect-timeout 15 --max-time 60 --retry 1 --retry-max-time 120 \
         -o "${RUNNER_TEMP:-/tmp}/onnxruntime.tgz" \
         https://github.com/microsoft/onnxruntime/releases/download/v1.29.0/onnxruntime-linux-aarch64-1.29.0.tgz
       tar -xzf "${RUNNER_TEMP:-/tmp}/onnxruntime.tgz" -C "${RUNNER_TEMP:-/tmp}"
     fi
     make -C ai ONNXRUNTIME_ROOT="$ort_root"
+    readelf -d test/inference | grep -Eq '\((RUNPATH|RPATH)\).*\[/opt/onnxruntime/lib\]'
     binaries=(inference video_processor)
     ;;
   time_sync)

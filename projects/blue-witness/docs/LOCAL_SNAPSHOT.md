@@ -6,7 +6,7 @@
 |---|---|---|
 | 서버 | Desktop/embeded_software_server/backend | app·frontend·tests·설정·요구 패키지 |
 | 모델 학습 | Desktop/ACE_Ai/vehicle_model | Python 도구·시험·YAML 실험 설정·Makefile |
-| 나머지 | 기존 원격 고정 커밋 | Time Sync·팀 AI 참고 설정·측정 자료·개인 CI/CD 시점 |
+| 나머지 | 기존 원격 고정 커밋 | Time Sync·팀 AI 참고 설정·측정 자료·CI/CD 운영본 `5148804` |
 
 개발 폴더에는 코드를 쓰지 않고 읽어서 복제했습니다. 실제 DB·영상·key·cert·쿠키·학습 dataset·모델 가중치·가상환경은 업로드하지 않습니다. source/PROVENANCE.json에는 로컬 파일명·원본 hash·복제 hash를 기록하며, 로컬 파일에 존재하지 않는 Git commit을 임의로 붙이지 않습니다.
 

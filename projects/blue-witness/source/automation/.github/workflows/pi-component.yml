@@ -1,40 +1,165 @@
-name: Pi component
+name: Pi components
 
 on:
   workflow_call:
     inputs:
-      component:
+      components:
+        description: JSON array of selected Pi components
         required: true
         type: string
 
 permissions:
   contents: read
 
+env:
+  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 2
+
 jobs:
   build:
-    name: Pi / ${{ inputs.component }}
+    name: Pi / selected components
     runs-on: ubuntu-24.04
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Install cross compiler and cppcheck
+        timeout-minutes: 2
+      - name: Validate selected components
+        env:
+          COMPONENTS: ${{ inputs.components }}
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-aarch64-linux-gnu g++-aarch64-linux-gnu cppcheck pkg-config libglib2.0-dev
-      - name: Restore Raspberry Pi sysroot
+          python - <<'PY'
+          import json, os
+          selected = json.loads(os.environ['COMPONENTS'])
+          allowed = {'sensor', 'filter', 'p2p', 'ai', 'time_sync', 'uploader'}
+          assert isinstance(selected, list) and selected
+          assert all(isinstance(name, str) and name in allowed for name in selected)
+          assert len(selected) == len(set(selected))
+          PY
+      - name: Select host dependency cache
+        id: host-deb-key
+        run: printf 'image=%s\n' "${ImageVersion:?Runner image version is required}" >> "$GITHUB_OUTPUT"
+      - name: Restore compiler and dependency packages
+        id: host-debs
+        uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        with:
+          path: ${{ runner.temp }}/pi-host-debs
+          key: pi-host-debs-v1-ubuntu24.04-${{ runner.arch }}-${{ steps.host-deb-key.outputs.image }}-${{ hashFiles('scripts/ci/install-host-deps.sh') }}
+      - name: Install cross compiler and cppcheck once
+        id: install-host-deps
+        timeout-minutes: 3
+        env:
+          HOST_DEB_CACHE_DIR: ${{ runner.temp }}/pi-host-debs
+          HOST_DEB_CACHE_HIT: ${{ steps.host-debs.outputs.cache-hit }}
+        run: bash scripts/ci/install-host-deps.sh
+      - name: Save main compiler and dependency packages
+        if: github.ref == 'refs/heads/main' && steps.host-debs.outputs.cache-hit != 'true' && steps.install-host-deps.outputs.cache-ready == 'true'
+        uses: actions/cache/save@v4
+        timeout-minutes: 1
+        with:
+          path: ${{ runner.temp }}/pi-host-debs
+          key: ${{ steps.host-debs.outputs.cache-primary-key }}
+      - name: Restore Raspberry Pi sysroot once
         id: sdk-cache
         uses: actions/cache/restore@v4
+        timeout-minutes: 3
         with:
           path: sdk
-          key: pi-sysroot-debian13-20260930-${{ runner.os }}
-      - name: Require prepared SDK
-        run: test '${{ steps.sdk-cache.outputs.cache-hit }}' = true
-      - name: Build, inspect, and test
-        shell: bash
-        run: bash scripts/ci/build-pi.sh '${{ inputs.component }}'
-      - name: Upload ARM64 binaries
-        uses: actions/upload-artifact@v4
+          key: pi-sdk-v1.2-d022ca1d-${{ runner.os }}
+      - name: Download verified Pi OS sysroot on cache miss
+        if: steps.sdk-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p sdk
+          gh release download v1.2 --repo "$GITHUB_REPOSITORY" \
+            --pattern aarch64-buildroot-linux-gnu_sdk-buildroot_rpi5.tar.gz --dir sdk --clobber
+          echo 'd022ca1d1ee038fdc479ee92992536834dd2f20ca5a3982f3849d74b50457f9d  sdk/aarch64-buildroot-linux-gnu_sdk-buildroot_rpi5.tar.gz' | sha256sum -c -
+          tar -xzf sdk/aarch64-buildroot-linux-gnu_sdk-buildroot_rpi5.tar.gz -C sdk --strip-components=1
+          rm sdk/aarch64-buildroot-linux-gnu_sdk-buildroot_rpi5.tar.gz
+      - name: Save main SDK cache
+        if: github.ref == 'refs/heads/main' && steps.sdk-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        timeout-minutes: 3
         with:
-          name: pi-${{ inputs.component }}
-          path: dist/${{ inputs.component }}/
+          path: sdk
+          key: pi-sdk-v1.2-d022ca1d-${{ runner.os }}
+      - name: Build and test sensor
+        if: contains(fromJSON(inputs.components), 'sensor')
+        timeout-minutes: 3
+        run: bash scripts/ci/build-pi.sh sensor
+      - name: Build and test filter
+        if: contains(fromJSON(inputs.components), 'filter')
+        timeout-minutes: 3
+        run: bash scripts/ci/build-pi.sh filter
+      - name: Build and test p2p
+        if: contains(fromJSON(inputs.components), 'p2p')
+        timeout-minutes: 3
+        run: bash scripts/ci/build-pi.sh p2p
+      - name: Build and test ai
+        if: contains(fromJSON(inputs.components), 'ai')
+        timeout-minutes: 3
+        run: bash scripts/ci/build-pi.sh ai
+      - name: Build and test time_sync
+        if: contains(fromJSON(inputs.components), 'time_sync')
+        timeout-minutes: 3
+        run: bash scripts/ci/build-pi.sh time_sync
+      - name: Build and test uploader
+        if: contains(fromJSON(inputs.components), 'uploader')
+        timeout-minutes: 3
+        run: bash scripts/ci/build-pi.sh uploader
+      - name: Upload sensor for main deployment
+        if: github.ref == 'refs/heads/main' && contains(fromJSON(inputs.components), 'sensor')
+        uses: actions/upload-artifact@v4
+        timeout-minutes: 2
+        with:
+          name: pi-sensor
+          path: dist/sensor/
           if-no-files-found: error
-          retention-days: 14
+          retention-days: 3
+      - name: Upload filter for main deployment
+        if: github.ref == 'refs/heads/main' && contains(fromJSON(inputs.components), 'filter')
+        uses: actions/upload-artifact@v4
+        timeout-minutes: 2
+        with:
+          name: pi-filter
+          path: dist/filter/
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload p2p for main deployment
+        if: github.ref == 'refs/heads/main' && contains(fromJSON(inputs.components), 'p2p')
+        uses: actions/upload-artifact@v4
+        timeout-minutes: 2
+        with:
+          name: pi-p2p
+          path: dist/p2p/
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload ai for main deployment
+        if: github.ref == 'refs/heads/main' && contains(fromJSON(inputs.components), 'ai')
+        uses: actions/upload-artifact@v4
+        timeout-minutes: 2
+        with:
+          name: pi-ai
+          path: dist/ai/
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload time_sync for main deployment
+        if: github.ref == 'refs/heads/main' && contains(fromJSON(inputs.components), 'time_sync')
+        uses: actions/upload-artifact@v4
+        timeout-minutes: 2
+        with:
+          name: pi-time_sync
+          path: dist/time_sync/
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload uploader for main deployment
+        if: github.ref == 'refs/heads/main' && contains(fromJSON(inputs.components), 'uploader')
+        uses: actions/upload-artifact@v4
+        timeout-minutes: 2
+        with:
+          name: pi-uploader
+          path: dist/uploader/
+          if-no-files-found: error
+          retention-days: 3
+

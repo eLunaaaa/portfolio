@@ -2,7 +2,20 @@ name: CI
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review, converted_to_draft, closed]
+    paths-ignore: ['**/*.md', 'docs/**']
   push:
+    branches: [main]
+    paths-ignore: ['**/*.md', 'docs/**']
+  workflow_dispatch:
+
+env:
+  SEGMENT_DOWNLOAD_TIMEOUT_MINS: 2
+  PIP_DISABLE_PIP_VERSION_CHECK: '1'
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -10,190 +23,176 @@ permissions:
 
 jobs:
   changes:
+    if: github.event_name != 'pull_request' || (!github.event.pull_request.draft && github.event.action != 'closed')
     runs-on: ubuntu-24.04
+    timeout-minutes: 5
     outputs:
-      sensor: ${{ steps.filter.outputs.sensor }}
-      filter: ${{ steps.filter.outputs.filter }}
-      p2p: ${{ steps.filter.outputs.p2p }}
-      ai: ${{ steps.filter.outputs.ai }}
-      time_sync: ${{ steps.filter.outputs.time_sync }}
-      uploader: ${{ steps.filter.outputs.uploader }}
-      server: ${{ steps.filter.outputs.server }}
-      aruco: ${{ steps.filter.outputs.aruco }}
+      components: ${{ steps.select.outputs.components }}
+      server: ${{ steps.select.outputs.server }}
+      contracts: ${{ steps.select.outputs.contracts }}
+      aruco: ${{ steps.select.outputs.aruco }}
     steps:
       - uses: actions/checkout@v4
+        timeout-minutes: 2
       - name: Check deployment configuration syntax
         run: |
-          bash -n scripts/deploy/*.sh
+          for script in scripts/deploy/*.sh scripts/ci/*.sh; do bash -n "$script"; done
           /usr/sbin/visudo -cf scripts/deploy/fleet-deploy.sudoers
+          python -m unittest discover -s scripts/ci -p "test_*.py" -v
       - uses: dorny/paths-filter@v3
         id: filter
         with:
+          base: main
+          predicate-quantifier: every
           filters: |
             sensor:
-              - 'sensor/**'
-              - 'ipc/**'
-              - 'scripts/ci/build-pi.sh'
-              - 'scripts/setting/setup_sdk.sh'
-              - 'scripts/setting/project.conf'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/pi-component.yml'
+              - '{sensor/**,ipc/**,scripts/ci/build-pi.sh,scripts/ci/install-host-deps.sh,scripts/setting/setup_sdk.sh,scripts/setting/project.conf,.github/workflows/ci.yml,.github/workflows/pi-component.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
             filter:
-              - 'filter/**'
-              - 'ipc/**'
-              - 'scripts/ci/build-pi.sh'
-              - 'scripts/setting/setup_sdk.sh'
-              - 'scripts/setting/project.conf'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/pi-component.yml'
+              - '{filter/**,ipc/**,scripts/ci/build-pi.sh,scripts/ci/install-host-deps.sh,scripts/setting/setup_sdk.sh,scripts/setting/project.conf,.github/workflows/ci.yml,.github/workflows/pi-component.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
             p2p:
-              - 'p2p/**'
-              - 'ipc/**'
-              - 'scripts/ci/build-pi.sh'
-              - 'scripts/setting/setup_sdk.sh'
-              - 'scripts/setting/project.conf'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/pi-component.yml'
+              - '{p2p/**,ipc/**,scripts/ci/build-pi.sh,scripts/ci/install-host-deps.sh,scripts/setting/setup_sdk.sh,scripts/setting/project.conf,.github/workflows/ci.yml,.github/workflows/pi-component.yml,scripts/ci/select-ci.py,test/p2p_go.sh,test/p2p_client.sh,p2p/tests/**}'
+              - '!**/*.md'
             ai:
-              - 'ai/**'
-              - 'ipc/**'
-              - 'scripts/ci/build-pi.sh'
-              - 'scripts/setting/setup_sdk.sh'
-              - 'scripts/setting/project.conf'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/pi-component.yml'
+              - '{ai/**,ipc/**,scripts/ci/build-pi.sh,scripts/ci/install-host-deps.sh,scripts/setting/setup_sdk.sh,scripts/setting/project.conf,.github/workflows/ci.yml,.github/workflows/pi-component.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
             time_sync:
-              - 'time_sync/**'
-              - 'ipc/**'
-              - 'scripts/ci/build-pi.sh'
-              - 'scripts/setting/setup_sdk.sh'
-              - 'scripts/setting/project.conf'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/pi-component.yml'
+              - '{time_sync/**,ipc/**,scripts/ci/build-pi.sh,scripts/ci/install-host-deps.sh,scripts/setting/setup_sdk.sh,scripts/setting/project.conf,.github/workflows/ci.yml,.github/workflows/pi-component.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
             uploader:
-              - 'uploader/**'
-              - 'ipc/**'
-              - 'scripts/ci/build-pi.sh'
-              - 'scripts/setting/setup_sdk.sh'
-              - 'scripts/setting/project.conf'
-              - '.github/workflows/ci.yml'
-              - '.github/workflows/pi-component.yml'
+              - '{uploader/**,ipc/**,scripts/ci/build-pi.sh,scripts/ci/install-host-deps.sh,scripts/setting/setup_sdk.sh,scripts/setting/project.conf,.github/workflows/ci.yml,.github/workflows/pi-component.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
             server:
-              - 'server/**'
-              - 'scripts/ci/check-server.sh'
-              - '.github/workflows/ci.yml'
+              - '{server/**,uploader/src/**,uploader/include/**,ipc/*.h,scripts/ci/check-server.py,scripts/ci/setup-windows-ffmpeg.py,.github/workflows/integration.yml,.github/workflows/ci.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
+            contracts:
+              - '{server/backend/app/**/*.py,server/backend/tests/**,server/backend/requirements.txt,uploader/src/**,uploader/include/**,ipc/*.h,scripts/ci/check-server.py,scripts/ci/setup-windows-ffmpeg.py,.github/workflows/ci.yml,.github/workflows/integration.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
             aruco:
-              - 'aruco_BLE_(IN_windowsPC)/**'
-              - 'scripts/ci/check-aruco.sh'
-              - '.github/workflows/ci.yml'
-
-  sdk:
-    needs: changes
-    if: >-
-      github.ref == 'refs/heads/main' ||
-      needs.changes.outputs.sensor == 'true' ||
-      needs.changes.outputs.filter == 'true' ||
-      needs.changes.outputs.p2p == 'true' ||
-      needs.changes.outputs.ai == 'true' ||
-      needs.changes.outputs.time_sync == 'true' ||
-      needs.changes.outputs.uploader == 'true'
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - name: Restore SDK cache
-        id: sdk-cache
-        uses: actions/cache@v4
-        with:
-          path: sdk
-          key: pi-sysroot-debian13-20260930-${{ runner.os }}
-      - name: Download verified Pi OS sysroot once
-        if: steps.sdk-cache.outputs.cache-hit != 'true'
+              - '{aruco_BLE_\(IN_windowsPC\)/**,.github/workflows/ci.yml,scripts/ci/select-ci.py}'
+              - '!**/*.md'
+      - name: Select affected jobs
+        id: select
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          mkdir -p sdk/sysroot
-          gh release download v1.1 --repo "$GITHUB_REPOSITORY" \
-            --pattern pi-sysroot-debian13-20260930.tar.gz --dir sdk
-          echo '2d9d2a4f6da9d77bd385a4525abaccbaa40c06c6909fe057c2bfcdeedb2f1d56  sdk/pi-sysroot-debian13-20260930.tar.gz' | sha256sum -c -
-          tar -xzf sdk/pi-sysroot-debian13-20260930.tar.gz -C sdk/sysroot
-          rm sdk/pi-sysroot-debian13-20260930.tar.gz
+          MATCHES: ${{ steps.filter.outputs.changes }}
+          CI_EVENT: ${{ github.event_name }}
+          CI_REF: ${{ github.ref }}
+        run: python scripts/ci/select-ci.py
 
-  pi_sensor:
-    needs: [changes, sdk]
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.sensor == 'true'
+  pi:
+    needs: changes
+    if: needs.changes.outputs.components != '[]'
     uses: ./.github/workflows/pi-component.yml
     with:
-      component: sensor
-    permissions:
-      contents: read
-
-  pi_filter:
-    needs: [changes, sdk]
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.filter == 'true'
-    uses: ./.github/workflows/pi-component.yml
-    with:
-      component: filter
-    permissions:
-      contents: read
-
-  pi_p2p:
-    needs: [changes, sdk]
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.p2p == 'true'
-    uses: ./.github/workflows/pi-component.yml
-    with:
-      component: p2p
-    permissions:
-      contents: read
-
-  pi_ai:
-    needs: [changes, sdk]
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.ai == 'true'
-    uses: ./.github/workflows/pi-component.yml
-    with:
-      component: ai
-    permissions:
-      contents: read
-
-  pi_time_sync:
-    needs: [changes, sdk]
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.time_sync == 'true'
-    uses: ./.github/workflows/pi-component.yml
-    with:
-      component: time_sync
-    permissions:
-      contents: read
-
-  pi_uploader:
-    needs: [changes, sdk]
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.uploader == 'true'
-    uses: ./.github/workflows/pi-component.yml
-    with:
-      component: uploader
+      components: ${{ needs.changes.outputs.components }}
     permissions:
       contents: read
 
   server:
     needs: changes
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.server == 'true'
-    runs-on: ubuntu-24.04
+    if: needs.changes.outputs.server == 'true'
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [ubuntu-24.04, windows-2022]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        timeout-minutes: 2
       - uses: actions/setup-python@v5
+        timeout-minutes: 3
         with:
           python-version: '3.12'
-      - run: python -m pip install -r server/backend/requirements.txt
-      - name: Import, startup, database, health
-        run: bash scripts/ci/check-server.sh
+          cache: pip
+          cache-dependency-path: server/backend/requirements.txt
+      - name: Install server dependencies
+        timeout-minutes: 3
+        run: python -m pip install --timeout 15 --retries 1 -r server/backend/requirements.txt cryptography
+      - name: Install FFmpeg (Linux)
+        timeout-minutes: 3
+        if: runner.os == 'Linux'
+        run: |
+          if command -v ffmpeg >/dev/null && command -v ffprobe >/dev/null; then exit 0; fi
+          sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 -o APT::Update::Error-Mode=any update
+          sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15 install -y ffmpeg
+      - name: Restore Windows FFmpeg archive
+        id: ffmpeg-cache
+        if: runner.os == 'Windows'
+        uses: actions/cache/restore@v4
+        timeout-minutes: 1
+        with:
+          path: ${{ runner.temp }}/windows-ffmpeg-cache
+          key: ffmpeg-Windows-${{ runner.arch }}-9.0.2-4705843c-${{ hashFiles('scripts/ci/setup-windows-ffmpeg.py') }}
+      - name: Install and verify FFmpeg (Windows)
+        id: ffmpeg-install
+        timeout-minutes: 3
+        if: runner.os == 'Windows'
+        env:
+          FFMPEG_CACHE_DIR: ${{ runner.temp }}/windows-ffmpeg-cache
+          FFMPEG_INSTALL_DIR: ${{ runner.temp }}/windows-ffmpeg
+        run: python scripts/ci/setup-windows-ffmpeg.py
+      - name: Save main Windows FFmpeg archive
+        if: runner.os == 'Windows' && github.ref == 'refs/heads/main' && steps.ffmpeg-cache.outputs.cache-hit != 'true' && steps.ffmpeg-install.outputs.cache-ready == 'true'
+        uses: actions/cache/save@v4
+        timeout-minutes: 1
+        with:
+          path: ${{ runner.temp }}/windows-ffmpeg-cache
+          key: ${{ steps.ffmpeg-cache.outputs.cache-primary-key }}
+      - name: Contracts, startup, database, HTTP, TLS and merge
+        timeout-minutes: 3
+        env:
+          TEST_MODE: ${{ runner.os == 'Linux' && needs.changes.outputs.contracts == 'true' && 'integration' || 'quick' }}
+        run: python scripts/ci/check-server.py ${{ env.TEST_MODE }}
 
   aruco:
     needs: changes
-    if: github.ref == 'refs/heads/main' || needs.changes.outputs.aruco == 'true'
-    runs-on: ubuntu-24.04
+    if: needs.changes.outputs.aruco == 'true'
+    runs-on: windows-2022
+    timeout-minutes: 10
+    defaults:
+      run:
+        shell: bash
+        working-directory: aruco_BLE_(IN_windowsPC)
     steps:
       - uses: actions/checkout@v4
+        timeout-minutes: 2
       - uses: actions/setup-python@v5
+        timeout-minutes: 3
         with:
           python-version: '3.12'
-      - run: python -m pip install -r 'aruco_BLE_(IN_windowsPC)/requirements_ble.txt' opencv-contrib-python-headless numpy
+          cache: pip
+          cache-dependency-path: aruco_BLE_(IN_windowsPC)/requirements_ble.txt
+      - name: Install ArUco dependencies
+        timeout-minutes: 3
+        run: python -m pip install --timeout 15 --retries 1 -r requirements_ble.txt opencv-contrib-python-headless numpy
       - name: Offline configuration and protocol checks
-        run: bash scripts/ci/check-aruco.sh
+        timeout-minutes: 3
+        run: |
+          python -m compileall -q .
+          python check_setup.py
+          python -m unittest -v test_ble_protocol test_tracking_offline test_tracking_ble_bridge test_ble_sender
+
+  checks:
+    name: CI result
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || (!github.event.pull_request.draft && github.event.action != 'closed')) }}
+    needs: [changes, pi, server, aruco]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Require selected checks to pass
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          python - <<'PY'
+          import json, os
+          results = json.loads(os.environ['RESULTS'])
+          failures = {name: job['result'] for name, job in results.items()
+                      if job['result'] not in ('success', 'skipped')}
+          if results['changes']['result'] != 'success' or failures:
+              raise SystemExit(f'CI failed: {failures}')
+          print('All selected checks passed')
+          PY
+
+

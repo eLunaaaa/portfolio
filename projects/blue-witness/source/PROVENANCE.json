@@ -1,7 +1,7 @@
 {
   "upstream_repository": "https://github.com/kingwooseok/2026ESWContest_mobility_ACE",
   "prepared_on": "2026-10-16",
-  "attribution_note": "Module ownership is not sole authorship; team follow-up edits remain credited. CI snapshot is historical. AI runtime and common IPC/watchdog implementations excluded.",
+  "attribution_note": "Module ownership and design contribution are not sole line authorship. CI/CD includes current operational design and implementation at 5148804; team Git history remains credited. AI runtime and common IPC/watchdog implementations excluded.",
   "files": [
     {
       "path": "../reference/github-regressions/test_admin_cleanup.py",
@@ -50,136 +50,6 @@
       "upstream_sha256": "1203d209c7beb3e7c9111aaa1a6796680ec551015b1ac7bc2ecc4e19f5e510d6",
       "exact_copy": true,
       "bytes": 276
-    },
-    {
-      "path": "automation/.github/actionlint.yaml",
-      "source": ".github/actionlint.yaml",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "5f45775562e3156d9e3d2e92bf518401a1240176066331a1e7a4fdde71adbc29",
-      "upstream_sha256": "5f45775562e3156d9e3d2e92bf518401a1240176066331a1e7a4fdde71adbc29",
-      "exact_copy": true,
-      "bytes": 55
-    },
-    {
-      "path": "automation/.github/workflows/ci.yml",
-      "source": ".github/workflows/ci.yml",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "8f0464b64014d7944f4f7777c521f9a7dc0e6ce2768cda144710e48350f68ca6",
-      "upstream_sha256": "8f0464b64014d7944f4f7777c521f9a7dc0e6ce2768cda144710e48350f68ca6",
-      "exact_copy": true,
-      "bytes": 6528
-    },
-    {
-      "path": "automation/.github/workflows/deploy.yml",
-      "source": ".github/workflows/deploy.yml",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "37e635f548b9d7c0ca177e465e377cf27eca0e39f9dbab35515001509631f882",
-      "upstream_sha256": "37e635f548b9d7c0ca177e465e377cf27eca0e39f9dbab35515001509631f882",
-      "exact_copy": true,
-      "bytes": 2636
-    },
-    {
-      "path": "automation/.github/workflows/integration.yml",
-      "source": ".github/workflows/integration.yml",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "e458da6733818e54bfcb58f1dffa6b0242938fcd62142f4320f1405a1dce0b2c",
-      "upstream_sha256": "e458da6733818e54bfcb58f1dffa6b0242938fcd62142f4320f1405a1dce0b2c",
-      "exact_copy": true,
-      "bytes": 701
-    },
-    {
-      "path": "automation/.github/workflows/pi-component.yml",
-      "source": ".github/workflows/pi-component.yml",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "8dfbbe8dcb50c22b1b6cdac5c83b36fb226eee701cb02a44f885acf9b51397aa",
-      "upstream_sha256": "8dfbbe8dcb50c22b1b6cdac5c83b36fb226eee701cb02a44f885acf9b51397aa",
-      "exact_copy": true,
-      "bytes": 1151
-    },
-    {
-      "path": "automation/scripts/ci/build-pi.sh",
-      "source": "scripts/ci/build-pi.sh",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "4b33057f92c0513a00ceb5d2d9dcaf8a8d68971c4c2c4567611c92d8f2a00d99",
-      "upstream_sha256": "4b33057f92c0513a00ceb5d2d9dcaf8a8d68971c4c2c4567611c92d8f2a00d99",
-      "exact_copy": true,
-      "bytes": 2127
-    },
-    {
-      "path": "automation/scripts/ci/check-aruco.sh",
-      "source": "scripts/ci/check-aruco.sh",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "332367945e30b2313c6813e3f3911ecc5475b0c773f739a2de3883ba8f06fe4e",
-      "upstream_sha256": "332367945e30b2313c6813e3f3911ecc5475b0c773f739a2de3883ba8f06fe4e",
-      "exact_copy": true,
-      "bytes": 222
-    },
-    {
-      "path": "automation/scripts/ci/check-server-merge.py",
-      "source": "scripts/ci/check-server-merge.py",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "e42464a1ed66864711f3c407313293a55b55715512916b0da2b038993b6dbbca",
-      "upstream_sha256": "e42464a1ed66864711f3c407313293a55b55715512916b0da2b038993b6dbbca",
-      "exact_copy": true,
-      "bytes": 1819
-    },
-    {
-      "path": "automation/scripts/ci/check-server-tls.sh",
-      "source": "scripts/ci/check-server-tls.sh",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "79d42ed05f9d092e51c9d3e3cc7f67672dbecc8aa4af69e4d41add5d14d20ece",
-      "upstream_sha256": "79d42ed05f9d092e51c9d3e3cc7f67672dbecc8aa4af69e4d41add5d14d20ece",
-      "exact_copy": true,
-      "bytes": 1483
-    },
-    {
-      "path": "automation/scripts/ci/check-server.sh",
-      "source": "scripts/ci/check-server.sh",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "0091e8a9af2e7bf53850fd31296fdd0968ff2b5a7c4933b532f29dad3bf2aa20",
-      "upstream_sha256": "0091e8a9af2e7bf53850fd31296fdd0968ff2b5a7c4933b532f29dad3bf2aa20",
-      "exact_copy": true,
-      "bytes": 1063
-    },
-    {
-      "path": "automation/scripts/deploy/apply_release.sh",
-      "source": "scripts/deploy/apply_release.sh",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "90da51faf277ef469d9303360e6039649a57e2f6cc9bfa923f428bd460a4e537",
-      "upstream_sha256": "90da51faf277ef469d9303360e6039649a57e2f6cc9bfa923f428bd460a4e537",
-      "exact_copy": true,
-      "bytes": 7715
-    },
-    {
-      "path": "automation/scripts/deploy/deploy_fleet.sh",
-      "source": "scripts/deploy/deploy_fleet.sh",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "f2920eeb7138dddbc0ad4d13d4b6d019aafdf431c0b90710614c2072b5ed264d",
-      "upstream_sha256": "f2920eeb7138dddbc0ad4d13d4b6d019aafdf431c0b90710614c2072b5ed264d",
-      "exact_copy": true,
-      "bytes": 1903
-    },
-    {
-      "path": "automation/scripts/deploy/fleet-deploy.sudoers",
-      "source": "scripts/deploy/fleet-deploy.sudoers",
-      "commit": "bc6371a",
-      "scope": "personal_ci_cd_working_snapshot",
-      "sha256": "2e09d64a40c341dd363706ef99742a4c404b3b67d14eb6dd7f451bde362a7955",
-      "upstream_sha256": "2e09d64a40c341dd363706ef99742a4c404b3b67d14eb6dd7f451bde362a7955",
-      "exact_copy": true,
-      "bytes": 683
     },
     {
       "path": "model_training/.gitignore",
@@ -1985,6 +1855,150 @@
       "upstream_sha256": "59a14928e2658fc3ffac277de3bb7594314d314bb82d8eedd095aa1a8aefb6ac",
       "exact_copy": true,
       "bytes": 39313
+    },
+    {
+      "path": "automation/.github/actionlint.yaml",
+      "source": ".github/actionlint.yaml",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "5f45775562e3156d9e3d2e92bf518401a1240176066331a1e7a4fdde71adbc29",
+      "bytes": 55
+    },
+    {
+      "path": "automation/.github/workflows/ci.yml",
+      "source": ".github/workflows/ci.yml",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "a5717cdc0480041e7314275baafc8f49139e136b20eec01a690f445ed581337b",
+      "bytes": 8713
+    },
+    {
+      "path": "automation/.github/workflows/deploy.yml",
+      "source": ".github/workflows/deploy.yml",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "46ee3ebea4e0348cc6bfc98700d8a0df8f980dac41c5419b6a1861daf729b0e4",
+      "bytes": 4782
+    },
+    {
+      "path": "automation/.github/workflows/integration.yml",
+      "source": ".github/workflows/integration.yml",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "e829f72b0029c87ae258b00d461a5034b72ccc8fae9365c8488ccdc6e96d92e6",
+      "bytes": 1357
+    },
+    {
+      "path": "automation/.github/workflows/pi-component.yml",
+      "source": ".github/workflows/pi-component.yml",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "b305ef3dff1ff6788774939f568a957133ea560822e771a8d7ae61632ae20b66",
+      "bytes": 6466
+    },
+    {
+      "path": "automation/scripts/ci/build-pi.sh",
+      "source": "scripts/ci/build-pi.sh",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "13525d8d3a828ee053bbb0ec4449754e12b3707ce1c9d513c575a59be2874df3",
+      "bytes": 2420
+    },
+    {
+      "path": "automation/scripts/ci/check-server.py",
+      "source": "scripts/ci/check-server.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "f6e435749345d714b0692293d3b0b87257fe54240b1d0f6a792d6261490d3323",
+      "bytes": 9001
+    },
+    {
+      "path": "automation/scripts/ci/install-host-deps.sh",
+      "source": "scripts/ci/install-host-deps.sh",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "741feb0ee706ec7fced5e864e20683a3b53d63c72e1c2d52c7179166cdf60570",
+      "bytes": 4014
+    },
+    {
+      "path": "automation/scripts/ci/select-ci.py",
+      "source": "scripts/ci/select-ci.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "f1fdfd781887664dd37a5b219338504d3da4ed672c042e7945bdf6d9efbf619f",
+      "bytes": 1125
+    },
+    {
+      "path": "automation/scripts/ci/setup-windows-ffmpeg.py",
+      "source": "scripts/ci/setup-windows-ffmpeg.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "b596afc209fec1c49d8e9168eef0665c0dcf60cfab836e10efde56719f131c93",
+      "bytes": 3965
+    },
+    {
+      "path": "automation/scripts/ci/test_apt_archive_cache.py",
+      "source": "scripts/ci/test_apt_archive_cache.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "17f6e6dc6e26de28390b8c1e7515ac708f56d09d488bf3b3d36b4fce85d68ee9",
+      "bytes": 4645
+    },
+    {
+      "path": "automation/scripts/ci/test_install_host_deps.py",
+      "source": "scripts/ci/test_install_host_deps.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "60cce799c2ba4eb5b584af9ad020bafafc89fe1b673e00917e7d9f26ee860096",
+      "bytes": 8582
+    },
+    {
+      "path": "automation/scripts/ci/test_select_ci.py",
+      "source": "scripts/ci/test_select_ci.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "c3dd300bbc5f73a47f2e8d29a29a64d7cce4576ce6521e693f69f9e22d8f5316",
+      "bytes": 2273
+    },
+    {
+      "path": "automation/scripts/ci/test_server_tools.py",
+      "source": "scripts/ci/test_server_tools.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "a73c084f26b739409f010a817ee7bdd5777e4aadeb9d69f4a0bce29c2f77731b",
+      "bytes": 6374
+    },
+    {
+      "path": "automation/scripts/ci/test_setup_windows_ffmpeg.py",
+      "source": "scripts/ci/test_setup_windows_ffmpeg.py",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "af615e92c5e0108746a2370e4f17dd3833d11227170a0942a688f6ee664d8ca0",
+      "bytes": 6447
+    },
+    {
+      "path": "automation/scripts/deploy/apply_release.sh",
+      "source": "scripts/deploy/apply_release.sh",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "b474b73ca19f5fb350ab1a39f243da2cc6bfc1d6d185fada81a5fde7ba589e67",
+      "bytes": 14861
+    },
+    {
+      "path": "automation/scripts/deploy/deploy_fleet.sh",
+      "source": "scripts/deploy/deploy_fleet.sh",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "d5223fb334fec62692050395abbdcae3d307ec12ffe4fadba8b3fe40371f1d9f",
+      "bytes": 4259
+    },
+    {
+      "path": "automation/scripts/deploy/fleet-deploy.sudoers",
+      "source": "scripts/deploy/fleet-deploy.sudoers",
+      "commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+      "scope": "ci_cd_design_and_operational_implementation",
+      "sha256": "787b41c568d07c1ed47dc0d76876ce3b695d5c7c56f210c88e3078b019f08ef4",
+      "bytes": 426
     }
   ],
   "normalization_note": "Some source copies normalize CRLF/final newline only. Both local source and snapshot hashes are retained. Local files have no invented Git commit.",

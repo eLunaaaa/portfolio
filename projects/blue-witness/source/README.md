@@ -11,7 +11,7 @@
 | time_sync/ | 담당 C 상태 서비스·Makefile·systemd 배포 설정 | `5148804` 통합 코드 |
 | ai/contribution-patches/ | 본인 계정의 추론 threshold 변경 diff | `afca0e4`, `59253bd` |
 | ai/inference_config.h | 팀 통합 버전의 런타임 설정 참고 | `5148804`, 현재 로컬 export가 import하는 파일은 아님 |
-| automation/ | 본인 작업 시점의 CI·수동 fleet CD 코드 | `bc6371a` — 최신 운영 버전이 아닌 역사적 설계 증거 |
+| automation/ | 실제 운영 CI·수동 fleet CD와 회귀 테스트 | `5148804` — 2026-10-16 원격 main, 설계·구축·개선 담당 |
 
 ‘내가 만든 부분’은 담당 모듈·설계 범위를 뜻하며 해당 파일 모든 줄의 단독 저작을 주장하지 않습니다. 파일별 원본 commit·SHA-256·출처 범위는 manifest에 기록합니다. 모델 학습의 공식 YOLOX, 공용 IPC·watchdog, Sensor·Filter·P2P·Uploader 본체, 팀원의 독립 모듈은 넣지 않았습니다. AI 촬영·Snapshot·영상 처리 본체는 팀 구현이므로 원본 링크로만 설명합니다.
 
@@ -50,7 +50,7 @@ PYTHONPATH=model_training python -m unittest discover -s model_training/tests -v
 
 ## 자동화 코드 주의
 
-`automation/.github/workflows/`는 증거용 하위 폴더라 **포트폴리오 push 시 실행되지 않습니다.** Pi 계정·runner·SDK·역할별 모듈과 원본 폴더 구조가 전제입니다. 포트폴리오에서 배포 helper나 sudoers를 실행·설치하지 마십시오. 최신 원본의 보안·복원 보완은 별도이며 [CI/CD 설계 문서](../docs/design/CD.md)에 차이를 명시합니다.
+`automation/.github/workflows/`는 실제 운영 파일을 보존한 하위 폴더라 **포트폴리오 push 시 실행되지 않습니다.** Pi 계정·runner·SDK·역할별 모듈과 원본 폴더 구조가 전제입니다. 포트폴리오에서 배포 helper나 sudoers를 실행·설치하지 마십시오. [실제 Actions 실행 근거](automation/README.md)와 [CI/CD 설계](../docs/design/CD.md)를 함께 제공합니다.
 
 ## 출처·라이선스
 

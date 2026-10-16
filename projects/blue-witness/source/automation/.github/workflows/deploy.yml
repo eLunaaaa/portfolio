@@ -25,8 +25,10 @@ jobs:
   prepare:
     if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-24.04
+    timeout-minutes: 10
     steps:
       - name: Verify CI run belongs to this main commit
+        timeout-minutes: 2
         env:
           GH_TOKEN: ${{ github.token }}
           CI_RUN_ID: ${{ inputs.ci_run_id }}
@@ -34,8 +36,18 @@ jobs:
           [[ "$CI_RUN_ID" =~ ^[0-9]+$ ]]
           gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CI_RUN_ID" |
             jq -e --arg sha "$GITHUB_SHA" \
-              '.name == "CI" and .event == "push" and .head_branch == "main" and .head_sha == $sha and .conclusion == "success"'
+              '.name == "CI" and (.event == "push" or .event == "workflow_dispatch") and .head_branch == "main" and .head_sha == $sha and .conclusion == "success"'
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CI_RUN_ID/artifacts?per_page=100" |
+            jq -e '([.artifacts[] | select(.expired == false) | .name] |
+              ["pi-sensor", "pi-filter", "pi-p2p", "pi-ai", "pi-time_sync", "pi-uploader"] - . | length) == 0'
+      - uses: actions/checkout@v4
+        timeout-minutes: 3
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          lfs: true
       - uses: actions/download-artifact@v4
+        timeout-minutes: 3
         with:
           run-id: ${{ inputs.ci_run_id }}
           github-token: ${{ github.token }}
@@ -43,6 +55,7 @@ jobs:
           path: artifact
           merge-multiple: true
       - name: Validate artifact and bundle
+        timeout-minutes: 2
         run: |
           expected=(witness_aruco accident_aruco witness_filter broadcast_sender \
             broadcast_receiver inference video_processor time_sync uploader \
@@ -56,14 +69,40 @@ jobs:
             fi
             chmod 0755 "artifact/$item"
           done
+          companions=(
+            time_sync/deploy/install-service.sh time_sync/deploy/systemd/time_sync.service
+            time_sync/deploy/time_sync.env uploader/deploy/install-service.sh
+            uploader/deploy/systemd/uploader.service uploader/deploy/uploader.env
+            uploader/deploy/certs/ace-ca.crt
+            ai/deploy/install-service.sh ai/deploy/systemd/inference.service
+            ai/deploy/systemd/video_processor.service filter/deploy/install-service.sh
+            filter/deploy/systemd/witness_filter.service p2p/deploy/install-service.sh
+            p2p/deploy/systemd/p2p-go.service p2p/deploy/systemd/p2p-client.service
+            sensor/sensor@.service
+          )
+          for item in "${companions[@]}"; do
+            test -s "$item"
+            if [[ "$item" == *.sh || "$item" == *.env ]]; then bash -n "$item"; fi
+            install -D -m 0644 "$item" "artifact/companions/$item"
+          done
+          if git ls-files --error-unmatch ai/vehicle_detector.onnx >/dev/null 2>&1; then
+            test -s ai/vehicle_detector.onnx
+            if head -c 128 ai/vehicle_detector.onnx | grep -q 'version https://git-lfs.github.com/spec/v1'; then
+              echo 'ONNX model still contains an LFS pointer' >&2
+              exit 1
+            fi
+            install -D -m 0644 ai/vehicle_detector.onnx artifact/companions/ai/vehicle_detector.onnx
+          fi
+          printf '%s\n' "$GITHUB_SHA" > artifact/RELEASE_SHA
           tar -czf pi-release.tar.gz -C artifact .
           echo "Prepared $(sha256sum pi-release.tar.gz)"
       - uses: actions/upload-artifact@v4
+        timeout-minutes: 2
         with:
           name: pi-release
           path: pi-release.tar.gz
           if-no-files-found: error
-          retention-days: 7
+          retention-days: 3
 
   deploy:
     needs: prepare
@@ -72,12 +111,14 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
+        timeout-minutes: 3
         with:
           persist-credentials: false
       - uses: actions/download-artifact@v4
+        timeout-minutes: 3
         with:
           name: pi-release
       - name: Canary, smoke test, optional fleet rollout
         env:
           FULL_ROLLOUT: ${{ inputs.full_rollout }}
-        run: bash scripts/deploy/deploy_fleet.sh pi-release.tar.gz "$FULL_ROLLOUT" "$GITHUB_RUN_ID"
+        run: bash scripts/deploy/deploy_fleet.sh pi-release.tar.gz "$FULL_ROLLOUT" "$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
