@@ -20,11 +20,15 @@
 | 웹·업로드·영상 병합 | [서버 코드](source/server/README.md) · [서버 설계](docs/design/SERVER.md) |
 | 자동 빌드와 회귀 검사 | [이 저장소 Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml) · [팀 CI/CD 코드](source/automation/README.md) |
 <!-- LOC:START -->
-## 코드 규모
+## 코드 규모와 기술적 과제
 
 **45,105 LOC · 221개 파일** · 구현 36,189 / 테스트·예제 5,230 / 빌드·CI·설정 3,686.
 
 주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)
+
+- **기술적 과제:** 단절·재시작·지연 도착 속에서 영상 보존과 시간 정합성 유지.
+- **설계 선택:** 영속 큐·저장 ACK·촬영 시각 정렬·병합 revision으로 처리 단계를 분리.
+- **확인 근거:** 27회 충돌·81건 저장·단절 복구 12건. [문제·해결·검증](../../docs/TECHNICAL_CHALLENGES.md#blue-witness)
 <!-- LOC:END -->
 
 

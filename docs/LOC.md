@@ -1,5 +1,7 @@
 # 프로젝트별 LOC 분석
 
+[문제·제약·설계·검증으로 보는 기술적 과제](TECHNICAL_CHALLENGES.md)
+
 | 프로젝트 | 구현 | 테스트·예제 | 빌드·CI·설정 | 합계 LOC |
 |---|---:|---:|---:|---:|
 | [Blue Witness](../projects/blue-witness/docs/LOC.md) | 36,189 | 5,230 | 3,686 | 45,105 |

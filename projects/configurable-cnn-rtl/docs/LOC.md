@@ -25,3 +25,13 @@
 프로젝트에 포함된 코드 규모이며 개인 단독 작성량을 뜻하지 않습니다. 담당 범위는 프로젝트 README에서 구분했습니다.
 
 [전체 비교·집계 기준](../../../docs/LOC.md) · [파일별 수치·SHA-256](../../../metrics/loc-files.csv)
+
+## 기술적 과제
+
+학습 모델의 형상·정수 계산을 Verilog 회로와 일치시키기.
+
+**해결 접근:** 공통 JSON·채널 우선 flatten·signed Q3.4 정렬·포화 규칙을 명시.
+
+**확인 근거:** MNIST 입력 10개·클래스 점수 100개 정수/RTL 일치.
+
+[문제·제약·설계·검증 상세](../../../docs/TECHNICAL_CHALLENGES.md#configurable-cnn-rtl)

@@ -23,3 +23,13 @@
 프로젝트에 포함된 코드 규모이며 개인 단독 작성량을 뜻하지 않습니다. 담당 범위는 프로젝트 README에서 구분했습니다.
 
 [전체 비교·집계 기준](../../../docs/LOC.md) · [파일별 수치·SHA-256](../../../metrics/loc-files.csv)
+
+## 기술적 과제
+
+측정 코드의 저장·스케줄링 비용이 실험을 교란하지 않게 구성.
+
+**해결 접근:** 절대 주기 송신·mmap 사전 준비·수신 중 binary 기록·CPU affinity.
+
+**확인 근거:** UDP C 코드·실행 설정·측정점 정의.
+
+[문제·제약·설계·검증 상세](../../../docs/TECHNICAL_CHALLENGES.md#embedded-linux-system-programming)

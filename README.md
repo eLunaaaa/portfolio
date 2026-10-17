@@ -36,17 +36,17 @@
 | **7** | [스마트 우산꽂이](projects/smart-umbrella-stand/README.md) | 아이디어, STM32 Master·SPI, Slave2 날씨·LCD·상태 표시 | [구조·시연](projects/smart-umbrella-stand/README.md) · [검수 기록](projects/smart-umbrella-stand/docs/CODE_REVIEW.md) |
 
 <!-- LOC:START -->
-## 프로젝트별 코드 규모
+## 프로젝트별 코드 규모와 기술적 과제
 
-| 프로젝트 | 구현 | 테스트·예제 | 빌드·CI·설정 | 합계 LOC |
-|---|---:|---:|---:|---:|
-| [Blue Witness](projects/blue-witness/docs/LOC.md) | 36,189 | 5,230 | 3,686 | 45,105 |
-| [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/docs/LOC.md) | 790 | 911 | 25 | 1,726 |
-| [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/docs/LOC.md) | 1,391 | 119 | 31 | 1,541 |
-| [Arduino 동적 부하 분산](projects/arduino-load-balancer/docs/LOC.md) | 571 | 187 | 13 | 771 |
-| [실시간 Linux 실험 환경](projects/embedded-linux-system-programming/docs/LOC.md) | 574 | 0 | 17 | 591 |
-| [뉴스·물리 버튼 주식 주문](projects/stockauto-news-trader/docs/LOC.md) | 1,736 | 851 | 14 | 2,601 |
-| [Smart Umbrella Stand](projects/smart-umbrella-stand/docs/LOC.md) | 596 | 77 | 14 | 687 |
+| 프로젝트 | 합계 LOC | 핵심 기술적 과제 | 설계·검증 근거 |
+|---|---:|---|---|
+| [Blue Witness](projects/blue-witness/README.md) | 45,105 | 단절·재시작·지연 도착 속에서 영상 보존과 시간 정합성 유지 | 27회 충돌·81건 저장·단절 복구 12건 · [상세](docs/TECHNICAL_CHALLENGES.md#blue-witness) |
+| [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md) | 1,726 | 학습 모델의 형상·정수 계산을 Verilog 회로와 일치시키기 | MNIST 입력 10개·클래스 점수 100개 정수/RTL 일치 · [상세](docs/TECHNICAL_CHALLENGES.md#configurable-cnn-rtl) |
+| [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | 1,541 | 촬영·추론·UART가 공유 버퍼와 완료 순서를 지키도록 동기화 | 실보드 연동·시연, 전처리 C·서버 API 검사 · [상세](docs/TECHNICAL_CHALLENGES.md#edge-ai-trash-sorter) |
+| [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | 771 | 제한된 MCU에서 비동기 완료·큐·배치별 결과를 일관되게 관리 | 무작위 완료 순서의 1,800개 패치 검산·5개 보드 구성 빌드 · [상세](docs/TECHNICAL_CHALLENGES.md#arduino-load-balancer) |
+| [실시간 Linux 실험 환경](projects/embedded-linux-system-programming/README.md) | 591 | 측정 코드의 저장·스케줄링 비용이 실험을 교란하지 않게 구성 | UDP C 코드·실행 설정·측정점 정의 · [상세](docs/TECHNICAL_CHALLENGES.md#embedded-linux-system-programming) |
+| [뉴스·물리 버튼 주식 주문](projects/stockauto-news-trader/README.md) | 2,601 | 승인·취소·부분 체결·재시작 이벤트가 뒤섞여도 주문 원장 유지 | Python 89개·Qt 통합 3개·펌웨어 통신·UNO 빌드 · [상세](docs/TECHNICAL_CHALLENGES.md#stockauto-news-trader) |
+| [Smart Umbrella Stand](projects/smart-umbrella-stand/README.md) | 687 | 3개 보드의 센서·모델·날씨·제어 상태를 일관되게 연결 | 제어·통신 C 검사와 건조·승강·수위·LCD 실장치 시연 · [상세](docs/TECHNICAL_CHALLENGES.md#smart-umbrella-stand) |
 
 주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 LOC입니다. 공동 구현을 포함하며 개인 단독 작성량과는 구분합니다. [언어별 분석·집계 기준](docs/LOC.md)
 <!-- LOC:END -->

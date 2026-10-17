@@ -13,11 +13,15 @@
 | 검수한 오류와 수정 | [검수 기록](docs/CODE_REVIEW.md) |
 | 실제 자동 검사 | [GitHub Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml) |
 <!-- LOC:START -->
-## 코드 규모
+## 코드 규모와 기술적 과제
 
 **2,601 LOC · 28개 파일** · 구현 1,736 / 테스트·예제 851 / 빌드·CI·설정 14.
 
 주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)
+
+- **기술적 과제:** 승인·취소·부분 체결·재시작 이벤트가 뒤섞여도 주문 원장 유지.
+- **설계 선택:** 주문 상태 머신·중복 체결 방지·트랜잭션·GUI 제어 경로 분리.
+- **확인 근거:** Python 89개·Qt 통합 3개·펌웨어 통신·UNO 빌드. [문제·해결·검증](../../docs/TECHNICAL_CHALLENGES.md#stockauto-news-trader)
 <!-- LOC:END -->
 
 

@@ -77,10 +77,31 @@ def section(text, block, before=None):
     return text[:at] + wrapped + text[at:]
 
 
+
+def write_challenge_report(challenges, reports):
+    """입력: 프로젝트별 문제·설계·근거와 LOC. 출력: 기술적 과제 종합 문서.
+    LOC는 구현 규모로, 기술적 과제는 제약·설계·검증으로 제시해 평가 기준을 구분합니다.
+    """
+    lines = ['# 프로젝트별 기술적 과제와 해결', '',
+             '각 프로젝트에서 해결한 문제를 **제약 → 설계 선택 → 구현·검증**으로 연결했습니다. LOC는 코드 규모이고, 기술적 깊이는 상태 관리·동시성·수치 정합성·자원 제약·측정 설계에서 확인할 수 있습니다.', '',
+             '[프로젝트별 LOC 비교](LOC.md) · [포트폴리오](../README.md)', '']
+    for slug, name in PROJECTS.items():
+        c = challenges[slug]
+        lines += [f'<a id="{slug}"></a>', '', f'## {name}', '',
+                  f'**{reports[slug]["total"]["code"]:,} LOC** · ' + c['summary'] + '.', '',
+                  '**개인 담당:** ' + c['role'], '',
+                  '| 해결해야 할 문제 | 기술적 제약 | 설계·구현 | 확인 근거 |', '|---|---|---|---|']
+        for row in c['challenges']:
+            lines.append('| ' + ' | '.join(row[k] for k in ['problem', 'constraint', 'solution', 'validation']) + ' |')
+        lines += ['', f'[프로젝트 코드·담당 범위](../projects/{slug}/README.md) · [언어별 LOC](../projects/{slug}/docs/LOC.md)', '']
+    (ROOT / 'docs/TECHNICAL_CHALLENGES.md').write_text('\n'.join(lines))
+
+
 def publish(rows, version):
     """입력: 파일별 수치·도구 버전. 출력: JSON·CSV·README·상세 LOC 문서.
     같은 파일 집계에서 모든 표를 생성해 요약과 언어별 수치가 어긋나지 않게 합니다.
     """
+    challenges = json.loads((ROOT / 'metrics/technical-challenges.json').read_text())
     reports = {}
     for slug in PROJECTS:
         group = [r for r in rows if r['project'] == slug]
@@ -113,14 +134,30 @@ def publish(rows, version):
             lines.append(f'| {lang} | {t["files"]} | {t["code"]:,} | {t["comment"]:,} | {t["blank"]:,} |')
         lines += ['', '프로젝트에 포함된 코드 규모이며 개인 단독 작성량을 뜻하지 않습니다. 담당 범위는 프로젝트 README에서 구분했습니다.', '',
                   '[전체 비교·집계 기준](../../../docs/LOC.md) · [파일별 수치·SHA-256](../../../metrics/loc-files.csv)', '']
+        challenge = challenges[slug]
+        lines += ['## 기술적 과제', '', challenge['summary'] + '.', '',
+                  '**해결 접근:** ' + challenge['decision'] + '.', '',
+                  '**확인 근거:** ' + challenge['evidence'] + '.', '',
+                  f'[문제·제약·설계·검증 상세](../../../docs/TECHNICAL_CHALLENGES.md#{slug})', '']
         (ROOT / f'projects/{slug}/docs/LOC.md').write_text('\n'.join(lines))
         readme = ROOT / f'projects/{slug}/README.md'
-        short = f'## 코드 규모\n\n**{r["total"]["code"]:,} LOC · {r["total"]["files"]}개 파일** · 구현 {nums[0]:,} / 테스트·예제 {nums[1]:,} / 빌드·CI·설정 {nums[2]:,}.\n\n주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)'
+        short = f'## 코드 규모와 기술적 과제\n\n**{r["total"]["code"]:,} LOC · {r["total"]["files"]}개 파일** · 구현 {nums[0]:,} / 테스트·예제 {nums[1]:,} / 빌드·CI·설정 {nums[2]:,}.\n\n주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)'
+        short += ('\n\n- **기술적 과제:** ' + challenge['summary'] + '.'
+                  + '\n- **설계 선택:** ' + challenge['decision'] + '.'
+                  + '\n- **확인 근거:** ' + challenge['evidence'] + '.'
+                  + f' [문제·해결·검증](../../docs/TECHNICAL_CHALLENGES.md#{slug})')
         readme.write_text(section(readme.read_text(), short))
-    block = '## 프로젝트별 코드 규모\n\n' + table + '\n주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 LOC입니다. 공동 구현을 포함하며 개인 단독 작성량과는 구분합니다. [언어별 분석·집계 기준](docs/LOC.md)'
+    challenge_table = '| 프로젝트 | 합계 LOC | 핵심 기술적 과제 | 설계·검증 근거 |\n|---|---:|---|---|\n'
+    for slug, name in PROJECTS.items():
+        c = challenges[slug]
+        challenge_table += (f'| [{name}](projects/{slug}/README.md) | {reports[slug]["total"]["code"]:,} | '
+                            + c['summary'] + ' | ' + c['evidence']
+                            + f' · [상세](docs/TECHNICAL_CHALLENGES.md#{slug}) |\n')
+    write_challenge_report(challenges, reports)
+    block = '## 프로젝트별 코드 규모와 기술적 과제\n\n' + challenge_table + '\n주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 LOC입니다. 공동 구현을 포함하며 개인 단독 작성량과는 구분합니다. [언어별 분석·집계 기준](docs/LOC.md)'
     readme = ROOT / 'README.md'
     readme.write_text(section(readme.read_text(), block, '## 대표 구현과 검증'))
-    overview = '# 프로젝트별 LOC 분석\n\n' + table.replace('](projects/', '](../projects/')
+    overview = '# 프로젝트별 LOC 분석\n\n[문제·제약·설계·검증으로 보는 기술적 과제](TECHNICAL_CHALLENGES.md)\n\n' + table.replace('](projects/', '](../projects/')
     overview += '''
 ## 집계 기준
 

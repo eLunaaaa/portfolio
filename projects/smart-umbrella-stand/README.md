@@ -6,11 +6,15 @@
 
 **개인 담당:** 아이디어 제안, Master의 상태 판단·SPI 통신·ML 추론, Slave2의 기상 API·LCD·수위 표시. [사진으로 보는 동작과 구현](docs/IMPLEMENTATION_GALLERY.md)
 <!-- LOC:START -->
-## 코드 규모
+## 코드 규모와 기술적 과제
 
 **687 LOC · 17개 파일** · 구현 596 / 테스트·예제 77 / 빌드·CI·설정 14.
 
 주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)
+
+- **기술적 과제:** 3개 보드의 센서·모델·날씨·제어 상태를 일관되게 연결.
+- **설계 선택:** 명시적 SPI 프레임·첫 응답 preload·tick timeout·판정 히스테리시스.
+- **확인 근거:** 제어·통신 C 검사와 건조·승강·수위·LCD 실장치 시연. [문제·해결·검증](../../docs/TECHNICAL_CHALLENGES.md#smart-umbrella-stand)
 <!-- LOC:END -->
 
 
