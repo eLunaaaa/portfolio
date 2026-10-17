@@ -3,9 +3,11 @@
 이유: 기존 QThread에서 GUI 객체를 직접 호출하던 구조와 무한 응답 대기, 호출 문자열 오타를 제거합니다.
 """
 import os
+import hashlib
 import time
 from datetime import datetime
-from .models import Account, Quote, Submission, Position
+from .models import Account, Quote, Submission, Position, OrderSnapshot
+from .orders import OrderBook
 from .market import KST
 
 
@@ -28,8 +30,12 @@ class KiwoomBroker:
         self.ax.OnEventConnect.connect(self._login_event)
         self.ax.OnReceiveTrData.connect(self._tr_event)
         self.ax.OnReceiveMsg.connect(self._message_event)
+        self.ax.OnReceiveChejanData.connect(self._chejan_event)
         self.messages = []
-        self.remote_orders = {}
+        self.book = OrderBook()
+        self.remote_orders = self.book.links
+        self.event_sink = None
+        self.unpersisted_events = []
         self.history_cache = {}
         loop, timer = self._waiter(120000)
         self.loop = loop
@@ -42,6 +48,7 @@ class KiwoomBroker:
         self.account_number = os.environ.get('KIWOOM_ACCOUNT','').strip()
         if not self.account_number or self.account_number not in accounts:
             raise ValueError('KIWOOM_ACCOUNT를 로그인된 계좌로 설정하세요')
+        self.identity = 'kiwoom:' + hashlib.sha256(self.account_number.encode()).hexdigest()
         # 응답 시간 초과 후에는 다음 요청에 늦은 응답을 섞지 않도록 세션을 중단합니다.
         self.healthy = True
 
@@ -78,7 +85,13 @@ class KiwoomBroker:
         """
         if str(request).startswith('N'):
             remote=str(self.ax.dynamicCall('GetCommData(QString, QString, int, QString)',tr,request,0,'주문번호')).strip()
-            if remote:self.remote_orders[str(request)[1:]]=remote.lstrip('0') or '0'
+            if remote.isdigit() and int(remote) > 0:
+                try:
+                    self._emit_order_event(dict(kind='ORDER_LINK', request_id=str(request)[1:],
+                                                remote_id=remote.lstrip('0') or '0'))
+                except Exception:
+                    self.healthy = False
+                    self.messages.append('주문번호 기록 실패: 세션 재연결 필요')
             return
         if request != self.waiting: return
         try:
@@ -94,6 +107,63 @@ class KiwoomBroker:
             self.response = (header,rows,str(next_page)=='2')
         except Exception as error: self.error = error
         finally: self.loop.quit()
+
+    def set_event_sink(self, sink):
+        """입력: Store 기록 함수. 출력: 없음. 이유: 접수 직후의 번호와 체결 원문을 DB에 바로 남깁니다."""
+        self.event_sink = sink
+        for event in self.unpersisted_events:
+            sink(event)
+        self.unpersisted_events.clear()
+
+    def restore_events(self, events):
+        """입력: DB에 남은 계좌 정보 없는 이벤트. 출력: 캐시 복원. 이유: 재시작 전 체결번호 중복 기록을 복원합니다."""
+        for event in events:
+            self.book.observe(event)
+
+    def _emit_order_event(self, event):
+        """입력: 정규화 이벤트. 출력: 캐시·DB 갱신. 구조·이유: DB 실패 시 숨기지 않고 캐시와 함께 복구 대상으로 남깁니다."""
+        self.book.observe(event)
+        if self.event_sink:
+            self.event_sink(event)
+        else:
+            self.unpersisted_events.append(event)
+
+    def _chejan_event(self, category, count, fields):
+        """입력: COM 통보. 출력: 검증/기록 또는 세션 중단. 이유: 콜백 예외로 프로세스가 비정상 종료되지 않게 합니다."""
+        try:
+            self._read_chejan(category, count, fields)
+        except Exception:
+            self.healthy = False
+            self.messages.append('주문 통보 처리 실패: 세션 재연결 필요')
+
+    def _read_chejan(self, category, count, fields):
+        """기능: 주문·체결 통보 수신. 입력: 키움 이벤트 인자. 출력: 계좌를 제거한 검증 이벤트.
+        구조: 계좌 확인→FID 추출→번호/방향/수량 검증→누계 캐시와 DB 기록.
+        이유: 잔고 통보나 다른 계좌 거래를 프로그램의 체결로 간주하지 않습니다.
+        """
+        if str(category) != '0':
+            return
+        def field(fid):
+            """입력: FID 정수. 출력: 정리된 문자열. 이유: GetChejanData 서명을 한곳에 고정합니다."""
+            return str(self.ax.dynamicCall('GetChejanData(int)', fid)).strip()
+        if field(9201) != getattr(self, 'account_number', ''):
+            return
+        direction = field(905)
+        if '정정' in direction:
+            return  # 외부에서 정정한 주문은 동일 주문이라고 추측하여 연결하지 않습니다.
+        side = 'CANCEL' if '취소' in direction else 'BUY' if '매수' in direction else 'SELL' if '매도' in direction else ''
+        remote, code = field(9203).lstrip('0') or '0', field(9001).removeprefix('A')
+        if not side or not remote.isdigit() or remote == '0' or len(code) != 6 or not code.isdigit():
+            return
+        original = field(904).lstrip('0')
+        event = dict(kind='CHEJAN', order_day=self.clock().astimezone(KST).date().isoformat(),
+                     remote_id=remote, original_id=original, code=code, side=side, status=field(913),
+                     ordered=self._integer(field(900)), remaining=self._integer(field(902)),
+                     execution_id=field(909), fill_quantity=self._integer(field(915) or field(911)),
+                     fill_price=self._integer(field(914) or field(910)), filled_value=self._integer(field(903)))
+        if event['remaining'] > event['ordered']:
+            return
+        self._emit_order_event(event)
 
     def _request(self, tr, inputs, fields, page=0):
         """기능: TR 한 페이지 조회. 입력: TR 코드·필드·입력값·페이지. 출력: 응답 tuple.
@@ -166,25 +236,49 @@ class KiwoomBroker:
         """기능: 미체결 주문 상세 조회. 입력: 없음. 출력: 원격 주문번호·코드·잔량·방향.
         구조·이유: 취소는 별도로 확인한 본 프로그램의 원격 번호에만 허용합니다.
         """
-        rows=self._pages('opt10075',{'계좌번호':self.account_number,'전체종목구분':'0','매매구분':'0','체결구분':'0'},['종목코드','주문번호','미체결수량','주문구분','주문상태','체결량','원주문번호'])
+        rows=self._pages('opt10075',{'계좌번호':self.account_number,'전체종목구분':'0','매매구분':'0','체결구분':'0'},['종목코드','주문번호','주문수량','미체결수량','주문구분','주문상태','체결량','원주문번호'])
         self.recent_orders=rows
+        if hasattr(self, 'book'):
+            self._cache_order_rows(rows)
         return [dict(order_id=str(self._integer(r.get('주문번호',0))),code=r['종목코드'].removeprefix('A'),remaining=self._integer(r['미체결수량']),side='BUY' if '매수' in r.get('주문구분','') else 'SELL') for r in rows if self._integer(r['미체결수량'])>0]
 
-    def order_status(self,remote_id):
-        """기능: 전체 주문 snapshot의 명시적 완료 상태. 입력: 원격 번호. 출력: 주문 상태.
-        구조·이유: 취소 확인·거부·체결 수량을 확인하며, 조회 목록 누락은 UNKNOWN으로 유지합니다.
+    def _cache_order_rows(self, rows):
+        """입력: 당일 주문 조회 행. 출력: 확인된 수량 snapshot 캐시.
+        구조·이유: 체결량 필드의 누계만 반영하고 취소 확인은 원주문의 잔량 종료로 구분합니다.
         """
-        rows=getattr(self,'recent_orders',[])
-        normalized=str(remote_id).lstrip('0') or '0'
-        row=next((r for r in rows if str(self._integer(r.get('주문번호',0)))==normalized),None)
-        if not row:return 'UNKNOWN'
-        if '거부' in row.get('주문상태',''):return 'FAILED'
-        if '취소' in row.get('주문구분','') and row.get('주문상태')=='확인':return 'FILLED'
-        if self._integer(row['미체결수량'])==0:
-            cancellations=[r for r in rows if str(self._integer(r.get('원주문번호',0)))==normalized and '취소' in r.get('주문구분','') and r.get('주문상태')=='확인']
-            if cancellations:return 'CANCELLED'
-            if self._integer(row.get('체결량',0))>0:return 'FILLED'
-        return 'PENDING'
+        day = self.clock().astimezone(KST).date().isoformat()
+        cancelled = {str(self._integer(row.get('원주문번호', 0))) for row in rows
+                     if '취소' in row.get('주문구분', '') and row.get('주문상태') == '확인'}
+        for row in rows:
+            remote = str(self._integer(row.get('주문번호', 0)))
+            code = row.get('종목코드', '').removeprefix('A')
+            direction = row.get('주문구분', '')
+            side = 'CANCEL' if '취소' in direction else 'BUY' if '매수' in direction else 'SELL' if '매도' in direction else ''
+            if remote == '0' or len(code) != 6 or not side or '정정' in direction:
+                continue
+            filled = 0 if side == 'CANCEL' else self._integer(row.get('체결량', 0))
+            remaining = 0 if side == 'CANCEL' else self._integer(row.get('미체결수량', 0))
+            ordered = self._integer(row.get('주문수량', 0))
+            status = row.get('주문상태', '')
+            state = ('FAILED' if '거부' in status else 'FILLED' if side == 'CANCEL' and status == '확인'
+                     else 'CANCELLED' if remote in cancelled else 'FILLED' if ordered and filled == ordered
+                     else 'PARTIALLY_FILLED' if filled else 'ACCEPTED')
+            if state in ('CANCELLED', 'FAILED'):
+                remaining = 0
+            if filled + remaining > ordered:
+                continue
+            self.book.merge(OrderSnapshot(remote, code, side, state, filled, remaining, 0, day))
+
+    def order_snapshot(self, remote_id, submitted_at):
+        """입력: 번호·원래 제출시각. 출력: 동일 거래일의 snapshot 또는 None.
+        이유: 당일 번호가 과거 날짜의 주문에 붙거나, 목록 누락이 체결로 해석되지 않게 합니다.
+        """
+        return self.book.snapshot(remote_id, submitted_at.astimezone(KST).date().isoformat())
+
+    def order_status(self, remote_id):
+        """입력: 원격 주문번호. 출력: 당일 확인 상태 또는 UNKNOWN. 이유: 구 인터페이스와 호환합니다."""
+        snapshot = self.book.snapshot(remote_id, self.clock().astimezone(KST).date().isoformat())
+        return snapshot.state if snapshot else 'UNKNOWN'
 
     def order_id(self,request_id):
         """기능: 비동기 접수 응답에서 원격 번호 조회. 입력: 로컬 ID. 출력: 번호 또는 빈 문자열.
@@ -234,6 +328,7 @@ class KiwoomBroker:
         if int(self.ax.dynamicCall('GetConnectState()'))!=1:return Submission('FAILED','키움 연결 끊김')
         result=self.ax.dynamicCall('SendOrder(QString, QString, QString, int, QString, int, int, QString, QString)',
             ['N'+request_id,'2002',self.account_number,side,code,quantity,price,'00',original])
+        if not self.healthy:return Submission('UNKNOWN','주문 통보 기록 실패: 자동 재전송하지 않습니다')
         if result is None:return Submission('UNKNOWN','주문 반환값 없음: 주문 내역 확인')
         code_result=int(result)
         return Submission('ACCEPTED' if code_result==0 else 'FAILED',f'SendOrder 반환 코드 {code_result}; 전송과 체결을 구분합니다')

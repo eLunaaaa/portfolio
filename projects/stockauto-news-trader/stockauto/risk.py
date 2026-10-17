@@ -66,25 +66,26 @@ class RiskManager:
         """기능: 주기적 계좌·주문·청산 관리. 입력: 없음. 출력: 처리 내역 목록.
         구조·이유: 미체결 정리 후 정상 장중에만 보유종목을 재조회하고, 현재 매도 가능 수량으로 한 번 전송합니다.
         """
-        if not self.settings.get('risk_enabled',False):return []
         now=self.clock();results=[]
-        account=self.broker.account();halted=self.buy_reason(account)=='일일 자산 손실 한도 도달'
+        account=self.broker.account()
+        halted=self.buy_reason(account)=='일일 자산 손실 한도 도달'
         # 이 프로그램의 원격 주문번호가 확인된 미체결 주문만 취소할 수 있습니다.
         for job in self.store.open_jobs():
-            if job['state']!='ACCEPTED':continue
             remote=job['remote_id'] or self.broker.order_id(job['id'])
             if remote:self.store.link_order(job['id'],remote)
         pending=self.broker.pending_orders()
         self.store.reconcile_jobs(self.broker,account)
+        if not self.settings.get('risk_enabled',False):return results
         for job in self.store.open_jobs():
             remote=job['remote_id']
             ticket=next((row for row in pending if row['order_id']==remote),None) if remote else None
             if not ticket:continue
             if ticket['side']!='BUY':continue
             elapsed=(now-datetime.fromisoformat(job['created_at'])).total_seconds()
-            if not halted and elapsed<self.settings['cancel_after_seconds']:continue
+            invalidated = self.settings.get('strategy_mode') != 'rsi' and self.store.buy_news_blocked(job['id'])
+            if not halted and not invalidated and elapsed<self.settings['cancel_after_seconds']:continue
             if not self.settings.get('demo',False) and not can_sell(self.clock(),self.settings.get('holidays',[])):continue
-            cancel_id=self.store.start_cancel(job['id'],now)
+            cancel_id=self.store.start_cancel(job['id'],now,'NEWS_INVALIDATED' if invalidated else 'TIMEOUT_OR_DAILY_LOSS')
             if not cancel_id:continue
             try:result=self.broker.cancel_buy(ticket['code'],remote,ticket['remaining'],cancel_id)
             except Exception as error:
@@ -96,7 +97,10 @@ class RiskManager:
         if not self.settings.get('demo',False) and not can_sell(self.clock(),self.settings.get('holidays',[])):return results
         # 직전 account 조회 이후 변했을 수 있으므로 포지션과 미체결을 다시 확인합니다.
         for position in self.broker.positions():
-            if not self.settings.get("manage_existing_positions",False) and position.code not in self.store.managed_codes():continue
+            if not self.settings.get("manage_existing_positions", False):
+                position = self.store.managed_position(position)
+                if position is None:
+                    continue
             if position.available<=0 or position.code in account.pending or self.store.has_exit(position.code):continue
             tracked=self.store.tracked_since(position.code,now)
             quote=self.broker.quote(position.code)
@@ -106,6 +110,8 @@ class RiskManager:
             if not reason:continue
             # 매도 직전 수량과 미체결을 다시 읽고, 익절/RSI 등 조건도 다시 검사합니다.
             fresh=next((p for p in self.broker.positions() if p.code==position.code),None)
+            if fresh and not self.settings.get('manage_existing_positions', False):
+                fresh = self.store.managed_position(fresh)
             if not fresh or fresh.available<=0 or position.code in self.broker.account().pending:continue
             quote=self.broker.quote(position.code)
             if not fresh_exit_quote(quote,self.settings,self.clock()):continue

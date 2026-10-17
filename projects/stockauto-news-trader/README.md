@@ -20,9 +20,11 @@
 | 뉴스 수집·분석 | RSS/Atom 파싱, 기업명·문맥 구분, 확정/전망/악재 분류, 사건 통합·최초 보도·가격 기록 |
 | 매수 판단 | 뉴스·RSI·결합 전략, 계약 규모·스프레드·거래량·가격 변화 검사, 수수료 포함 수량 계산 |
 | 물리 승인 장치 | UNO I²C LCD, D2 매수·D3 구매 X, 디바운스·동시 입력·만료 처리, D8 비차단 부저 |
-| 주문·상태 관리 | 키움 ActiveX 어댑터, 승인 후 계좌·호가 재조회, SQLite 선기록, 중복·재시작·응답 미확정 처리 |
+| 주문·상태 관리 | 키움 ActiveX 어댑터, 승인 후 계좌·호가 재조회, SQLite 선기록, 체결 누계·원격 주문번호·재시작 복구 |
 | 보유종목 관리 | 손절·익절·보유기간·일일 손실 기준, 확인된 본 프로그램 미체결 주문의 잔량 취소 |
-| 전략 재생·검사 | 시간순 데이터·다음 봉 체결·수수료·슬리피지를 적용한 비교, Python·펌웨어·UNO 빌드 검사 |
+| 전략 재생·검사 | 공통 전략 함수·고정 승인 수량·다음 봉 체결·수수료·슬리피지를 적용한 비교, Python·펌웨어·UNO 빌드 검사 |
+
+프로그램이 매수한 수량은 확인된 체결 누계로 별도 관리합니다. 같은 종목을 수동으로 추가 매수해도 자동 매도 수량에 합치지 않습니다. 최신 악재·미확정 보도가 승인 근거를 바꾸면 LCD 제안을 취소하고, 이미 접수한 매수는 확인된 미체결 잔량의 취소 대상으로 넘깁니다.
 
 **기술:** Python · SQLite · Qt/ActiveX · RSS/Atom · UART · C++ · Arduino UNO · I²C LCD · GPIO · GitHub Actions.
 
@@ -48,17 +50,18 @@ flowchart LR
 이 프로젝트 폴더에서 실행합니다. 기본 실행 모드는 로컬 `paper`입니다.
 
 ```sh
-python -m pip install -r requirements.txt
+python -m pip install -r requirements-test.txt
 python examples/demo_without_hardware.py --decision BUY
 python examples/demo_without_hardware.py --decision NO
-make test firmware-test
+make test qt-test firmware-test
 ```
 
 가상 뉴스에서 중요도 6을 계산하고, BUY는 로컬 주문 1건, NO는 0건으로 이어지는 흐름을 확인할 수 있습니다. 장치 연결 실행은 `python -m stockauto --port COM3 --demo`입니다. [배선·키움 연결](docs/USAGE.md)
 
 ## 검증
 
-- **Python 58개:** 뉴스 문맥·시장 조건·승인·거절·중복·재시작·청산·재생·DB 실패 경계 검사.
+- **Python 88개:** 뉴스 문맥·시장 조건·승인·거절·중복·재시작·청산·재생·DB 실패 경계 검사.
+- **Qt 통합 3개:** 실제 QEventLoop 조회 대기 중 거절·새 뉴스·만료를 처리하고 주문이 전송되지 않는지 검사합니다.
 - **실제 펌웨어 검사:** 배포하는 `.ino`를 C++ 검사기에 포함해 프레임·버튼·알람·만료를 확인하고 Python 전송 바이트를 같은 수신기에 입력합니다.
 - **UNO 컴파일:** Flash 9,858 bytes / 32,256 bytes, SRAM 1,046 bytes / 2,048 bytes.
 - **전략 비교 예제:** [가상 입력](examples/replay_sample.json) · [계산 결과](examples/replay_result.json). `synthetic: true`로 표시한 기능 검사용 데이터입니다.

@@ -2,12 +2,13 @@
 구조: 제안→대기→거절/만료 또는 재검사→전송 중 기록→증권사 결과 기록.
 이유: 뉴스 수집과 버튼 입력이 주문 함수를 직접 호출하지 못하도록 경계를 둡니다.
 """
-from datetime import timedelta
+from datetime import datetime
 from dataclasses import replace
 import uuid
-from .market import can_buy, estimated_cost, order_quantity, technical_buy
+from .market import can_buy, estimated_cost
 from .models import Offer, Account
-from .risk import RiskManager, entry_reason
+from .risk import RiskManager
+from .strategy import build_intent, signal_reason
 
 
 class Engine:
@@ -18,7 +19,16 @@ class Engine:
         """
         self.broker, self.store, self.settings, self.clock = broker, store, settings, clock
         self.active = None
+        store.bind_context(getattr(broker, 'identity', settings['mode']))
+        if hasattr(broker, 'bind_store'):
+            broker.bind_store(store)
         self.risk = RiskManager(broker,store,settings,clock)
+        self.revision = 0
+        if hasattr(broker, 'restore_events'):
+            import json
+            broker.restore_events(json.loads(row[0]) for row in store.db.execute('SELECT payload FROM broker_events ORDER BY id'))
+        if hasattr(broker, 'set_event_sink'):
+            broker.set_event_sink(store.record_broker_event)
 
     def _checked(self, code, now):
         """기능: 주문 전 공통 조건 확인. 입력: 종목·현재시각. 출력: 계좌·시세.
@@ -47,8 +57,6 @@ class Engine:
         if self.settings.get('market_filters',False) and self.settings.get('mode')=='kiwoom':
             if quote.market_at is None or not -2<=(now-quote.market_at).total_seconds()<=self.settings['quote_max_age_seconds']:
                 raise ValueError('거래소 호가 시각이 오래되었거나 누락되었습니다')
-        if (self.settings.get('require_rsi', False) or self.settings.get('strategy_mode') in ('rsi','combined')) and not technical_buy([*quote.closes, quote.ask]):
-            raise ValueError('기존 RSI 매수 조건을 만족하지 않습니다')
         return account, quote
 
     def normalize(self,candidate):
@@ -58,25 +66,34 @@ class Engine:
         key,first=self.store.observe_event(candidate,self.clock())
         return replace(candidate,key=key,first_report_at=first)
 
-    def _market_check(self,candidate,quote):
-        """기능: 뉴스/시장 필터 재검사. 입력: 후보·호가. 출력: 없음 또는 예외.
-        구조·이유: 가격/거래량 조건은 승인 직전에도 다시 적용합니다.
+    def observe_news(self, candidates):
+        """기능: 최신 뉴스 반영과 승인 취소. 입력: 새 후보 목록. 출력: 취소한 제안 ID 또는 None.
+        구조: 부정/미확정 보도를 영구 기록하고 활성 제안보다 최신이면 승인권을 폐기합니다.
+        이유: 새 뉴스가 큐에만 쌓여 이전 호재로 주문되는 문제를 막습니다.
         """
-        if self.settings.get('strategy_mode','news')!='rsi' and not candidate.confirmed:
-            raise ValueError('미확정 뉴스는 알림만 표시합니다')
-        first_at=candidate.first_report_at or candidate.article.published_at
-        row=self.store.db.execute('SELECT first_at FROM events WHERE id=?',(candidate.key,)).fetchone()
-        if row:
-            from datetime import datetime
-            first_at=datetime.fromisoformat(row[0])
-        if (self.clock()-first_at).total_seconds()>self.settings['news_max_age_hours']*3600:
-            raise ValueError('동일 사건의 최초 보도가 오래되었습니다')
-        if self.settings.get('require_contract_materiality',False) and 'NEW CONTRACT' in candidate.reason and 'EARNINGS UP' not in candidate.reason:
-            if candidate.contract_revenue_pct is None or candidate.contract_revenue_pct<self.settings['min_contract_revenue_pct']:
-                raise ValueError('계약 금액/연매출 대비 규모의 확인 기준 미달')
-        first=self.store.event_price(candidate.key,quote.ask)
-        reason=entry_reason(quote,self.settings,first)
-        if reason:raise ValueError(reason)
+        for candidate in candidates:
+            self.store.observe_news(candidate)
+        if self.active and self.settings.get('strategy_mode') != 'rsi' and self.store.news_blocked(self.active.candidate):
+            offer_id = self.active.id
+            self.store.transition(offer_id, 'OFFERED', 'REJECTED', '최신 악재·미확정 뉴스로 제안 취소')
+            self.active = None
+            return offer_id
+        return None
+
+    def _market_check(self, candidate, quote):
+        """기능: 공통 전략과 최신 뉴스 검사. 입력: 후보·시세. 출력: 없음 또는 ValueError.
+        구조·이유: 최초 관측 가격과 영구 뉴스 차단 상태를 읽어 승인 직전에 다시 판단합니다.
+        """
+        if self.settings.get('strategy_mode') != 'rsi' and self.store.news_blocked(candidate):
+            raise ValueError('최신 악재·미확정 뉴스로 기존 매수 근거가 취소되었습니다')
+        report = self.store.db.execute('SELECT first_at FROM events WHERE id=?', (candidate.key,)).fetchone()
+        if report:
+            candidate = replace(candidate, first_report_at=datetime.fromisoformat(report[0]))
+        first = self.store.event_price(candidate.key, quote.ask)
+        reason = signal_reason(candidate, quote, self.settings, self.clock(), first)
+        if reason:
+            raise ValueError(reason)
+        return first
 
     def propose(self, candidate):
         """기능: 후보를 LCD 승인 제안으로 고정. 입력: Candidate. 출력: Offer 또는 None.
@@ -88,15 +105,14 @@ class Engine:
         now = self.clock()
         if not -300 <= (now-(candidate.first_report_at or candidate.article.published_at)).total_seconds() <= self.settings['news_max_age_hours']*3600:
             return None
+        revision = self.revision
         account, quote = self._checked(candidate.code, now)
-        self._market_check(candidate,quote)
-        slots = self.settings['max_positions'] - len(account.holdings | account.pending | self.store.locked_codes())
-        budget = min(self.settings['max_order_won'], account.cash // slots)
-        qty = order_quantity(account.cash, budget, quote.ask, self.settings['buy_fee_rate'])
-        qty = min(qty,1000000)
-        if qty < 1: return None
-        now = self.clock()
-        offer = Offer(uuid.uuid4().hex[:16],candidate,qty,quote.ask,now+timedelta(seconds=self.settings['approval_seconds']))
+        first = self._market_check(candidate, quote)
+        if revision != self.revision:
+            raise ValueError('조회 중 장치 연결이 변경되었습니다')
+        intent = build_intent(candidate, account, quote, self.settings, self.clock(),
+                              account.holdings | account.pending | self.store.locked_codes(), first)
+        offer = Offer(uuid.uuid4().hex[:16], candidate, intent.quantity, intent.limit_price, intent.expires_at)
         if not self.store.add(offer): return None
         self.active = offer
         return offer
@@ -116,6 +132,7 @@ class Engine:
         """기능: 장치 연결 끊김 처리. 입력: 없음. 출력: 없음.
         구조·이유: 연결 전의 화면/버튼을 다시 승인하지 않도록 현재 제안을 만료시킵니다.
         """
+        self.revision += 1
         if self.active:
             self.store.transition(self.active.id,'OFFERED','EXPIRED','Arduino 연결 초기화')
             self.active = None
@@ -136,11 +153,17 @@ class Engine:
         try:
             account, quote = self._checked(offer.candidate.code,self.clock())
             self._market_check(offer.candidate,quote)
+            if self.active is None or self.active.id != offer.id or self.store.state(offer.id) != 'OFFERED':
+                return 'IGNORED', '조회 중 제안이 취소되었습니다'
             if self.clock() >= offer.expires_at: raise ValueError('재조회 중 승인 시간이 만료되었습니다')
             if quote.ask > offer.price: raise ValueError('호가가 승인 화면의 가격보다 높아졌습니다')
             cost = estimated_cost(offer.quantity, offer.price, self.settings['buy_fee_rate'])
             if cost > min(account.cash,self.settings['max_order_won']): raise ValueError('수수료 포함 주문액이 예산을 초과했습니다')
         except Exception as error:
+            state = self.store.state(offer.id)
+            if state in ('REJECTED', 'EXPIRED'):
+                # 제어 타이머가 취소한 상태를 조회 오류 응답으로 덮어쓰지 않습니다.
+                return state, '조회 중 승인 취소'
             self.store.transition(offer.id,'OFFERED','FAILED',str(error))
             self.active = None
             return 'FAILED',str(error)

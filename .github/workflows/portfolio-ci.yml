@@ -112,9 +112,11 @@ jobs:
         with:
           python-version: '3.12'
       - name: Python dependencies
-        run: python -m pip install -r requirements.txt
+        run: python -m pip install -r requirements-test.txt
       - name: News approval order and risk regressions
         run: python -m unittest discover -s tests -v
+      - name: Qt controls during TR wait
+        run: python tests/check_qt_controls.py
       - name: Offline approval and rejection demo
         run: |
           python examples/demo_without_hardware.py --decision BUY

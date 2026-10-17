@@ -4,6 +4,7 @@
 """
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from collections import deque
 from datetime import timedelta
 import json
 import logging
@@ -142,6 +143,7 @@ class Runner:
         self.next_candidate=0; self.busy=False; self.failed=False; self.last_ping=time.monotonic()
         self.last_risk=-float("inf")
         self.attempt_after={}
+        self.actions=deque();self.io_busy=False
 
     def _collect(self):
         """기능: 뉴스 수집 작업. 입력: 실행 설정. 출력: 기사·오류 목록.
@@ -154,75 +156,130 @@ class Runner:
         if self.settings['strategy_mode']=='rsi':return [],[]
         return fetch_news(self.settings['rss_urls'],now,self.settings['news_max_age_hours'])
 
-    def tick(self):
-        """기능: 한 번의 주기 처리. 입력: 없음. 출력: LCD/DB/콘솔 갱신.
-        구조·이유: 중첩 Qt 이벤트로 재진입해도 busy가 주문 경로의 동시 실행을 차단합니다.
+    def _collect_ready_news(self):
+        """입력: 완료된 뉴스 Future. 출력: 후보 큐·차단 원장·화면 취소.
+        구조·이유: 주문 재진입 없이 새 악재를 반영하므로 TR 대기 중에도 오래된 승인 근거를 폐기합니다.
         """
-        if self.busy or self.failed:return
-        self.busy=True
-        try:self._tick()
-        except (OSError, IOError):
-            self.engine.disconnect()
-            self.device.ready=False
-            self.failed=True
-            LOG.exception('장치 연결 오류: 현재 제안 만료, 프로그램 종료')
-        except Exception:LOG.exception('작업 실패: 주문은 자동 재전송하지 않습니다')
-        finally:self.busy=False
+        if not self.future or not self.future.done():
+            return
+        future, self.future = self.future, None
+        articles, errors = future.result()
+        for error in errors:
+            LOG.warning('RSS 수집: %s', error)
+        if self.settings['strategy_mode'] == 'rsi':
+            now = self.engine.clock()
+            candidates = [Candidate('rsi:' + stock['code'] + ':' + now.date().isoformat(),
+                stock['code'], stock['name'], self.settings['min_news_score'], 0,
+                'RSI(2) TECHNICAL', stock['lcd_name'] + ' RSI REVIEW',
+                Article('rsi', 'RSI 기술 조건 검사', 'urn:stockauto:rsi', now)) for stock in self.settings['watchlist']]
+        else:
+            candidates = analyze(articles, self.settings['watchlist'], self.settings['min_news_score'])
+        revoked = self.engine.observe_news(candidates)
+        if any(not candidate.confirmed or candidate.score < 0 for candidate in candidates):
+            self.last_risk = -float('inf')
+        if revoked:
+            self.device.send(f'RESULT|{revoked}|REJECTED\n'.encode('ascii'))
+            self.actions = deque(action for action in self.actions if action[0] != revoked)
+            LOG.info('최신 뉴스로 승인 취소: %s', revoked)
+        self.queue = [self.engine.normalize(candidate) for candidate in candidates]
+
+    def service_io(self):
+        """기능: 조회 대기와 독립적인 통신·취소 처리. 입력: UART·완료 뉴스·시계. 출력: 상태/응답.
+        구조: 뉴스 반영→READY/PING→즉시 NO→BUY 큐→만료·연결 감시.
+        이유: 이 경로는 브로커 조회/전송을 호출하지 않으므로 Qt의 TR 대기 중에도 계속 실행합니다.
+        """
+        if self.failed or self.io_busy:
+            return
+        self.io_busy = True
+        try:
+            self._collect_ready_news()
+            for kind, offer_id, decision in self.device.messages():
+                if kind == 'READY':
+                    self.engine.disconnect(); self.actions.clear(); self.device.ready = True
+                    self.device.send(b'RESET\n'); self.last_ping = time.monotonic()
+                elif kind == 'PING':
+                    self.last_ping = time.monotonic()
+                elif kind == 'DECIDE' and self.device.ready:
+                    if decision == 'NO':
+                        # 거절에는 외부 조회가 필요 없으므로 진행 중인 BUY 재검사도 바로 무효화합니다.
+                        state, detail = self.engine.decide(offer_id, 'NO')
+                        self.actions = deque(action for action in self.actions if action[0] != offer_id)
+                        if state != 'IGNORED':
+                            self.device.send(f'RESULT|{offer_id}|{state}\n'.encode('ascii'))
+                    elif len(self.actions) < 32:
+                        self.actions.append((offer_id, decision))
+            expired = self.engine.expire()
+            if expired:
+                self.device.send(f'RESULT|{expired}|EXPIRED\n'.encode('ascii'))
+            if self.device.ready and time.monotonic() - self.last_ping > 8:
+                self.engine.disconnect(); self.actions.clear(); self.device.ready = False
+                LOG.error('Arduino 응답 중단: 기존 승인 취소')
+        except Exception:
+            # Qt 타이머 콜백 밖으로 예외를 전달하지 않고 현재 승인권을 폐기합니다.
+            self.failed = True; self.device.ready = False
+            try:
+                self.engine.disconnect()
+            except Exception:
+                self.engine.active = None; self.engine.revision += 1
+            LOG.exception('통신·뉴스 상태 갱신 실패: 신규 주문 중단')
+        finally:
+            self.io_busy = False
+
+    def tick(self):
+        """입력: 주기 타이머. 출력: 조회·주문 작업 진행.
+        구조·이유: 경량 I/O는 재진입 시에도 처리하되 busy가 외부 주문 경로의 중첩을 막습니다.
+        """
+        self.service_io()
+        if self.busy or self.failed:
+            return
+        self.busy = True
+        try:
+            self._tick()
+        except Exception:
+            LOG.exception('작업 실패: 주문은 자동 재전송하지 않습니다')
+        finally:
+            self.busy = False
 
     def _tick(self):
-        """기능: 수집·버튼·표시 순서 제어. 입력: 내부 상태. 출력: 다음 상태.
-        구조·이유: 버튼/만료를 먼저 처리한 후 새 제안을 표시해 이전 제안 승인을 방지합니다.
+        """입력: 결정 큐·시계·후보 큐. 출력: 주문 결과와 새 제안.
+        구조: 승인 처리→원장 복구/위험 관리→뉴스 수집 시작→후보 제안.
+        이유: 신호 수집·물리 입력과 증권사 호출 경계를 분리하면서 한 번에 한 주문만 처리합니다.
         """
-        if self.settings.get('risk_enabled',False) and time.monotonic()-self.last_risk>=self.settings['risk_poll_seconds']:
-            self.last_risk=time.monotonic()
-            try:
-                for reason,code,state in self.engine.risk.tick():LOG.info('주문 관리: %s %s %s',reason,code,state)
-            except Exception:LOG.exception('위험 관리 조회 실패: 다음 주기에 재조회')
-        for kind,offer_id,decision in self.device.messages():
-            if kind=='READY':
-                self.engine.disconnect(); self.device.ready=True
-                self.device.send(b'RESET\n'); self.last_ping=time.monotonic()
-            elif kind=='PING':
-                self.last_ping=time.monotonic()
-            elif kind=='DECIDE' and self.device.ready:
-                state,detail=self.engine.decide(offer_id,decision)
-                LOG.info('버튼 처리: %s / %s',state,detail)
-                # 낡은/잡음 프레임으로 현재 화면을 덮어쓰지 않습니다.
-                if state!='IGNORED':self.device.send(f'RESULT|{offer_id}|{state}\n'.encode('ascii'))
-        expired=self.engine.expire()
-        if expired:self.device.send(f'RESULT|{expired}|EXPIRED\n'.encode('ascii'))
-        if self.device.ready and time.monotonic()-self.last_ping>8:
-            self.engine.disconnect(); self.device.ready=False
-            LOG.error('Arduino 응답 중단: 재시작이 필요합니다')
-        if self.future and self.future.done():
-            articles,errors=self.future.result();self.future=None
-            for error in errors:LOG.warning('RSS 수집: %s',error)
-            if self.settings['strategy_mode']=='rsi':
-                # 뉴스 전략과 독립적으로 RSI 후보를 생성합니다. 하루 한 번의 종목별 승인 단위입니다.
-                now=self.engine.clock()
-                self.queue=[Candidate('rsi:'+stock['code']+':'+now.date().isoformat(),stock['code'],stock['name'],self.settings['min_news_score'],0,'RSI(2) TECHNICAL',stock['lcd_name']+' RSI REVIEW',Article('rsi', 'RSI 기술 조건 검사','urn:stockauto:rsi',now)) for stock in self.settings['watchlist']]
-            else:self.queue=analyze(articles,self.settings['watchlist'],self.settings['min_news_score'])
-            self.queue=[self.engine.normalize(candidate) for candidate in self.queue]
-        if self.future is None and time.monotonic()-self.last_fetch>=self.settings['poll_seconds']:
-            self.last_fetch=time.monotonic();self.future=self.pool.submit(self._collect)
-        if not self.device.ready or self.engine.active or time.monotonic()<self.next_candidate:return
+        while self.actions and self.device.ready:
+            offer_id, decision = self.actions.popleft()
+            state, detail = self.engine.decide(offer_id, decision)
+            LOG.info('버튼 처리: %s / %s', state, detail)
+            if state != 'IGNORED':
+                self.device.send(f'RESULT|{offer_id}|{state}\n'.encode('ascii'))
+        if time.monotonic() - self.last_risk >= self.settings['risk_poll_seconds']:
+            self.last_risk = time.monotonic()
+            for reason, code, state in self.engine.risk.tick():
+                LOG.info('주문 관리: %s %s %s', reason, code, state)
+        if self.future is None and time.monotonic() - self.last_fetch >= self.settings['poll_seconds']:
+            self.last_fetch = time.monotonic(); self.future = self.pool.submit(self._collect)
+        if not self.device.ready or self.engine.active or time.monotonic() < self.next_candidate:
+            return
         while self.queue:
-            candidate=self.engine.normalize(self.queue.pop(0))
-            if self.engine.store.seen(candidate.key):continue
-            already_notified=candidate.key in self.notified
-            if already_notified and (not candidate.confirmed or candidate.score<self.settings['min_news_score']):continue
-            if time.monotonic()<self.attempt_after.get(candidate.key,0):continue
-            LOG.info('뉴스: %s | %s | 점수=%d 중요도=%d | %s | %s',candidate.name,candidate.article.title,candidate.score,candidate.importance,candidate.reason,candidate.article.link)
+            candidate = self.engine.normalize(self.queue.pop(0))
+            if self.engine.store.seen(candidate.key):
+                continue
+            already_notified = candidate.key in self.notified
+            if already_notified and (not candidate.confirmed or candidate.score < self.settings['min_news_score']):
+                continue
+            if time.monotonic() < self.attempt_after.get(candidate.key, 0):
+                continue
             self.notified.add(candidate.key)
-            self.attempt_after[candidate.key]=time.monotonic()+self.settings['poll_seconds']
-            try:offer=self.engine.propose(candidate)
-            except Exception as error:
-                LOG.info('매수 제안 생략: %s',error);offer=None
+            self.attempt_after[candidate.key] = time.monotonic() + self.settings['poll_seconds']
+            LOG.info('뉴스: %s | %s | %s', candidate.name, candidate.article.title, candidate.reason)
+            try:
+                offer = self.engine.propose(candidate)
+            except ValueError as error:
+                LOG.info('매수 제안 생략: %s', error); offer = None
             if offer:
-                self.device.send(offer_frame(offer,self.settings['alarm_threshold'],self.engine.clock()))
-                LOG.info('승인 대기: %s %d주 × %d원 (ID %s)',candidate.code,offer.quantity,offer.price,offer.id)
-            elif not already_notified:self.device.send(news_frame(candidate,self.settings['alarm_threshold']))
-            self.next_candidate=time.monotonic()+8
+                self.device.send(offer_frame(offer, self.settings['alarm_threshold'], self.engine.clock()))
+            elif not already_notified:
+                self.device.send(news_frame(candidate, self.settings['alarm_threshold']))
+            self.next_candidate = time.monotonic() + 8
             return
 
     def close(self):
@@ -265,6 +322,8 @@ def main(argv=None):
         runner=Runner(settings,Engine(broker,store,settings,now_kst),device,args.demo)
         LOG.info('실행 모드: %s / 매수 승인 버튼 필요 / 알람 기준: %d',settings['mode'],settings['alarm_threshold'])
         if qt_app:
+            # 통신 타이머는 busy와 독립적이며 QEventLoop가 TR을 기다리는 동안에도 실행됩니다.
+            io_timer=QTimer();io_timer.timeout.connect(runner.service_io);io_timer.start(20)
             timer=QTimer();timer.timeout.connect(runner.tick)
             timer.timeout.connect(lambda: qt_app.exit(1) if runner.failed else None);timer.start(50)
             return qt_app.exec_()

@@ -60,3 +60,19 @@ RSS HTTP만 작업 스레드에서 수집합니다. Qt/ActiveX와 주문 상태 
 ## 5. 검사와 재생
 
 [tests](../tests)는 실제 모듈과 `.ino`를 호출합니다. [회귀 검사](../tests/test_review_regressions.py)는 DB INSERT 실패를 주입해 상태 rollback·브로커 호출 0회를 확인합니다. [replay.py](../stockauto/replay.py)는 해당 시각까지의 뉴스·종가로 신호를 만들고 다음 봉에서 체결을 계산합니다.
+
+## 구조 개선으로 추가된 핵심 파일
+
+| 파일·함수 | 입력 | 출력·설계 이유 |
+|---|---|---|
+| [strategy.signal_reason](../stockauto/strategy.py) | 후보·호가·설정·시각 | 실행·재생이 공유하는 매수 제외 사유 |
+| `strategy.build_intent` | 판단 자료·현금·점유 종목 | 고정 수량·지정가·만료·근거 TradeIntent |
+| [OrderBook.observe](../stockauto/orders.py) | 접수·체결 원문 | 체결번호 중복 제거·부분 체결·취소 상태 |
+| [Store.apply_snapshot](../stockauto/store.py) | 확인된 주문 snapshot | 누계 차이만 소유 수량에 반영하는 트랜잭션 |
+| `Store.managed_position` | 실제 계좌 Position | 프로그램 소유 수량·원가로 제한한 Position |
+| `Store.bind_context` | 모드·계좌 hash | 다른 계좌·모의 원장의 혼용 차단 |
+| [Runner.service_io](../stockauto/app.py) | USB·완료 뉴스·시각 | 브로커를 호출하지 않는 제어·취소 경로 |
+| [KiwoomBroker._read_chejan](../stockauto/kiwoom.py) | 키움 통보 FID | 계좌 확인 후 식별자·수량·원가 정규화 |
+| [PaperBroker.bind_store](../stockauto/broker.py) | 동일 계좌 Store | 모의 계좌·예약금·미체결 복원 |
+
+[새 회귀 검사](../tests/test_lifecycle.py) · [실제 Qt 이벤트 루프 검사](../tests/check_qt_controls.py)

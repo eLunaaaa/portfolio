@@ -192,11 +192,11 @@ class ImprovementTests(TestCase):
     def test_partial_buy_cancel_remains_managed(self):
         """입력: 매수 일부 체결 후 잔량 취소. 결과: 체결된 실제 잔고는 계속 관리."""
         offer=self.engine.propose(self.candidate);self.engine.decide(offer.id,'BUY')
-        self.broker.inventory['005930']=Position('005930',2,70000,2,self.now)
-        self.broker.pending.clear()
+        self.broker.fill_buy(offer.id, quantity=2)
+        self.broker.cancel_buy('005930',offer.id,offer.quantity-2,'cancel-partial')
         self.store.link_order(offer.id,offer.id)
-        self.broker.order_status=lambda remote:'CANCELLED'
         self.store.reconcile_jobs(self.broker,self.broker.account())
+        self.assertEqual(self.store.managed_position(self.broker.positions()[0]).quantity,2)
         self.assertIn('005930',self.store.managed_codes())
 
     def test_live_exit_requires_exchange_time(self):

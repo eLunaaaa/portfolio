@@ -84,3 +84,29 @@ class Position:
     average_price: int
     available: int
     opened_at: datetime = None
+
+
+@dataclass(frozen=True)
+class OrderSnapshot:
+    """확인된 주문 상태. 수량은 누계이며 같은 통보를 다시 적용해도 체결이 중복되지 않습니다.
+    order_day는 거래일 식별자여서 다음 날 재사용된 주문번호를 다른 주문으로 혼동하지 않습니다.
+    average_price=0은 평균 체결가 미확인입니다. 그 값을 임의의 체결가로 대체하지 않습니다.
+    """
+    remote_id: str
+    code: str
+    side: str
+    state: str
+    filled_quantity: int
+    remaining_quantity: int
+    average_price: float
+    order_day: str
+
+
+@dataclass(frozen=True)
+class TradeIntent:
+    """실행본과 재생이 공유하는 승인 대상. 수량·지정가·만료·근거는 생성 뒤 고정합니다."""
+    code: str
+    quantity: int
+    limit_price: int
+    expires_at: datetime
+    reason: str

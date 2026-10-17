@@ -3,10 +3,13 @@
 이유: 버튼 중복, 프로세스 재시작, 주문 도중 중단에도 같은 제안을 재주문하지 않습니다.
 """
 import json
+import math
 import sqlite3
 import uuid
 from datetime import datetime, timedelta
 from dataclasses import asdict
+from .models import Position
+from .market import KST
 
 
 class Store:
@@ -24,11 +27,37 @@ class Store:
         self.db.execute('CREATE TABLE IF NOT EXISTS jobs (id TEXT PRIMARY KEY, kind TEXT NOT NULL, code TEXT NOT NULL, quantity INTEGER NOT NULL, price INTEGER NOT NULL, reason TEXT NOT NULL, created_at TEXT NOT NULL, state TEXT NOT NULL, remote_id TEXT NOT NULL DEFAULT "", parent TEXT NOT NULL DEFAULT "")')
         if 'detail' not in {row[1] for row in self.db.execute('PRAGMA table_info(jobs)')}:
             self.db.execute('ALTER TABLE jobs ADD COLUMN detail TEXT NOT NULL DEFAULT ""')
+        # 구 DB는 주문 수량을 체결 수량으로 추측하지 않고 새 누계 열을 0으로 시작합니다.
+        columns = {row[1] for row in self.db.execute('PRAGMA table_info(jobs)')}
+        for name, declaration in (
+            ('filled_quantity', 'INTEGER NOT NULL DEFAULT 0'),
+            ('remaining_quantity', 'INTEGER NOT NULL DEFAULT 0'),
+            ('filled_value', 'REAL NOT NULL DEFAULT 0'),
+        ):
+            if name not in columns:
+                self.db.execute(f'ALTER TABLE jobs ADD COLUMN {name} {declaration}')
+        self.db.execute('CREATE TABLE IF NOT EXISTS owned_positions (code TEXT PRIMARY KEY, quantity INTEGER NOT NULL, cost REAL NOT NULL, cost_known INTEGER NOT NULL, opened_at TEXT NOT NULL)')
+        self.db.execute('CREATE TABLE IF NOT EXISTS metadata (key TEXT PRIMARY KEY,value TEXT NOT NULL)')
+        self.db.execute('CREATE TABLE IF NOT EXISTS broker_events (id INTEGER PRIMARY KEY, payload TEXT NOT NULL)')
+        self.db.execute('CREATE TABLE IF NOT EXISTS news_blocks (code TEXT PRIMARY KEY, published_at TEXT NOT NULL, reason TEXT NOT NULL)')
         self.db.execute("UPDATE jobs SET state='UNKNOWN' WHERE state='SUBMITTING'")
         # 이전 실행에서 전송 도중 종료했다면 결과 미확정으로 남겨 자동 재전송을 막습니다.
         self.db.execute("UPDATE offers SET state='UNKNOWN' WHERE state='SUBMITTING'")
         self.db.execute("UPDATE offers SET state='EXPIRED' WHERE state='OFFERED'")
         self.db.commit()
+
+    def bind_context(self, context):
+        """입력: paper 또는 계좌 hash를 포함한 브로커 ID. 출력: 없음 또는 ValueError.
+        구조·이유: 다른 계좌/모의 원장의 소유 수량을 실제 계좌 매도에 사용하는 것을 차단합니다.
+        출처 없는 이전 주문 원장은 임의로 새 계좌에 귀속하지 않습니다.
+        """
+        row = self.db.execute("SELECT value FROM metadata WHERE key='broker_context'").fetchone()
+        if row and row[0] != context:
+            raise ValueError('다른 모드·계좌의 주문 DB입니다. 계좌별 database 경로를 지정하세요')
+        if not row and self.db.execute('SELECT 1 FROM jobs LIMIT 1').fetchone():
+            raise ValueError('계좌 출처가 없는 이전 원장입니다. 이전 주문을 확인하고 별도 계좌 DB를 지정하세요')
+        with self.db:
+            self.db.execute("INSERT OR IGNORE INTO metadata VALUES('broker_context',?)", (context,))
 
     def seen(self, key):
         """기능: 처리한 후보 조회. 입력: 후보 키. 출력: bool.
@@ -59,13 +88,13 @@ class Store:
         """기능: 주문 결과 확인이 필요한 종목 조회. 입력: 없음. 출력: 코드 set.
         구조·이유: 전송 중·전송 성공·결과 미확정은 다른 뉴스에서도 중복 매수를 막습니다.
         """
-        return {r[0] for r in self.db.execute("SELECT code FROM offers WHERE state IN ('SUBMITTING','ACCEPTED','UNKNOWN')")}
+        return {r[0] for r in self.db.execute("SELECT code FROM offers WHERE state IN ('SUBMITTING','ACCEPTED','UNKNOWN','PARTIALLY_FILLED')")}
 
     def reservations(self):
         """기능: 아직 주문 확인이 필요한 금액 조회. 입력: 없음. 출력: (종목, 수량, 가격) 목록.
         구조·이유: 주문 직후 서버 잔고 반영이 늦어도 다른 종목에 같은 돈을 다시 쓰지 않습니다.
         """
-        rows = self.db.execute("SELECT code,payload FROM offers WHERE state IN ('SUBMITTING','ACCEPTED','UNKNOWN')")
+        rows = self.db.execute("SELECT code,payload FROM offers WHERE state IN ('SUBMITTING','ACCEPTED','UNKNOWN','PARTIALLY_FILLED')")
         return [(code,json.loads(payload)['quantity'],json.loads(payload)['price']) for code,payload in rows]
 
     def observe_event(self,candidate,now):
@@ -118,7 +147,7 @@ class Store:
         """기능: 원격 주문 확인 대상 조회. 입력: 없음. 출력: 작업 dict 목록.
         구조·이유: 전송 성공과 미확정 상태를 구분하고 증권사 주문번호를 연결합니다.
         """
-        rows=self.db.execute("SELECT id,kind,code,quantity,price,reason,created_at,state,remote_id,parent FROM jobs WHERE state IN ('SUBMITTING','ACCEPTED','UNKNOWN')").fetchall()
+        rows=self.db.execute("SELECT id,kind,code,quantity,price,reason,created_at,state,remote_id,parent FROM jobs WHERE state IN ('SUBMITTING','ACCEPTED','UNKNOWN','PARTIALLY_FILLED')").fetchall()
         keys=('id','kind','code','quantity','price','reason','created_at','state','remote_id','parent')
         return [dict(zip(keys,row)) for row in rows]
 
@@ -149,32 +178,128 @@ class Store:
             )
         return True
 
-    def reconcile_jobs(self,broker,account):
-        """기능: 명시적 증권사 완료 응답으로 원장 정리. 입력: 브로커·현재 계좌. 출력: 없음.
-        구조·이유: 단순한 목록 누락으로는 완료 처리하지 않고, 매수 체결은 잔고 반영도 확인합니다.
+    def record_broker_event(self, event):
+        """기능: 주문번호 연결·체결 원문을 즉시 보존. 입력: 어댑터 이벤트 dict. 출력: 없음.
+        구조·이유: 접수 콜백에서 확인한 로컬/원격 번호를 재시작 전에 DB에 연결합니다.
+        계좌번호·인증값은 이벤트에 포함하지 않습니다.
         """
-        for job in self.open_jobs():
-            if not job['remote_id']:continue
-            status=broker.order_status(job['remote_id'])
-            if status not in ('FILLED','CANCELLED','FAILED'):continue
-            if job['kind']=='BUY' and status=='FILLED' and job['code'] not in account.holdings:continue
-            if job['kind']=='BUY' and status=='CANCELLED' and job['code'] in account.holdings:
-                status='FILLED'  # 일부 체결 후 잔량 취소: 실제 잔고 수량은 계속 관리합니다.
-            with self.db:
-                self.db.execute('UPDATE jobs SET state=? WHERE id=?',(status,job['id']))
-                self.db.execute('UPDATE offers SET state=? WHERE id=?',(status,job['id']))
-        # 한 번 잔고로 확인한 종목이 전량 사라진 뒤에만 추적/매수 잠금을 닫습니다.
-        for (code,) in self.db.execute('SELECT code FROM positions').fetchall():
-            if code not in account.holdings and code not in account.pending:
-                with self.db:
-                    self.db.execute("UPDATE jobs SET state='CLOSED' WHERE code=? AND kind='BUY' AND state='FILLED'",(code,))
-                    self.db.execute('DELETE FROM positions WHERE code=?',(code,))
+        with self.db:
+            self.db.execute('INSERT INTO broker_events(payload) VALUES(?)', (json.dumps(event, ensure_ascii=False),))
+            if event.get('kind') == 'ORDER_LINK':
+                self.db.execute('UPDATE jobs SET remote_id=? WHERE id=?',
+                                (event['remote_id'], event['request_id']))
+
+    def reconcile_jobs(self, broker, account):
+        """기능: 주문 번호와 확인된 체결 누계로 원장을 복구합니다.
+        입력: 브로커·계좌 snapshot. 출력: 없음. UNKNOWN도 늦은 번호 연결 대상입니다.
+        구조: 번호 연결→주문일·종목·방향 검사→증가한 체결 수량만 소유 원장에 반영합니다.
+        이유: 계좌에 같은 종목이 있다는 사실만으로 프로그램 소유 수량을 만들지 않습니다.
+        """
+        rows = self.db.execute("SELECT id,kind,code,quantity,created_at,state,remote_id FROM jobs WHERE state!='CLOSED' ORDER BY rowid").fetchall()
+        for job_id, kind, code, quantity, created, state, remote in rows:
+            if not remote:
+                remote = broker.order_id(job_id)
+                if remote:
+                    self.link_order(job_id, remote)
+            if not remote or not hasattr(broker, 'order_snapshot'):
+                continue
+            snapshot = broker.order_snapshot(remote, datetime.fromisoformat(created))
+            if snapshot is not None:
+                self.apply_snapshot(job_id, snapshot)
+
+    def apply_snapshot(self, job_id, snapshot):
+        """기능: 확인된 누계 체결을 멱등 반영. 입력: 로컬 주문 ID·OrderSnapshot. 출력: 반영 bool.
+        구조: 식별자·날짜·방향·수량 검증 후 누계 차이만 계산해 jobs와 소유 잔량을 함께 저장합니다.
+        이유: 중복/역순 통보가 수량을 늘리거나, 취소가 전체 체결로 오인되는 것을 막습니다.
+        """
+        row = self.db.execute('SELECT kind,code,quantity,remote_id,created_at,filled_quantity,filled_value,state FROM jobs WHERE id=?', (job_id,)).fetchone()
+        if not row:
+            return False
+        kind, code, ordered, remote, created, old_filled, old_value, old_state = row
+        day = datetime.fromisoformat(created).astimezone(KST).date().isoformat()
+        if (snapshot.remote_id != remote or snapshot.code != code or snapshot.side != kind
+                or snapshot.order_day != day or type(snapshot.filled_quantity) is not int
+                or type(snapshot.remaining_quantity) is not int
+                or not 0 <= old_filled <= snapshot.filled_quantity <= ordered
+                or not 0 <= snapshot.remaining_quantity <= ordered - snapshot.filled_quantity):
+            return False
+        if type(snapshot.average_price) not in (int, float) or not math.isfinite(snapshot.average_price) or snapshot.average_price < 0:
+            return False
+        allowed = {'ACCEPTED', 'PARTIALLY_FILLED', 'FILLED', 'CANCELLED', 'FAILED'}
+        if snapshot.state not in allowed:
+            return False
+        if kind != 'CANCEL' and snapshot.state == 'FILLED' and snapshot.filled_quantity != ordered:
+            return False
+        delta = snapshot.filled_quantity - old_filled
+        state = snapshot.state
+        if old_state in ('FILLED', 'CANCELLED', 'FAILED') and state in ('ACCEPTED', 'PARTIALLY_FILLED'):
+            state = old_state
+        value = snapshot.average_price * snapshot.filled_quantity if snapshot.average_price > 0 else old_value
+        owned = self.db.execute('SELECT quantity,cost,cost_known,opened_at FROM owned_positions WHERE code=?', (code,)).fetchone()
+        with self.db:
+            if kind == 'BUY' and delta:
+                quantity, cost, known, opened = owned or (0, 0, 1, created)
+                if quantity == 0:
+                    cost, known, opened = 0, 1, created
+                new_value = value - old_value if snapshot.average_price > 0 else 0
+                self.db.execute('INSERT OR REPLACE INTO owned_positions VALUES(?,?,?,?,?)',
+                                (code, quantity + delta, cost + new_value,
+                                 int(bool(known) and snapshot.average_price > 0), opened))
+            elif kind == 'SELL' and delta and owned:
+                quantity, cost, known, opened = owned
+                sold = min(delta, quantity)
+                self.db.execute('UPDATE owned_positions SET quantity=?,cost=? WHERE code=?',
+                                (quantity - sold, cost * (quantity - sold) / quantity, code))
+            self.db.execute('UPDATE jobs SET state=?,filled_quantity=?,remaining_quantity=?,filled_value=? WHERE id=?',
+                            (state, snapshot.filled_quantity, snapshot.remaining_quantity, value, job_id))
+            self.db.execute('UPDATE offers SET state=? WHERE id=?', (state, job_id))
+        return True
+
+    def managed_position(self, actual):
+        """기능: 프로그램 소유 수량과 원가 조회. 입력: 실제 계좌 Position. 출력: 제한된 Position 또는 None.
+        구조·이유: 수동 추가 매수는 소유 원장에 더하지 않고 실제 잔고·매도 가능 수량도 상한으로 적용합니다.
+        """
+        row = self.db.execute('SELECT quantity,cost,cost_known,opened_at FROM owned_positions WHERE code=? AND quantity>0', (actual.code,)).fetchone()
+        if not row:
+            return None
+        quantity, cost, known, opened = row
+        return Position(actual.code, min(quantity, actual.quantity), cost / quantity if known else 0,
+                        min(quantity, actual.quantity, actual.available), datetime.fromisoformat(opened))
 
     def managed_codes(self):
-        """기능: 이 프로그램에서 매수한 종목 조회. 입력: 없음. 출력: 종목 set.
-        구조·이유: 자동 청산이 사용자의 다른 수동 보유종목을 관리 대상으로 삼지 않습니다.
+        """입력: 없음. 출력: 확인된 매수 체결 잔량이 양수인 종목 set. 이유: UNKNOWN은 소유 근거가 아닙니다."""
+        return {row[0] for row in self.db.execute('SELECT code FROM owned_positions WHERE quantity>0')}
+
+    def buy_news_blocked(self, job_id):
+        """입력: 기존 매수 작업 ID. 출력: 승인 이후 새 악재가 확인되면 True.
+        구조·이유: 이미 전송한 매수는 제안 취소 대신 확인된 미체결 잔량의 취소 대상으로 넘깁니다.
         """
-        return {row[0] for row in self.db.execute("SELECT code FROM jobs WHERE kind='BUY' AND state IN ('ACCEPTED','UNKNOWN','FILLED')")}
+        row = self.db.execute('SELECT code,payload FROM offers WHERE id=?', (job_id,)).fetchone()
+        if not row:
+            return False
+        blocked = self.db.execute('SELECT published_at FROM news_blocks WHERE code=?', (row[0],)).fetchone()
+        article = json.loads(row[1])['candidate']['article']
+        return bool(blocked and datetime.fromisoformat(blocked[0]) >= datetime.fromisoformat(article['published_at']))
+
+    def observe_news(self, candidate):
+        """기능: 종목별 최신 악재·미확정 보도 저장. 입력: Candidate. 출력: 없음.
+        구조·이유: 원래 호재보다 최신인 부정·정정 보도가 있으면 기존 승인 근거를 차단합니다.
+        """
+        if candidate.confirmed and candidate.score >= 0:
+            return
+        previous = self.db.execute('SELECT published_at FROM news_blocks WHERE code=?', (candidate.code,)).fetchone()
+        if previous and datetime.fromisoformat(previous[0]) > candidate.article.published_at:
+            return
+        with self.db:
+            self.db.execute('INSERT OR REPLACE INTO news_blocks VALUES(?,?,?)',
+                            (candidate.code, candidate.article.published_at.isoformat(), candidate.reason))
+
+    def news_blocked(self, candidate):
+        """입력: 승인 근거 Candidate. 출력: 더 최신 악재/미확정 보도가 있으면 True.
+        이유: 승인을 기다리거나 호가를 조회하는 동안 바뀐 뉴스 상태를 다시 검사합니다.
+        """
+        row = self.db.execute('SELECT published_at FROM news_blocks WHERE code=?', (candidate.code,)).fetchone()
+        return bool(row and datetime.fromisoformat(row[0]) >= candidate.article.published_at)
 
     def has_exit(self,code):
         """기능: 기존 매도 작업 조회. 입력: 종목. 출력: bool.
@@ -191,14 +316,14 @@ class Store:
         with self.db:self.db.execute('INSERT INTO jobs(id,kind,code,quantity,price,reason,created_at,state) VALUES(?,?,?,?,?,?,?,?)',(job_id,'SELL',code,quantity,price,reason,now.isoformat(),'SUBMITTING'))
         return job_id
 
-    def start_cancel(self,parent,now):
+    def start_cancel(self,parent,now,reason='TIMEOUT_OR_DAILY_LOSS'):
         """기능: 미체결 취소 선기록. 입력: 매수 작업 ID·시각. 출력: 취소 ID 또는 None.
         구조·이유: 취소 응답 미확정 때 원주문을 다시 취소하지 않습니다.
         """
         if self.db.execute("SELECT 1 FROM jobs WHERE parent=? AND state!='FAILED'",(parent,)).fetchone():return None
         row=self.db.execute('SELECT code FROM jobs WHERE id=?',(parent,)).fetchone()
         job_id=uuid.uuid4().hex[:16]
-        with self.db:self.db.execute('INSERT INTO jobs(id,kind,code,quantity,price,reason,created_at,state,parent) VALUES(?,?,?,?,?,?,?,?,?)',(job_id,'CANCEL',row[0],0,0,'TIMEOUT_OR_DAILY_LOSS',now.isoformat(),'SUBMITTING',parent))
+        with self.db:self.db.execute('INSERT INTO jobs(id,kind,code,quantity,price,reason,created_at,state,parent) VALUES(?,?,?,?,?,?,?,?,?)',(job_id,'CANCEL',row[0],0,0,reason,now.isoformat(),'SUBMITTING',parent))
         return job_id
 
     def finish_job(self,job_id,state,detail=''):
