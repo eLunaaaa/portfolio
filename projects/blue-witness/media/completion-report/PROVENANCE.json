@@ -1,0 +1,79 @@
+{
+  "source": "ACE_개발완료보고서.pptx",
+  "source_sha256": "b717c1a04620a44572f3c4e1168fecb9648b97f8835dcd5b7a735ebacfd4a8fa",
+  "slide_numbering": "표지 포함, 1부터 시작",
+  "assets": [
+    {
+      "file": "testbed.jpg",
+      "slide": 4,
+      "pptx_media": "ppt/media/image5.jpeg",
+      "original_sha256": "d41a87222380618184beaf84ee9cbc1cff4a14256f9a9af45bbb789efb0011aa",
+      "published_sha256": "c061b47d9a1af24d9af7e4954f505ad31772fd9e0eeb1da96a17473b9c250d7d",
+      "processing": "시계 방향 90도 회전(원본 슬라이드와 동일), 긴 변 1400px"
+    },
+    {
+      "file": "vehicle-hardware.jpg",
+      "slide": 5,
+      "pptx_media": "ppt/media/image7.jpeg",
+      "original_sha256": "8dfe1266fd35947e6e2100713f55d9a1090d4a389228d28d62e7aaefd2a9051b",
+      "published_sha256": "68abab669b6670a14ab7921e1692122855a0f60de9e91ff2d243fc0c48cb3fa3",
+      "processing": "시계 방향 90도 회전(원본 슬라이드와 동일), 긴 변 1400px"
+    },
+    {
+      "file": "annotation.png",
+      "slide": 11,
+      "pptx_media": "ppt/media/image12.png",
+      "original_sha256": "163ab1ae3dc8cbe34eef963e97c5ad06659a71a53a4d24f521f4c001be2d562c",
+      "published_sha256": "163ab1ae3dc8cbe34eef963e97c5ad06659a71a53a4d24f521f4c001be2d562c",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "merged-video.png",
+      "slide": 14,
+      "pptx_media": "ppt/media/image15.png",
+      "original_sha256": "55523d4f2c402f96c8cbc19d9519b78d06ce4f94dbeb3f5ea8de8981ffc1a617",
+      "published_sha256": "55523d4f2c402f96c8cbc19d9519b78d06ce4f94dbeb3f5ea8de8981ffc1a617",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "portal.png",
+      "slide": 16,
+      "pptx_media": "ppt/media/v56-usability-1.png",
+      "original_sha256": "6aba9ae3d221c8aeacdf571f4ba5013cf144c9762b19c68587cbf6ecca556f77",
+      "published_sha256": "6aba9ae3d221c8aeacdf571f4ba5013cf144c9762b19c68587cbf6ecca556f77",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "playback.png",
+      "slide": 16,
+      "pptx_media": "ppt/media/v56-usability-3.png",
+      "original_sha256": "bc1edaa8124085ba2481353b812bb769ecba631289d72a62c56514828fa08c7c",
+      "published_sha256": "bc1edaa8124085ba2481353b812bb769ecba631289d72a62c56514828fa08c7c",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "trello.png",
+      "slide": 6,
+      "pptx_media": "ppt/media/image8.png",
+      "original_sha256": "fb4d07558b2cb6a59745299e0025e3f9f4fa60f08ddae091e62254ea4979a5ec",
+      "published_sha256": "fb4d07558b2cb6a59745299e0025e3f9f4fa60f08ddae091e62254ea4979a5ec",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "slack.png",
+      "slide": 6,
+      "pptx_media": "ppt/media/image9.png",
+      "original_sha256": "1acd947784d8dc3cd9654b358237c182aa6eac8de413d86183a9ce270599d222",
+      "published_sha256": "1acd947784d8dc3cd9654b358237c182aa6eac8de413d86183a9ce270599d222",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "github-actions.png",
+      "slide": 6,
+      "pptx_media": "ppt/media/image10.png",
+      "original_sha256": "6298a67fec779d2cf3f70f0ead4d4591abfb276fbece2720971f0f92f53b7d74",
+      "published_sha256": "6298a67fec779d2cf3f70f0ead4d4591abfb276fbece2720971f0f92f53b7d74",
+      "processing": "원본 이미지 그대로"
+    }
+  ]
+}

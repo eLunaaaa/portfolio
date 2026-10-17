@@ -4,8 +4,13 @@
 
 **이민석 담당:** 차량 검출 모델 학습·배포, 서버·웹, 시간 동기화 상태 서비스, 전체 Fail-safe·Uploader 설계, CI/CD 설계·구축.
 
+![서버에서 촬영 시각을 맞춰 병합한 사고차·관측차의 실제 영상](media/completion-report/merged-video.png)
+
+**구현 결과:** 사고차와 관측차의 영상을 같은 화면에서 비교하고, 웹에서 시점·배속을 선택해 확인합니다. [실제 장치·개인 구현 사진과 설명](docs/IMPLEMENTATION_GALLERY.md)
+
 | 먼저 확인할 내용 | 자료 |
 |---|---|
+| 실제 장치·AI 검수·웹·CI 화면 | [사진으로 보는 개인 구현](docs/IMPLEMENTATION_GALLERY.md) |
 | 실제 구현 파일과 읽는 순서 | [코드 안내](source/README.md) · [기여 구분](docs/CODE_GUIDE.md) |
 | 대안과 선택 이유 | [설계 결정표](docs/design/DECISIONS.md) |
 | 영상 보존·재전송·ACK | [Uploader 전체 모듈](source/uploader/README.md) · [Fail-safe](docs/FAILSAFE.md) |
@@ -43,6 +48,14 @@ Raspberry Pi 5 · IMX219 · C/C++ · POSIX IPC · PyTorch · YOLOX-Tiny · ONNX 
 ![데이터 준비부터 ONNX 내보내기까지](media/training-flow.png)
 
 촬영 callback과 추론·인코딩·전송을 분리하고 Snapshot 참조로 사고 구간을 보호합니다. 업로더는 HTTP 성공만으로 완료하지 않고 사고·차량·파일 hash·서버 저장 상태를 확인합니다. 서버는 늦게 도착한 영상을 새 revision으로 재병합합니다. [모듈별 설계](docs/design/README.md)
+
+## 실제 구현 화면
+
+![등록 차량과 사고별 수집·병합 상태를 조회하는 직접 구현한 웹 포털](media/completion-report/portal.png)
+
+FastAPI·SQLite로 차량별 사건과 영상 수집 상태를 관리하고, 별도 Worker·FFmpeg로 병합합니다. 늦게 도착한 영상은 병합본에 반영하며, 웹에서 전체·목격 차량·내 차량 영상과 사고 장면 0.25배속 재생을 제공합니다.
+
+[차량 실장 → AI 학습 → 영속 업로드 → 시간 정렬·웹 → 협업·CI/CD 사진과 코드](docs/IMPLEMENTATION_GALLERY.md)
 
 ## 검증 자료
 

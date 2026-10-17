@@ -4,6 +4,10 @@
 
 [기여 안내](CODE_GUIDE.md)는 담당 모듈·대표 기여 커밋·협업 역할을 연결합니다. [소스 manifest](../source/PROVENANCE.json)는 원본 기준과 파일 hash를 기록합니다. 실제 코드는 모두 이 저장소의 [source/](../source/README.md)에서 확인할 수 있습니다.
 
+## 실제 구현 사진과 보고서
+
+[완료보고서 기반 구현 갤러리](IMPLEMENTATION_GALLERY.md)에서 차량 실장·AI 검수·웹 포털·병합 영상·Trello·Slack·실제 팀 CI 실행 화면을 코드와 함께 확인할 수 있습니다. 원본 슬라이드 번호와 이미지 해시는 [출처 기록](../media/completion-report/PROVENANCE.json)에 연결했습니다.
+
 ## 측정 자료
 
 | 자료 | 확인할 내용 |

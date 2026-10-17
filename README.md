@@ -39,11 +39,13 @@
 
 ### 1. Blue Witness · 임베디드·AI·서버·자동화 통합
 
+[![Blue Witness 실제 사고차·관측차 영상 병합 결과](projects/blue-witness/media/completion-report/merged-video.png)](projects/blue-witness/docs/IMPLEMENTATION_GALLERY.md)
+
 Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영상을 선별해 서버에서 시간에 맞춰 병합하는 팀 프로젝트입니다. 2026 임베디드 소프트웨어 경진대회 본선 참가 프로젝트입니다.
 
 - **설계·구현:** 촬영 세션별 데이터 분리, YOLOX-Tiny 학습·ONNX 계약 검증, 영속 업로드 큐·저장 ACK, 지연 영상 재병합, 시간 동기화 IPC·스레드 진행 감시.
 - **협업·자동화:** Slack·Git·Trello를 활용한 팀 개발과 CI/CD 설계·구축. 검증한 산출물을 수동 장치 배포로 연결했습니다.
-- **확인 자료:** [담당 모듈과 협업 기여](projects/blue-witness/docs/CODE_GUIDE.md) · [설계 결정](projects/blue-witness/docs/design/DECISIONS.md) · [평가 CSV·분석](projects/blue-witness/analysis/README.md).
+- **확인 자료:** [담당 모듈과 협업 기여](projects/blue-witness/docs/CODE_GUIDE.md) · [설계 결정](projects/blue-witness/docs/design/DECISIONS.md) · [실제 장치·웹·AI·CI 화면](projects/blue-witness/docs/IMPLEMENTATION_GALLERY.md) · [평가 CSV·분석](projects/blue-witness/analysis/README.md).
 
 업로더는 개인 설계·팀 구현으로, 카메라·추론 런타임과 공통 IPC는 팀 구현 및 개인 학습·배포 연동으로 표시했습니다. 담당 모듈·공통 의존성·테스트를 이 저장소에 함께 포함했습니다.
 
