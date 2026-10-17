@@ -171,8 +171,8 @@
     },
     {
       "path": "stockauto/kiwoom.py",
-      "sha256": "791c5c05832b9cdfa2e7ebfbf91b3ca2bbbab4cecce1b2948ed69f66269e7899",
-      "bytes": 22313,
+      "sha256": "f8e8882e2b825218833e08c9aaf695efeb49f68bda5427e6d11e797e62e703b3",
+      "bytes": 22600,
       "source": "personal_stockauto_project",
       "source_sha256": "b7d5cf46a6e7352712af0be8fe1f75f231c2c5f2567890c1ba0b07073044f2fe",
       "modified_during_review": true
@@ -301,8 +301,8 @@
     },
     {
       "path": "tests/test_lifecycle.py",
-      "sha256": "2be05341ce90080a1a1d52a7a3ae5e9f3934390f687685f1addc5e9e152a8a65",
-      "bytes": 24998,
+      "sha256": "8eeaac78923e9c7b8788ed5ecabc370e64015bedeb22d3458abb2229daaf7b86",
+      "bytes": 25371,
       "source": "portfolio_review_addition"
     },
     {

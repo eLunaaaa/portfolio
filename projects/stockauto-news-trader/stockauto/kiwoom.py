@@ -249,6 +249,9 @@ class KiwoomBroker:
         day = self.clock().astimezone(KST).date().isoformat()
         cancelled = {str(self._integer(row.get('원주문번호', 0))) for row in rows
                      if '취소' in row.get('주문구분', '') and row.get('주문상태') == '확인'}
+        # 뒤늦은 조회에서 취소 행이 생략돼도 이미 확인한 취소를 잊지 않습니다.
+        cancelled.update(remote for (record_day, remote), snapshot in self.book.snapshots.items()
+                         if record_day == day and snapshot.state == 'CANCELLED')
         for row in rows:
             remote = str(self._integer(row.get('주문번호', 0)))
             code = row.get('종목코드', '').removeprefix('A')

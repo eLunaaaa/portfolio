@@ -300,6 +300,10 @@ class AdapterTests(TestCase):
         self.broker._cache_order_rows(rows)
         snap=self.broker.order_snapshot('123',self.broker.clock())
         self.assertEqual((snap.state,snap.filled_quantity,snap.remaining_quantity),('CANCELLED',2,0))
+        # 다음 조회에 취소 행이 빠지고 원주문 잔량이 0이어도 전체 7주 체결로 바꾸지 않습니다.
+        self.broker._cache_order_rows([dict(rows[0], 미체결수량='0')])
+        snap=self.broker.order_snapshot('123',self.broker.clock())
+        self.assertEqual((snap.state,snap.filled_quantity,snap.remaining_quantity),('CANCELLED',2,0))
 
     def test_polling_uses_total_fill_instead_of_last_execution(self):
         """마지막 단위 체결 1주와 실제 누계 2주를 혼동하지 않고 누계 금액으로 평균가를 복원합니다."""
