@@ -83,6 +83,21 @@ Zybo의 카메라 촬영·AI 분류와 Arduino 제어, 적재량 전송·웹 대
 - **검증:** 실보드 시스템 연동·시연 자료와 Arduino 컴파일, C 코어·서버 API 검사를 연결했습니다.
 - **확인 자료:** [개인 담당·구현·시연](projects/edge-ai-trash-sorter/README.md) · [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md).
 
+## Awards & Activities
+
+### 2024 KHU Valley Start-up 10기 데모데이
+
+사용자에게 적합한 선물을 추천하는 **AI 기반 맞춤형 선물 추천 플랫폼**을 창업 아이디어로 기획했습니다.
+
+- **프로젝트:** AI 기반 맞춤형 선물 추천 플랫폼
+- **성과:** 성장팀 선정 및 창업 지원금 **300만 원 확보**
+- **주요 활동:** 서비스 기획 및 창업 아이디어 구체화, 사업화 가능성 검토, 데모데이 발표
+- **주관:** 경희대학교 창업교육프로그램
+
+| 서비스 로고 | 데모데이 성장팀 선정 |
+|---|---|
+| <img src="media/activities/khu-valley-2024/logo.png" width="200" alt="맞춤형 선물 추천 서비스 MADE FOR YOU 로고"> | <img src="media/activities/khu-valley-2024/demo-day.jpg" width="340" alt="2024 KHU Valley Start-up 10기 데모데이 성장팀 선정 및 창업 지원금 300만 원 기념 사진"> |
+
 ## 코드 확인과 자동 검사
 
 각 프로젝트의 README에서 담당 범위·파일 역할·실행 순서를 안내합니다. 주요 함수에는 입력·출력·처리 구조와 설계 이유를 한글 주석으로 설명했습니다.
