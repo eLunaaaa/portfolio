@@ -236,7 +236,7 @@ class KiwoomBroker:
         """기능: 미체결 주문 상세 조회. 입력: 없음. 출력: 원격 주문번호·코드·잔량·방향.
         구조·이유: 취소는 별도로 확인한 본 프로그램의 원격 번호에만 허용합니다.
         """
-        rows=self._pages('opt10075',{'계좌번호':self.account_number,'전체종목구분':'0','매매구분':'0','체결구분':'0'},['종목코드','주문번호','주문수량','미체결수량','주문구분','주문상태','체결량','원주문번호'])
+        rows=self._pages('opt10075',{'계좌번호':self.account_number,'전체종목구분':'0','매매구분':'0','체결구분':'0'},['종목코드','주문번호','주문수량','미체결수량','주문구분','주문상태','체결량','체결누계금액','원주문번호'])
         self.recent_orders=rows
         if hasattr(self, 'book'):
             self._cache_order_rows(rows)
@@ -260,6 +260,11 @@ class KiwoomBroker:
             remaining = 0 if side == 'CANCEL' else self._integer(row.get('미체결수량', 0))
             ordered = self._integer(row.get('주문수량', 0))
             status = row.get('주문상태', '')
+            # 취소되지 않은 신규 주문에서만 주문수량−미체결을 확인된 누계로 사용합니다.
+            if side != 'CANCEL' and remote not in cancelled and status == '체결':
+                filled = max(filled, ordered - remaining)
+            cumulative_value = self._integer(row.get('체결누계금액', 0))
+            average = cumulative_value / filled if filled and cumulative_value and remote not in cancelled else 0
             state = ('FAILED' if '거부' in status else 'FILLED' if side == 'CANCEL' and status == '확인'
                      else 'CANCELLED' if remote in cancelled else 'FILLED' if ordered and filled == ordered
                      else 'PARTIALLY_FILLED' if filled else 'ACCEPTED')
@@ -267,7 +272,7 @@ class KiwoomBroker:
                 remaining = 0
             if filled + remaining > ordered:
                 continue
-            self.book.merge(OrderSnapshot(remote, code, side, state, filled, remaining, 0, day))
+            self.book.merge(OrderSnapshot(remote, code, side, state, filled, remaining, average, day))
 
     def order_snapshot(self, remote_id, submitted_at):
         """입력: 번호·원래 제출시각. 출력: 동일 거래일의 snapshot 또는 None.

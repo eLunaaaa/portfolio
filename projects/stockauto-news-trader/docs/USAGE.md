@@ -141,7 +141,7 @@ PYTHONPATH=. python tests/check_serial_contract.py
 arduino-cli compile --fqbn arduino:avr:uno firmware/news_lcd
 ```
 
-Python 테스트 88개, 펌웨어의 프레임·버튼·알람·만료 검사, UNO 컴파일을 통과했습니다. UNO 컴파일 결과는 Flash 9,858바이트, SRAM 1,046바이트입니다. 실제 RSS 수집기로 한국경제 증권 피드의 XML 수신·기사 파싱도 확인했습니다.
+Python 테스트 89개, 펌웨어의 프레임·버튼·알람·만료 검사, UNO 컴파일을 통과했습니다. UNO 컴파일 결과는 Flash 9,858바이트, SRAM 1,046바이트입니다. 실제 RSS 수집기로 한국경제 증권 피드의 XML 수신·기사 파싱도 확인했습니다.
 
 ## 참고
 

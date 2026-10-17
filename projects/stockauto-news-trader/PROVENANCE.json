@@ -21,7 +21,7 @@
     },
     {
       "path": "README.md",
-      "sha256": "ee5112e3a4970a3ae1e40103bf392b507fbe801fd5f2dd23bf1ca01c9ac9993e",
+      "sha256": "551704a0a109a8a223c9c2ba4cac113418917c4b86dabbd1759e3aeeda9fc2c2",
       "bytes": 4864,
       "source": "personal_stockauto_project",
       "source_sha256": "c6051213d8ca7a87f7e1659116e24ba5c638d3152253faadbf271143d2821465",
@@ -61,7 +61,7 @@
     },
     {
       "path": "docs/CODE_REVIEW.md",
-      "sha256": "9e823c64890647dd115aaff070933402a1c3848daee959007e08988868e0039c",
+      "sha256": "21d3d44bd4d4a37f02a561a4c959dd5749254b1614b8872d2787c55297682b7b",
       "bytes": 7979,
       "source": "personal_stockauto_project",
       "source_sha256": "8a46bfb3610dbd0aee08a634ae9a22efb9bd2896499742dabd739990a0216920",
@@ -69,7 +69,7 @@
     },
     {
       "path": "docs/USAGE.md",
-      "sha256": "d4393a531a67a70dd68ac8f69d45f18c76ad6ad36b2b6e32273e480c1d3e8992",
+      "sha256": "edc57e61d51c7092cbdc75bd004fa828e751e11a919d6055a99ff9801266dc19",
       "bytes": 9538,
       "source": "personal_stockauto_project",
       "source_sha256": "5545c8e43b9f697f5e07fd70b5ee5c528fb2f723a27735ed7fac079a27a9b40b",
@@ -171,8 +171,8 @@
     },
     {
       "path": "stockauto/kiwoom.py",
-      "sha256": "d6ca077991bc5f3554a0e813b1b4712abdb725f67ac91fdd485686848c1cd028",
-      "bytes": 21829,
+      "sha256": "791c5c05832b9cdfa2e7ebfbf91b3ca2bbbab4cecce1b2948ed69f66269e7899",
+      "bytes": 22313,
       "source": "personal_stockauto_project",
       "source_sha256": "b7d5cf46a6e7352712af0be8fe1f75f231c2c5f2567890c1ba0b07073044f2fe",
       "modified_during_review": true
@@ -301,8 +301,8 @@
     },
     {
       "path": "tests/test_lifecycle.py",
-      "sha256": "0ebd72f64d588ea21513154507e029e984db601944b33e1741c3880321e30773",
-      "bytes": 24407,
+      "sha256": "2be05341ce90080a1a1d52a7a3ae5e9f3934390f687685f1addc5e9e152a8a65",
+      "bytes": 24998,
       "source": "portfolio_review_addition"
     },
     {
