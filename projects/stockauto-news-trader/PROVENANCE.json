@@ -16,16 +16,16 @@
       "sha256": "8d1ffe6e64eb0c03560215f1a12e283c9d30d9dbfdf4a428218499ccb94ff755",
       "bytes": 549,
       "source": "personal_stockauto_project",
-      "source_sha256": "d3c4defd26c988f8cd883757fce9677588231bb7782dee34df3b5403124496bb",
-      "modified_during_review": true
+      "source_sha256": "8d1ffe6e64eb0c03560215f1a12e283c9d30d9dbfdf4a428218499ccb94ff755",
+      "modified_during_review": false
     },
     {
       "path": "README.md",
       "sha256": "551704a0a109a8a223c9c2ba4cac113418917c4b86dabbd1759e3aeeda9fc2c2",
       "bytes": 4864,
       "source": "personal_stockauto_project",
-      "source_sha256": "c6051213d8ca7a87f7e1659116e24ba5c638d3152253faadbf271143d2821465",
-      "modified_during_review": true
+      "source_sha256": "551704a0a109a8a223c9c2ba4cac113418917c4b86dabbd1759e3aeeda9fc2c2",
+      "modified_during_review": false
     },
     {
       "path": "config/settings.json",
@@ -37,10 +37,10 @@
     },
     {
       "path": "docs/ARCHITECTURE.md",
-      "sha256": "aab870c41be3bf80a0057beac14d9c6229f840b6d5d3ea2608f65a5c3f19ddb5",
-      "bytes": 6647,
+      "sha256": "cbbc0d9151cb56bcc01494f5ab91fd886da9427f46a29970339702d847c6f48e",
+      "bytes": 6918,
       "source": "personal_stockauto_project",
-      "source_sha256": "19e321466389aae7ff83bf50c9be64c26bb2be123f8d5fa44cd4c964a0b81824",
+      "source_sha256": "aab870c41be3bf80a0057beac14d9c6229f840b6d5d3ea2608f65a5c3f19ddb5",
       "modified_during_review": true
     },
     {
@@ -48,32 +48,32 @@
       "sha256": "2bbda553a9dc0c844af3243f1b742c60789ecd2bffd051a8ce481f6d7805f360",
       "bytes": 9088,
       "source": "personal_stockauto_project",
-      "source_sha256": "e21392901aa8558a10acd58c99b4d520263a57c2ec2624053e3da031d9e1b045",
-      "modified_during_review": true
+      "source_sha256": "2bbda553a9dc0c844af3243f1b742c60789ecd2bffd051a8ce481f6d7805f360",
+      "modified_during_review": false
     },
     {
       "path": "docs/CODE_GUIDE.md",
       "sha256": "f760c417d9243e980fc1235d20f843aebf54d0172ceaeea153e81eb22338399e",
       "bytes": 5927,
       "source": "personal_stockauto_project",
-      "source_sha256": "e4b65a12a4419e084443e927ca30b051001caf174a21a12004898161ba4555d4",
-      "modified_during_review": true
+      "source_sha256": "f760c417d9243e980fc1235d20f843aebf54d0172ceaeea153e81eb22338399e",
+      "modified_during_review": false
     },
     {
       "path": "docs/CODE_REVIEW.md",
       "sha256": "21d3d44bd4d4a37f02a561a4c959dd5749254b1614b8872d2787c55297682b7b",
       "bytes": 7979,
       "source": "personal_stockauto_project",
-      "source_sha256": "8a46bfb3610dbd0aee08a634ae9a22efb9bd2896499742dabd739990a0216920",
-      "modified_during_review": true
+      "source_sha256": "21d3d44bd4d4a37f02a561a4c959dd5749254b1614b8872d2787c55297682b7b",
+      "modified_during_review": false
     },
     {
       "path": "docs/USAGE.md",
       "sha256": "edc57e61d51c7092cbdc75bd004fa828e751e11a919d6055a99ff9801266dc19",
       "bytes": 9538,
       "source": "personal_stockauto_project",
-      "source_sha256": "5545c8e43b9f697f5e07fd70b5ee5c528fb2f723a27735ed7fac079a27a9b40b",
-      "modified_during_review": true
+      "source_sha256": "edc57e61d51c7092cbdc75bd004fa828e751e11a919d6055a99ff9801266dc19",
+      "modified_during_review": false
     },
     {
       "path": "examples/demo_without_hardware.py",
@@ -88,8 +88,8 @@
       "sha256": "825b99cbbd621a8ddc6f5f603215fd6a745accbc17a301b1807ffd86549b4ac0",
       "bytes": 5238,
       "source": "personal_stockauto_project",
-      "source_sha256": "cc87879fdac1418e62a337af084640d42f8dec2c92929fb72af977a84fc979ee",
-      "modified_during_review": true
+      "source_sha256": "825b99cbbd621a8ddc6f5f603215fd6a745accbc17a301b1807ffd86549b4ac0",
+      "modified_during_review": false
     },
     {
       "path": "examples/replay_sample.json",
@@ -119,7 +119,9 @@
       "path": "requirements-test.txt",
       "sha256": "fa3e810c80a3ca1f582968ceb44f9a18692227c70dba817681478a86fac9edbc",
       "bytes": 35,
-      "source": "portfolio_review_addition"
+      "source": "personal_stockauto_project",
+      "source_sha256": "fa3e810c80a3ca1f582968ceb44f9a18692227c70dba817681478a86fac9edbc",
+      "modified_during_review": false
     },
     {
       "path": "requirements.txt",
@@ -150,32 +152,32 @@
       "sha256": "8282cc3c42f77ab5c606851d50484a0aabcd594e9b12dfae5e5f9143c36c99d0",
       "bytes": 19530,
       "source": "personal_stockauto_project",
-      "source_sha256": "a6b976a4cf4f23a95634db186f393ed1fb17d0dde389b0c423284f3e66237957",
-      "modified_during_review": true
+      "source_sha256": "8282cc3c42f77ab5c606851d50484a0aabcd594e9b12dfae5e5f9143c36c99d0",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/broker.py",
       "sha256": "d1bc887c9463404cf297989a82b18ccbefd7377d61ae8cc82772b00b30f14ec3",
       "bytes": 11516,
       "source": "personal_stockauto_project",
-      "source_sha256": "842a072ef07f46e9e72724316d4a82fefce970f132527e4e105b08346265361b",
-      "modified_during_review": true
+      "source_sha256": "d1bc887c9463404cf297989a82b18ccbefd7377d61ae8cc82772b00b30f14ec3",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/engine.py",
       "sha256": "2bc1be3290f3746f74cdb61a6a1b7e9064b2c3bff53853d6d978158440916710",
       "bytes": 11677,
       "source": "personal_stockauto_project",
-      "source_sha256": "0eecdfc44d81390e2cdd33f386599c5557eeda07a607ece1fd8aa4e08b692eb7",
-      "modified_during_review": true
+      "source_sha256": "2bc1be3290f3746f74cdb61a6a1b7e9064b2c3bff53853d6d978158440916710",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/kiwoom.py",
       "sha256": "f8e8882e2b825218833e08c9aaf695efeb49f68bda5427e6d11e797e62e703b3",
       "bytes": 22600,
       "source": "personal_stockauto_project",
-      "source_sha256": "b7d5cf46a6e7352712af0be8fe1f75f231c2c5f2567890c1ba0b07073044f2fe",
-      "modified_during_review": true
+      "source_sha256": "f8e8882e2b825218833e08c9aaf695efeb49f68bda5427e6d11e797e62e703b3",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/market.py",
@@ -190,8 +192,8 @@
       "sha256": "ebfb09eaa9f85c08066b2cbba428b82208d7921e187aff9c333e2f26aecdd3ce",
       "bytes": 3331,
       "source": "personal_stockauto_project",
-      "source_sha256": "27263b0e70f4a9c9d67aa9f7cd7ec4ddc5ea0eee7ec7c31e91791fe4303df9d8",
-      "modified_during_review": true
+      "source_sha256": "ebfb09eaa9f85c08066b2cbba428b82208d7921e187aff9c333e2f26aecdd3ce",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/news.py",
@@ -205,7 +207,9 @@
       "path": "stockauto/orders.py",
       "sha256": "5cc459cee42a3c8125a4be6a3908e1f72ccfdf38d59e62fa8dd68c4e8bebbe64",
       "bytes": 4531,
-      "source": "portfolio_review_addition"
+      "source": "personal_stockauto_project",
+      "source_sha256": "5cc459cee42a3c8125a4be6a3908e1f72ccfdf38d59e62fa8dd68c4e8bebbe64",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/protocol.py",
@@ -220,30 +224,32 @@
       "sha256": "fb566800385d5a54bf4284e9100323a6ff965a62ed3e63d34762ee3d2266c206",
       "bytes": 10702,
       "source": "personal_stockauto_project",
-      "source_sha256": "65fa216580ea0f3e6b859333b7dff0ba57108359ea4fd2d694931615ab11256a",
-      "modified_during_review": true
+      "source_sha256": "fb566800385d5a54bf4284e9100323a6ff965a62ed3e63d34762ee3d2266c206",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/risk.py",
       "sha256": "5aaca511291758947255eac9caac6a3371f1cca51bf07ca3b84816559e400b7f",
       "bytes": 8529,
       "source": "personal_stockauto_project",
-      "source_sha256": "ac7d90f0eba48a3ccc6a2b5346fb3bd24c15e9dac780bf7ab49480d68d357c51",
-      "modified_during_review": true
+      "source_sha256": "5aaca511291758947255eac9caac6a3371f1cca51bf07ca3b84816559e400b7f",
+      "modified_during_review": false
     },
     {
       "path": "stockauto/store.py",
-      "sha256": "11dbd804840872d36050f851f3fb8bf718e5e07717e9d01b3f7d8b84852409d2",
-      "bytes": 23598,
+      "sha256": "9289a6cd3e3c15ca3d9a810b6ff876f2cc4445d126307317747121db40d40385",
+      "bytes": 24452,
       "source": "personal_stockauto_project",
-      "source_sha256": "aa10e8da7511bb5696634c551c9b719798edb721b99e1491e243a3db586fce01",
+      "source_sha256": "11dbd804840872d36050f851f3fb8bf718e5e07717e9d01b3f7d8b84852409d2",
       "modified_during_review": true
     },
     {
       "path": "stockauto/strategy.py",
       "sha256": "bfe6ffeb5709e641d83c2bdc4461e81edd4b4d462d9cb6a8b0706c1127a09196",
       "bytes": 3455,
-      "source": "portfolio_review_addition"
+      "source": "personal_stockauto_project",
+      "source_sha256": "bfe6ffeb5709e641d83c2bdc4461e81edd4b4d462d9cb6a8b0706c1127a09196",
+      "modified_during_review": false
     },
     {
       "path": "tests/arduino_stub/Arduino.h",
@@ -273,7 +279,9 @@
       "path": "tests/check_qt_controls.py",
       "sha256": "3dfbeb6ddd6dde156bb49701ff2e19c894d290e0aa8e6d2c189f3ae3e63f6abd",
       "bytes": 3031,
-      "source": "portfolio_review_addition"
+      "source": "personal_stockauto_project",
+      "source_sha256": "3dfbeb6ddd6dde156bb49701ff2e19c894d290e0aa8e6d2c189f3ae3e63f6abd",
+      "modified_during_review": false
     },
     {
       "path": "tests/check_serial_contract.py",
@@ -296,14 +304,16 @@
       "sha256": "68b1758de2bdca8f3cef1338d1ed56c3ac0021fb3e9abca2dc7876fde70de27a",
       "bytes": 13827,
       "source": "personal_stockauto_project",
-      "source_sha256": "cd1b181b952f132e6753877e560bfaf33ed397b4d91f9ab808bde96195189e5c",
-      "modified_during_review": true
+      "source_sha256": "68b1758de2bdca8f3cef1338d1ed56c3ac0021fb3e9abca2dc7876fde70de27a",
+      "modified_during_review": false
     },
     {
       "path": "tests/test_lifecycle.py",
-      "sha256": "8eeaac78923e9c7b8788ed5ecabc370e64015bedeb22d3458abb2229daaf7b86",
-      "bytes": 25371,
-      "source": "portfolio_review_addition"
+      "sha256": "88a393deb555774ead9d175f2b881c86725acef25853bc76448bd4a4ad61985c",
+      "bytes": 25795,
+      "source": "personal_stockauto_project",
+      "source_sha256": "8eeaac78923e9c7b8788ed5ecabc370e64015bedeb22d3458abb2229daaf7b86",
+      "modified_during_review": true
     },
     {
       "path": "tests/test_review_regressions.py",

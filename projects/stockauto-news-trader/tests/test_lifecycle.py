@@ -111,9 +111,17 @@ class LifecycleTests(TestCase):
         self.assertEqual(self.store.managed_position(self.broker.positions()[0]).quantity, 2)
 
     def test_duplicate_snapshots_do_not_double_owned_quantity(self):
-        """동일한 누계 체결 응답을 두 번 반영해도 소유 수량은 한 번만 증가합니다."""
-        offer = self.buy(); self.engine.risk.tick(); self.engine.risk.tick()
-        self.assertEqual(self.store.managed_position(self.broker.positions()[0]).quantity, offer.quantity)
+        """수량 중복 가산 없이 늦게 확인된 평균가도 복원합니다. 원장 재생은 같은 결과를 냅니다."""
+        offer = self.buy()
+        snapshot = self.broker.order_snapshot
+        self.broker.order_snapshot = lambda *args: replace(snapshot(*args), average_price=0)
+        self.engine.risk.tick()
+        self.assertEqual(self.store.managed_position(self.broker.positions()[0]).average_price, 0)
+        self.broker.order_snapshot = snapshot
+        self.engine.risk.tick(); self.engine.risk.tick()
+        owned = self.store.managed_position(self.broker.positions()[0])
+        self.assertEqual(owned.quantity, offer.quantity)
+        self.assertEqual(owned.average_price, offer.price)
 
     def test_older_snapshot_does_not_reduce_filled_quantity(self):
         """완료 이후 과거 부분 체결 응답이 와도 수량과 상태를 되돌리지 않습니다."""

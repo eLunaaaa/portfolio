@@ -209,7 +209,7 @@ class Store:
 
     def apply_snapshot(self, job_id, snapshot):
         """기능: 확인된 누계 체결을 멱등 반영. 입력: 로컬 주문 ID·OrderSnapshot. 출력: 반영 bool.
-        구조: 식별자·날짜·방향·수량 검증 후 누계 차이만 계산해 jobs와 소유 잔량을 함께 저장합니다.
+        구조: 식별자·날짜·방향·누계 검증 후 jobs를 갱신하고 체결 원장에서 소유 잔량·원가를 재계산합니다.
         이유: 중복/역순 통보가 수량을 늘리거나, 취소가 전체 체결로 오인되는 것을 막습니다.
         """
         row = self.db.execute('SELECT kind,code,quantity,remote_id,created_at,filled_quantity,filled_value,state FROM jobs WHERE id=?', (job_id,)).fetchone()
@@ -234,26 +234,40 @@ class Store:
         state = snapshot.state
         if old_state in ('FILLED', 'CANCELLED', 'FAILED') and state in ('ACCEPTED', 'PARTIALLY_FILLED'):
             state = old_state
-        value = snapshot.average_price * snapshot.filled_quantity if snapshot.average_price > 0 else old_value
-        owned = self.db.execute('SELECT quantity,cost,cost_known,opened_at FROM owned_positions WHERE code=?', (code,)).fetchone()
+        # 미확인 원가는 -1로 남기고, 늦게 확인된 평균가는 체결 수량 변화가 없어도 반영합니다.
+        value = (snapshot.average_price * snapshot.filled_quantity if snapshot.average_price > 0
+                 else -1 if delta and snapshot.filled_quantity else old_value)
         with self.db:
-            if kind == 'BUY' and delta:
-                quantity, cost, known, opened = owned or (0, 0, 1, created)
-                if quantity == 0:
-                    cost, known, opened = 0, 1, created
-                new_value = value - old_value if snapshot.average_price > 0 else 0
-                self.db.execute('INSERT OR REPLACE INTO owned_positions VALUES(?,?,?,?,?)',
-                                (code, quantity + delta, cost + new_value,
-                                 int(bool(known) and snapshot.average_price > 0), opened))
-            elif kind == 'SELL' and delta and owned:
-                quantity, cost, known, opened = owned
-                sold = min(delta, quantity)
-                self.db.execute('UPDATE owned_positions SET quantity=?,cost=? WHERE code=?',
-                                (quantity - sold, cost * (quantity - sold) / quantity, code))
             self.db.execute('UPDATE jobs SET state=?,filled_quantity=?,remaining_quantity=?,filled_value=? WHERE id=?',
                             (state, snapshot.filled_quantity, snapshot.remaining_quantity, value, job_id))
             self.db.execute('UPDATE offers SET state=? WHERE id=?', (state, job_id))
+            self._rebuild_owned_position(code)
         return True
+
+    def _rebuild_owned_position(self, code):
+        """기능: 확인된 체결 원장으로 소유 잔량·원가를 다시 계산합니다.
+        입력: 종목코드. 출력: owned_positions 캐시 갱신(호출자의 트랜잭션 안).
+        구조: 매수 체결을 lot으로 쌓고 매도 체결은 먼저 매수한 lot부터 차감합니다.
+        이유: 같은 통보·늦은 평균가·재시작에도 원장 하나에서 같은 잔량과 원가를 복원합니다.
+        """
+        lots = []
+        rows = self.db.execute("SELECT kind,filled_quantity,filled_value,created_at FROM jobs WHERE code=? AND kind IN ('BUY','SELL') AND filled_quantity>0 ORDER BY rowid", (code,))
+        for kind, quantity, value, created in rows:
+            if kind == 'BUY':
+                lots.append([quantity, value / quantity if value > 0 else 0, created])
+            else:
+                remaining = quantity
+                for lot in lots:
+                    consumed = min(remaining, lot[0]); lot[0] -= consumed; remaining -= consumed
+                    if not remaining:
+                        break
+        lots = [lot for lot in lots if lot[0] > 0]
+        quantity = sum(lot[0] for lot in lots)
+        cost = sum(lot[0] * lot[1] for lot in lots)
+        known = all(lot[1] > 0 for lot in lots)
+        opened = lots[0][2] if lots else self.db.execute('SELECT created_at FROM jobs WHERE code=? ORDER BY rowid DESC LIMIT 1', (code,)).fetchone()[0]
+        self.db.execute('INSERT OR REPLACE INTO owned_positions VALUES(?,?,?,?,?)',
+                        (code, quantity, cost, int(known), opened))
 
     def managed_position(self, actual):
         """기능: 프로그램 소유 수량과 원가 조회. 입력: 실제 계좌 Position. 출력: 제한된 Position 또는 None.
