@@ -28,6 +28,10 @@
 
 ## 전송·인증·무결성의 역할 분리
 
+<p align="center"><img src="../media/completion-report/node-authentication.png" width="640" alt="차량의 인증키를 확인한 뒤 서버에서 사고 영상을 접수하는 구조 개념도"></p>
+
+**차량 업로드 인증 구조:** 등록된 차량 노드의 인증키를 확인한 뒤 영상을 접수합니다. 아래 구현에서 TLS·노드 인증·파일 무결성의 역할을 각각 구분했습니다.
+
 | 보호 대상 | 구현 | 코드 |
 |---|---|---|
 | 전송 구간 | OpenSSL TLS 1.2 이상, 지정 CA·서버 인증서 검증, DNS hostname 또는 IP SAN 대조 | [uploader_tls.c](../source/uploader/src/worker/uploader_tls.c) |
@@ -37,6 +41,12 @@
 **TLS는 전송 암호화와 서버 신원 확인, API Key는 차량 인증, SHA-256은 파일 대조를 담당합니다.** HTTPS 연결 실패 시 HTTP로 자동 전환하지 않으며, 실패한 작업은 영속 큐에 남겨 재시도합니다.
 
 ## 사용자와 사고별 접근 제어
+
+| 사용자 로그인 | 사고별 임시 접근 코드 |
+|---|---|
+| <img src="../media/completion-report/user-login.png" width="360" alt="Blue Witness 사용자 아이디·비밀번호 로그인 화면"> | <img src="../media/completion-report/event-access-code.png" width="360" alt="유효기간 5분의 사고 접근 코드와 남은 시간을 표시하는 발급 화면"> |
+
+**로그인 → 차량 소유권 확인 → 사고 선택 → 임시 접근 코드 → 영상 열람** 순서로 접근을 관리합니다. 왼쪽은 계정 로그인 화면, 오른쪽은 사고 접근 코드의 복사 기능과 남은 유효시간을 보여주는 실제 웹 화면입니다. 코드의 유효기간은 서버에서도 검사하며, 검증 후 발급하는 사고 세션은 해당 사고와 만료 시각에 연결합니다.
 
 | 단계 | 구현 내용 | 목적 |
 |---|---|---|

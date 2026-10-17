@@ -74,6 +74,30 @@
       "original_sha256": "6298a67fec779d2cf3f70f0ead4d4591abfb276fbece2720971f0f92f53b7d74",
       "published_sha256": "6298a67fec779d2cf3f70f0ead4d4591abfb276fbece2720971f0f92f53b7d74",
       "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "node-authentication.png",
+      "slide": 19,
+      "pptx_media": "ppt/media/image20.png",
+      "original_sha256": "8e1f19e5890c5942c37aa0a9d535fe381bd337aa74a5682097fb7506581404cd",
+      "published_sha256": "8e1f19e5890c5942c37aa0a9d535fe381bd337aa74a5682097fb7506581404cd",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "user-login.png",
+      "slide": 19,
+      "pptx_media": "ppt/media/image22.png",
+      "original_sha256": "b407f3f5eed46aeb0f737950d1fbd9d6936945fb1760313324845ba9f95ad02a",
+      "published_sha256": "b407f3f5eed46aeb0f737950d1fbd9d6936945fb1760313324845ba9f95ad02a",
+      "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "event-access-code.png",
+      "slide": 19,
+      "pptx_media": "ppt/media/image21.png",
+      "original_sha256": "47afa95b69edeeb2f45fafcd5f52b0c537730fc3332089122c293b5637e3517d",
+      "published_sha256": "47afa95b69edeeb2f45fafcd5f52b0c537730fc3332089122c293b5637e3517d",
+      "processing": "원본 이미지 그대로"
     }
   ]
 }
