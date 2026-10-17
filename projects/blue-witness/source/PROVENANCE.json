@@ -1,15 +1,17 @@
 {
   "upstream_repository": "https://github.com/kingwooseok/2026ESWContest_mobility_ACE",
   "prepared_on": "2026-10-17",
-  "attribution_note": "이민석 담당 모듈과 개인 설계·팀 구현 Uploader 및 공통 의존성을 포함합니다. 모듈 담당·설계 기여는 모든 행의 단독 저작을 뜻하지 않습니다. 원래 팀·서드파티 저작권을 유지합니다.",
+  "attribution_note": "이민석이 Uploader 전체를 개발했고 이후 CD 연동 과정에서 팀 수정이 반영됐습니다. 개인 담당 모듈과 팀 공통 의존성을 포함하며 현재 줄별 작성자 기여는 별도 LOC 근거로 구분합니다. 원래 팀·서드파티 저작권을 유지합니다.",
   "integration_note": "팀 5148804 수정과 개인 개발본의 세션 가중 학습·미세조정·병합 수 표시를 통합했습니다. 운영 key·개인 DB·원본 영상·대규모 모델은 포함하지 않습니다.",
   "files": [
     {
       "path": "README.md",
-      "sha256": "9d47e9684144801e6c8b799a2768d2e17cfa5f61a5876bcaa42e3476d27cadfc",
-      "bytes": 3330,
+      "sha256": "ab653398c1a683ba362f50aa5c02ca1bb4e5b74f77d3a638ab4970ecb00ce07f",
+      "bytes": 3345,
       "origin": "personal_development_and_portfolio",
-      "previous_snapshot_sha256": "2426b14356b7d3ee82cb80ff4a8b72175295de8141ac0070d2bc40fc0370a078"
+      "previous_snapshot_sha256": "2426b14356b7d3ee82cb80ff4a8b72175295de8141ac0070d2bc40fc0370a078",
+      "exact_copy": false,
+      "portfolio_note": "개인 전체 개발·후속 팀 수정 기여 설명 반영"
     },
     {
       "path": "THIRD_PARTY_LICENSE.md",
@@ -2873,12 +2875,13 @@
     },
     {
       "path": "uploader/README.md",
-      "sha256": "e4bbb15a0a1409528842c352a68f2c4a02981c6238e9957e9612c5f01b58d087",
-      "bytes": 19863,
+      "sha256": "1084e752d835927adcf7c7d1e31a8b513c328deacca84196a750a3c878421f7c",
+      "bytes": 19902,
       "source": "uploader/README.md",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "8749f9c37f1ef174d2e15b9487406c178a44e2d54ccee9be83d5e3b260e6be9d",
-      "exact_copy": false
+      "exact_copy": false,
+      "portfolio_note": "개인 전체 개발·후속 팀 수정 기여 설명 반영"
     },
     {
       "path": "uploader/deploy/deploy.sh",

@@ -27,7 +27,7 @@
 
 | 순서 | 프로젝트 | 개인 담당과 핵심 구현 | 확인 자료 |
 |---:|---|---|---|
-| **1** | [Blue Witness · 다중 시점 사고 영상 수집](projects/blue-witness/README.md) | AI 학습·배포, 서버·웹, 시간 동기화 상태 서비스, 전체 Fail-safe·Uploader 설계, CI/CD 설계·구축 | [설계 선택](projects/blue-witness/docs/design/DECISIONS.md) · [전체 소스 안내](projects/blue-witness/source/README.md) · [측정 자료](projects/blue-witness/docs/EVIDENCE.md) |
+| **1** | [Blue Witness · 다중 시점 사고 영상 수집](projects/blue-witness/README.md) | AI 학습·배포, 서버·웹, 시간 동기화 상태 서비스, 전체 Fail-safe 설계·Uploader 전체 개발, CI/CD 설계·구축 | [설계 선택](projects/blue-witness/docs/design/DECISIONS.md) · [전체 소스 안내](projects/blue-witness/source/README.md) · [측정 자료](projects/blue-witness/docs/EVIDENCE.md) |
 | **2** | [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md) | **전체 개인 구현.** JSON 모델 구성, PyTorch 학습, Q3.4 평가, Verilog 생성·시뮬레이션·합성 자동화 | [저장 가중치·RTL 비교](projects/configurable-cnn-rtl/tests/check_fixed_point.py) · [코드 안내](projects/configurable-cnn-rtl/docs/CODE_GUIDE.md) |
 | **3** | [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | 시스템 설계·통합, Zybo 카메라·AI·FreeRTOS, 적재량·Wi-Fi, Flask 서버·대시보드 | [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md) · [검수 기록](projects/edge-ai-trash-sorter/docs/CODE_REVIEW.md) |
 | **4** | [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | Master 스케줄링, I²C·완료 인터럽트, Slave 합성곱·큐, PWM·UART·타이머 | [통신 규격](projects/arduino-load-balancer/docs/PROTOCOL.md) · [검수 기록](projects/arduino-load-balancer/docs/CODE_REVIEW.md) |
@@ -40,7 +40,7 @@
 
 | 프로젝트 | 합계 LOC | 핵심 기술적 과제 | 설계·검증 근거 |
 |---|---:|---|---|
-| [Blue Witness](projects/blue-witness/README.md) | 45,105 | 단절·재시작·지연 도착 속에서 영상 보존과 시간 정합성 유지 | 27회 충돌·81건 저장·단절 복구 12건 · [상세](docs/TECHNICAL_CHALLENGES.md#blue-witness) |
+| [Blue Witness](projects/blue-witness/README.md) | 45,105<br>개인 작성 확인 **33,418** [근거](projects/blue-witness/docs/PERSONAL_LOC.md) | 단절·재시작·지연 도착 속에서 영상 보존과 시간 정합성 유지 | 27회 충돌·81건 저장·단절 복구 12건 · [상세](docs/TECHNICAL_CHALLENGES.md#blue-witness) |
 | [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/README.md) | 1,726 | 학습 모델의 형상·정수 계산을 Verilog 회로와 일치시키기 | MNIST 입력 10개·클래스 점수 100개 정수/RTL 일치 · [상세](docs/TECHNICAL_CHALLENGES.md#configurable-cnn-rtl) |
 | [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | 1,541 | 촬영·추론·UART가 공유 버퍼와 완료 순서를 지키도록 동기화 | 실보드 연동·시연, 전처리 C·서버 API 검사 · [상세](docs/TECHNICAL_CHALLENGES.md#edge-ai-trash-sorter) |
 | [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | 771 | 제한된 MCU에서 비동기 완료·큐·배치별 결과를 일관되게 관리 | 무작위 완료 순서의 1,800개 패치 검산·5개 보드 구성 빌드 · [상세](docs/TECHNICAL_CHALLENGES.md#arduino-load-balancer) |
@@ -65,7 +65,7 @@ Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영
 - **학습 결과:** 검증 mAP@0.50:0.95 **57.95%**, 동일 조건 내부 모델 비교에서 부재 오탐률 **3.69%→1.17%**. [학습 곡선·비교 조건](projects/blue-witness/analysis/model-results/README.md)
 - **확인 자료:** [담당 모듈과 협업 기여](projects/blue-witness/docs/CODE_GUIDE.md) · [설계 결정](projects/blue-witness/docs/design/DECISIONS.md) · [실제 장치·웹·AI·CI 화면](projects/blue-witness/docs/IMPLEMENTATION_GALLERY.md) · [평가 CSV·분석](projects/blue-witness/analysis/README.md).
 
-업로더는 개인 설계·팀 구현으로, 카메라·추론 런타임과 공통 IPC는 팀 구현 및 개인 학습·배포 연동으로 표시했습니다. 담당 모듈·공통 의존성·테스트를 이 저장소에 함께 포함했습니다.
+업로더는 개인 전체 개발 후 CD 연동 과정에서 팀이 수정한 모듈로, 카메라·추론 런타임과 공통 IPC는 팀 구현 및 개인 학습·배포 연동으로 표시했습니다. 담당 모듈·공통 의존성·테스트를 이 저장소에 함께 포함했습니다.
 
 ### 2. CNN·RTL · 모델에서 정수 연산 회로까지 전체 구현
 

@@ -1,6 +1,6 @@
 # 구현 위치와 기여
 
-**이민석:** 모델 학습·배포, 서버·웹, Time Sync, 전체 Fail-safe·Uploader 설계, CI/CD 설계·구축을 담당했습니다. 아래 파일에는 협업 수정도 포함됩니다.
+**이민석:** 모델 학습·배포, 서버·웹, Time Sync, 전체 Fail-safe 설계·Uploader 전체 개발, CI/CD 설계·구축을 담당했습니다. 아래 파일에는 협업 수정도 포함됩니다.
 
 | 영역 | 실제 파일 | 읽을 내용 |
 |---|---|---|
@@ -9,12 +9,16 @@
 | 서버 | [API](../source/server/backend/app/api) · [services](../source/server/backend/app/services) | 저장·ACK·사건 수집·지연 영상 재병합 |
 | 웹 | [frontend](../source/server/backend/frontend) | 사용자·차량 선택·사고 재생·관리자 |
 | 시간 상태 | [time_sync.c](../source/time_sync/src/time_sync.c) | Chrony 조회·상태 Snapshot·IPC·종료 |
-| 업로드 | [uploader](../source/uploader/README.md) | 개인 설계·팀 구현: spool·영속 큐·전송·ACK·복구 전체 |
+| 업로드 | [uploader](../source/uploader/README.md) | 개인 전체 개발: spool·영속 큐·전송·ACK·복구. 이후 CD 연동 과정에서 팀 수정 |
 | 촬영·추론 | [AI](../source/ai/README.md) · [영상 인계](../source/ai/evidence_handoff.h) | 팀 런타임·개인 모델 배포·설정 연동 |
 | 공통 IPC | [ipc](../source/ipc/README.md) · [watchdog](../source/ipc/runtime_watchdog.h) | 팀 공통 소켓·메시지·스레드 감시 |
 | CI/CD | [automation](../source/automation/README.md) | 실제 팀 workflow·검사·배포 코드 |
 
 원본 저장소 접근 없이 위 파일과 [파일별 출처](../source/PROVENANCE.json)를 확인할 수 있습니다. 아래 원본 커밋 링크는 협업 이력의 추가 참고 자료입니다.
+
+## 개인 작성 LOC
+
+프로젝트 전체 LOC와 분리해 **개인 구현 담당 범위 안의 Git 작성자 기준 LOC**를 집계했습니다. [개인 작성·후속 팀 수정·공통 코드 구분](PERSONAL_LOC.md)에서 모듈별 수치와 코드행별 커밋 근거를 확인할 수 있습니다.
 
 ## 본인 계정의 대표 기여 커밋
 
@@ -40,4 +44,4 @@
 
 ## 협업 범위
 
-전체 Fail-safe와 Uploader 구조는 개인 설계, 모듈 세부 구현·후속 강화는 협업입니다. 촬영·Snapshot·추론 런타임·IPC·공통 watchdog은 팀 구현이며 개인 학습·배포와 연결했습니다. 센서·V2V·위치 필터, 라벨 검수·통합 시나리오는 팀 작업입니다. CI/CD 캐시·SDK·복원 개선과 서버 UI 후속 수정도 원래 협업 기여를 유지합니다.
+전체 Fail-safe 구조를 설계하고 Uploader 전체를 직접 개발했습니다. 이후 CD 연동 과정의 수정·후속 개선은 팀 협업입니다. 촬영·Snapshot·추론 런타임·IPC·공통 watchdog은 팀 구현이며 개인 학습·배포와 연결했습니다. 센서·V2V·위치 필터, 라벨 검수·통합 시나리오는 팀 작업입니다. CI/CD 캐시·SDK·복원 개선과 서버 UI 후속 수정도 원래 협업 기여를 유지합니다.

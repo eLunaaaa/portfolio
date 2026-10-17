@@ -1,0 +1,69 @@
+{
+  "baseline_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
+  "tool": "cloc 2.10 + git blame -w -M",
+  "personal_module_scope": [
+    "automation",
+    "model_training",
+    "server",
+    "time_sync",
+    "uploader"
+  ],
+  "total": {
+    "code": 45105,
+    "personal_verified": 33418,
+    "collaboration": 4340,
+    "team_implementation": 5545,
+    "integration": 1802
+  },
+  "modules": {
+    "ai": {
+      "code": 4907,
+      "personal_verified": 0,
+      "collaboration": 0,
+      "team_implementation": 4907,
+      "integration": 0
+    },
+    "automation": {
+      "code": 1815,
+      "personal_verified": 331,
+      "collaboration": 1483,
+      "team_implementation": 0,
+      "integration": 1
+    },
+    "ipc": {
+      "code": 638,
+      "personal_verified": 0,
+      "collaboration": 0,
+      "team_implementation": 638,
+      "integration": 0
+    },
+    "model_training": {
+      "code": 7272,
+      "personal_verified": 5150,
+      "collaboration": 543,
+      "team_implementation": 0,
+      "integration": 1579
+    },
+    "server": {
+      "code": 22006,
+      "personal_verified": 20117,
+      "collaboration": 1701,
+      "team_implementation": 0,
+      "integration": 188
+    },
+    "time_sync": {
+      "code": 1026,
+      "personal_verified": 792,
+      "collaboration": 234,
+      "team_implementation": 0,
+      "integration": 0
+    },
+    "uploader": {
+      "code": 7441,
+      "personal_verified": 7028,
+      "collaboration": 379,
+      "team_implementation": 0,
+      "integration": 34
+    }
+  }
+}

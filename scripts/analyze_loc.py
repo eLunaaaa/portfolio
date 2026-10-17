@@ -102,6 +102,16 @@ def publish(rows, version):
     같은 파일 집계에서 모든 표를 생성해 요약과 언어별 수치가 어긋나지 않게 합니다.
     """
     challenges = json.loads((ROOT / 'metrics/technical-challenges.json').read_text())
+    personal_path = ROOT / 'metrics/blue-witness-personal-loc.json'
+    personal = json.loads(personal_path.read_text()) if personal_path.exists() else None
+    if personal:
+        # 소스가 바뀌면 과거 개인 LOC를 그대로 노출하지 않고 먼저 재집계하도록 요구합니다.
+        recorded = {r['path']: r['sha256'] for r in csv.DictReader(
+            (ROOT / 'metrics/blue-witness-personal-loc-files.csv').open())}
+        current = {r['path']: r['sha256'] for r in rows if r['project'] == 'blue-witness'
+                   and r['category'] not in {'external', 'generated'}}
+        if recorded != current:
+            raise RuntimeError('Blue Witness 소스가 변경됐습니다. analyze_personal_loc.py를 먼저 실행하세요.')
     reports = {}
     for slug in PROJECTS:
         group = [r for r in rows if r['project'] == slug]
@@ -135,6 +145,11 @@ def publish(rows, version):
         lines += ['', '프로젝트에 포함된 코드 규모이며 개인 단독 작성량을 뜻하지 않습니다. 담당 범위는 프로젝트 README에서 구분했습니다.', '',
                   '[전체 비교·집계 기준](../../../docs/LOC.md) · [파일별 수치·SHA-256](../../../metrics/loc-files.csv)', '']
         challenge = challenges[slug]
+        if slug == 'blue-witness' and personal:
+            verified = personal['total']['personal_verified']
+            lines += ['## 개인 작성 LOC', '',
+                      f'**개인 작성 확인 {verified:,} LOC / 프로젝트 전체 {r["total"]["code"]:,} LOC**. 개인 구현 담당 영역과 원본 Git 작성자 이력을 함께 적용했습니다.', '',
+                      '[모듈별 개인·팀 수정 구분과 줄별 근거](PERSONAL_LOC.md)', '']
         lines += ['## 기술적 과제', '', challenge['summary'] + '.', '',
                   '**해결 접근:** ' + challenge['decision'] + '.', '',
                   '**확인 근거:** ' + challenge['evidence'] + '.', '',
@@ -142,6 +157,9 @@ def publish(rows, version):
         (ROOT / f'projects/{slug}/docs/LOC.md').write_text('\n'.join(lines))
         readme = ROOT / f'projects/{slug}/README.md'
         short = f'## 코드 규모와 기술적 과제\n\n**{r["total"]["code"]:,} LOC · {r["total"]["files"]}개 파일** · 구현 {nums[0]:,} / 테스트·예제 {nums[1]:,} / 빌드·CI·설정 {nums[2]:,}.\n\n주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)'
+        if slug == 'blue-witness' and personal:
+            short += (f'\n\n**개인 작성 확인 {personal["total"]["personal_verified"]:,} LOC** · 개인 구현 담당 영역의 원본 Git 작성 이력 기준. '
+                      + '[개인·팀 수정·통합분 구분](docs/PERSONAL_LOC.md)')
         short += ('\n\n- **기술적 과제:** ' + challenge['summary'] + '.'
                   + '\n- **설계 선택:** ' + challenge['decision'] + '.'
                   + '\n- **확인 근거:** ' + challenge['evidence'] + '.'
@@ -150,7 +168,11 @@ def publish(rows, version):
     challenge_table = '| 프로젝트 | 합계 LOC | 핵심 기술적 과제 | 설계·검증 근거 |\n|---|---:|---|---|\n'
     for slug, name in PROJECTS.items():
         c = challenges[slug]
-        challenge_table += (f'| [{name}](projects/{slug}/README.md) | {reports[slug]["total"]["code"]:,} | '
+        loc_display = f'{reports[slug]["total"]["code"]:,}'
+        if slug == 'blue-witness' and personal:
+            loc_display += (f'<br>개인 작성 확인 **{personal["total"]["personal_verified"]:,}** '
+                            + '[근거](projects/blue-witness/docs/PERSONAL_LOC.md)')
+        challenge_table += (f'| [{name}](projects/{slug}/README.md) | {loc_display} | '
                             + c['summary'] + ' | ' + c['evidence']
                             + f' · [상세](docs/TECHNICAL_CHALLENGES.md#{slug}) |\n')
     write_challenge_report(challenges, reports)

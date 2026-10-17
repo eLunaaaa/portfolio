@@ -7,7 +7,7 @@
 | [model_training/](model_training/README.md) | 촬영 등록 → BBox 검수 → COCO 변환 → 학습 → 평가 → ONNX | 개인 담당, 팀 검수·후속 수정 포함 |
 | [server/](server/README.md) | API → 서비스 → DB repository → 웹·회귀 테스트 | 개인 담당, 팀 후속 수정 포함 |
 | [time_sync/](time_sync/README.md) | Chrony 측정 → 상태 Snapshot → IPC 응답 | 개인 담당 |
-| [uploader/](uploader/README.md) | 영상 인계 → spool → SQLite 큐 → 전송 → 저장 확인·복구 | 개인 설계·팀 구현, 전체 모듈 포함 |
+| [uploader/](uploader/README.md) | 영상 인계 → spool → SQLite 큐 → 전송 → 저장 확인·복구 | 개인 전체 개발, 이후 CD 연동 과정에서 팀 수정 |
 | [ai/](ai/README.md) | 촬영 Ring·Snapshot → 추론·인코딩 → 영상 인계 | 팀 런타임, 개인 학습·배포·설정 연동 |
 | [ipc/](ipc/README.md) | 공통 메시지·소켓·스레드 진행 watchdog | 팀 공통 의존성 |
 | [automation/](automation/README.md) | 팀 CI·ARM64 빌드·수동 Pi 배포의 실제 workflow·스크립트 | 개인 설계·구축, 협업 개선 |
