@@ -1,0 +1,196 @@
+[
+  {
+    "strategy": "news",
+    "synthetic": true,
+    "approval_assumption": "신호 시 승인 가정, 다음 봉 시가 체결",
+    "total_return_pct": 0.865,
+    "max_drawdown_pct": 0.3959,
+    "completed_trades": 4,
+    "win_rate_pct": 50.0,
+    "final_positions": 0,
+    "fills": [
+      {
+        "at": "2026-04-03T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 12188,
+        "signal_at": "2026-04-02T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-06T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 11698,
+        "signal_at": "2026-04-03T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-07T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 11257,
+        "signal_at": "2026-04-06T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-08T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12267,
+        "signal_at": "2026-04-07T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-17T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 12538,
+        "signal_at": "2026-04-16T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-20T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12047,
+        "signal_at": "2026-04-17T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-21T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 11607,
+        "signal_at": "2026-04-20T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-22T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12617,
+        "signal_at": "2026-04-21T14:00:00+09:00"
+      }
+    ],
+    "trades": [
+      {
+        "code": "005930",
+        "pnl_won": -3959,
+        "reason": "STOP_LOSS"
+      },
+      {
+        "code": "005930",
+        "pnl_won": 8041,
+        "reason": "TAKE_PROFIT"
+      },
+      {
+        "code": "005930",
+        "pnl_won": -3472,
+        "reason": "STOP_LOSS"
+      },
+      {
+        "code": "005930",
+        "pnl_won": 8040,
+        "reason": "TAKE_PROFIT"
+      }
+    ]
+  },
+  {
+    "strategy": "rsi",
+    "synthetic": true,
+    "approval_assumption": "신호 시 승인 가정, 다음 봉 시가 체결",
+    "total_return_pct": 1.6081,
+    "max_drawdown_pct": 0.0361,
+    "completed_trades": 2,
+    "win_rate_pct": 100.0,
+    "final_positions": 0,
+    "fills": [
+      {
+        "at": "2026-04-07T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 11257,
+        "signal_at": "2026-04-06T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-08T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12267,
+        "signal_at": "2026-04-07T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-21T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 11607,
+        "signal_at": "2026-04-20T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-22T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12617,
+        "signal_at": "2026-04-21T14:00:00+09:00"
+      }
+    ],
+    "trades": [
+      {
+        "code": "005930",
+        "pnl_won": 8041,
+        "reason": "TAKE_PROFIT"
+      },
+      {
+        "code": "005930",
+        "pnl_won": 8040,
+        "reason": "TAKE_PROFIT"
+      }
+    ]
+  },
+  {
+    "strategy": "combined",
+    "synthetic": true,
+    "approval_assumption": "신호 시 승인 가정, 다음 봉 시가 체결",
+    "total_return_pct": 1.6081,
+    "max_drawdown_pct": 0.0361,
+    "completed_trades": 2,
+    "win_rate_pct": 100.0,
+    "final_positions": 0,
+    "fills": [
+      {
+        "at": "2026-04-07T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 11257,
+        "signal_at": "2026-04-06T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-08T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12267,
+        "signal_at": "2026-04-07T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-21T14:00:00+09:00",
+        "code": "005930",
+        "side": "BUY",
+        "price": 11607,
+        "signal_at": "2026-04-20T14:00:00+09:00"
+      },
+      {
+        "at": "2026-04-22T14:00:00+09:00",
+        "code": "005930",
+        "side": "SELL",
+        "price": 12617,
+        "signal_at": "2026-04-21T14:00:00+09:00"
+      }
+    ],
+    "trades": [
+      {
+        "code": "005930",
+        "pnl_won": 8041,
+        "reason": "TAKE_PROFIT"
+      },
+      {
+        "code": "005930",
+        "pnl_won": 8040,
+        "reason": "TAKE_PROFIT"
+      }
+    ]
+  }
+]

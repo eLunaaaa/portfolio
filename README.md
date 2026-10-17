@@ -28,6 +28,7 @@ JSON으로 정의한 CNN을 PyTorch 모델과 Verilog로 구성하고 학습·�
 
 | 프로젝트 | 개인 담당 | 구현·검증 자료 |
 |---|---|---|
+| [뉴스·물리 버튼 기반 주식 주문](projects/stockauto-news-trader/README.md) | 키움 연동, 뉴스·RSI 분석, 주문 상태·청산, UNO LCD·버튼·부저 | [코드 안내](projects/stockauto-news-trader/docs/CODE_GUIDE.md) · Python 58개 · 실제 펌웨어·UNO 빌드 |
 | [실시간 Linux 실험 환경](projects/embedded-linux-system-programming/README.md) | UDP 기준 송수신 구현, PREEMPT_RT 도구 설정, CPU 3 고정, 논문 리딩 | [C 코드](projects/embedded-linux-system-programming/source/README.md) · [측정 설계](projects/embedded-linux-system-programming/docs/DESIGN.md) |
 | [Arduino 동적 부하 분산](projects/arduino-load-balancer/README.md) | Master 스케줄링, I²C·인터럽트, Slave 합성곱·큐, PWM·UART·타이머 | 시연 지연 포함 측정 234초 → 80.5초 · [통신 규격](projects/arduino-load-balancer/docs/PROTOCOL.md) |
 | [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/README.md) | 시스템·카메라·AI·FreeRTOS, 적재량·Wi-Fi, Flask·웹 | [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md) · Arduino·C·API 검사 |
@@ -37,4 +38,4 @@ JSON으로 정의한 CNN을 PyTorch 모델과 Verilog로 구성하고 학습·�
 
 각 프로젝트의 README에서 파일 역할과 실행 순서를 안내합니다. 주요 함수에는 입력·출력·처리 구조와 설계 이유를 한글 주석으로 설명했습니다.
 
-[GitHub Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)는 서버·웹 회귀, Uploader·Time Sync Linux 빌드, 모델 파이프라인, CNN 정수·RTL 일치, 하드웨어 독립 제어 코어와 문서 링크를 검사합니다. [검사 정의](.github/workflows/portfolio-ci.yml)
+[GitHub Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)는 서버·웹 회귀, Uploader·Time Sync Linux 빌드, 모델 파이프라인, CNN 정수·RTL 일치, 하드웨어 독립 제어 코어와 문서 링크를 검사하고, 주식 주문 프로젝트의 Python·펌웨어·UNO 빌드도 확인합니다. [검사 정의](.github/workflows/portfolio-ci.yml)

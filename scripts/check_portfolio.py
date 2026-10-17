@@ -26,11 +26,14 @@ def main():
             target = unquote(target.split('#', 1)[0])
             if target and not (page.parent / target).exists():
                 failures.append(f'{page.relative_to(ROOT)}: 링크 없음: {target}')
-    manifest = json.loads((SOURCE / 'PROVENANCE.json').read_text())
-    for entry in manifest['files']:
-        path = SOURCE / entry['path']
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != entry['sha256']:
-            failures.append(f'manifest 불일치: {entry["path"]}')
+    recorded = 0
+    for manifest_path in (SOURCE / 'PROVENANCE.json', ROOT / 'projects/stockauto-news-trader/PROVENANCE.json'):
+        manifest = json.loads(manifest_path.read_text())
+        for entry in manifest['files']:
+            path = manifest_path.parent / entry['path']
+            if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != entry['sha256']:
+                failures.append(f'manifest 불일치: {path.relative_to(ROOT)}')
+            recorded += 1
     # 운영 인증 값이 들어가는 파일은 example만 허용합니다. 내용은 로그에 출력하지 않습니다.
     for path in SOURCE.rglob('*'):
         if not path.is_file() or '__pycache__' in path.parts:
@@ -43,7 +46,7 @@ def main():
                 failures.append(f'개인키 혼입: {path.relative_to(ROOT)}')
     if failures:
         print('\n'.join(failures)); return 1
-    print(f'내부 문서 링크·출처 hash {len(manifest["files"])}개·운영 설정 분리 PASS')
+    print(f'내부 문서 링크·출처 hash {recorded}개·운영 설정 분리 PASS')
     return 0
 
 

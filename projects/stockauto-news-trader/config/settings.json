@@ -1,0 +1,67 @@
+{
+  "mode": "paper",
+  "rss_urls": [
+    "https://www.hankyung.com/feed/finance"
+  ],
+  "watchlist": [
+    {
+      "code": "005930",
+      "name": "삼성전자",
+      "lcd_name": "SAMSUNG",
+      "aliases": [],
+      "annual_revenue_won": 0
+    },
+    {
+      "code": "000660",
+      "name": "SK하이닉스",
+      "lcd_name": "SK HYNIX",
+      "aliases": [
+        "SK하이닉스",
+        "SK hynix"
+      ],
+      "annual_revenue_won": 0
+    }
+  ],
+  "min_news_score": 3,
+  "alarm_threshold": 5,
+  "news_max_age_hours": 24,
+  "poll_seconds": 60,
+  "approval_seconds": 90,
+  "quote_max_age_seconds": 10,
+  "max_positions": 10,
+  "max_order_won": 100000,
+  "buy_fee_rate": 0.0002,
+  "require_rsi": false,
+  "holidays": [],
+  "paper_cash_won": 1000000,
+  "paper_quotes": {
+    "005930": {
+      "ask": 70000
+    },
+    "000660": {
+      "ask": 150000
+    }
+  },
+  "database": "runtime/orders.db",
+  "strategy_mode": "news",
+  "market_filters": true,
+  "max_spread_pct": 0.5,
+  "max_day_rise_pct": 5.0,
+  "max_news_rise_pct": 2.0,
+  "min_volume_ratio": 1.0,
+  "risk_enabled": true,
+  "auto_exit": true,
+  "stop_loss_pct": 3.0,
+  "take_profit_pct": 6.0,
+  "max_holding_days": 5,
+  "daily_loss_limit_pct": 2.0,
+  "rsi_exit": true,
+  "cancel_after_seconds": 120,
+  "risk_poll_seconds": 30,
+  "require_contract_materiality": true,
+  "min_contract_revenue_pct": 1.0,
+  "manage_existing_positions": false,
+  "sell_fee_rate": 0.0002,
+  "sell_tax_rate": 0.0,
+  "replay_slippage_bps": 10
+}

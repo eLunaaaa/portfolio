@@ -1,0 +1,11 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+runtime/
+.env
+*.db
+*.db-wal
+*.db-shm
+build/
+.DS_Store

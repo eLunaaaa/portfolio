@@ -93,3 +93,44 @@ jobs:
           make -C projects/smart-umbrella-stand/tests test
           make -C projects/arduino-load-balancer/tests test
           make -C projects/edge-ai-trash-sorter/tests test
+  stockauto:
+    name: stockauto (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: projects/stockauto-news-trader
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Python dependencies
+        run: python -m pip install -r requirements.txt
+      - name: News approval order and risk regressions
+        run: python -m unittest discover -s tests -v
+      - name: Offline approval and rejection demo
+        run: |
+          python examples/demo_without_hardware.py --decision BUY
+          python examples/demo_without_hardware.py --decision NO
+          python -m stockauto.replay examples/replay_sample.json
+      - name: Firmware and PC serial contract
+        if: runner.os == 'Linux'
+        run: make firmware-test
+      - uses: arduino/setup-arduino-cli@v2
+        if: runner.os == 'Linux'
+        with:
+          version: '1.2.0'
+      - name: Arduino UNO build
+        if: runner.os == 'Linux'
+        run: |
+          arduino-cli core update-index
+          arduino-cli core install arduino:avr@1.8.6
+          arduino-cli lib install "LiquidCrystal I2C@1.1.2"
+          arduino-cli compile --fqbn arduino:avr:uno --build-path build/uno firmware/news_lcd

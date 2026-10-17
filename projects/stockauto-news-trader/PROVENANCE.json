@@ -1,0 +1,289 @@
+{
+  "prepared_on": "2026-10-17",
+  "project": "StockAuto News Trader",
+  "source_note": "개인 StockAutoTransaction 프로그램의 키움·RSI·DB 기반을 뉴스·UNO 물리 승인 장치로 확장한 실행본입니다. 개인 개발 폴더를 기준으로 검수·수정했습니다.",
+  "files": [
+    {
+      "path": ".gitignore",
+      "sha256": "74cd96f968ce4bfef6ba75026d8f2351a8dd2a21bf40c4153f10cf44d3286a18",
+      "bytes": 86,
+      "source": "personal_stockauto_project",
+      "source_sha256": "74cd96f968ce4bfef6ba75026d8f2351a8dd2a21bf40c4153f10cf44d3286a18",
+      "modified_during_review": false
+    },
+    {
+      "path": "Makefile",
+      "sha256": "d3c4defd26c988f8cd883757fce9677588231bb7782dee34df3b5403124496bb",
+      "bytes": 494,
+      "source": "personal_stockauto_project",
+      "source_sha256": "d3c4defd26c988f8cd883757fce9677588231bb7782dee34df3b5403124496bb",
+      "modified_during_review": false
+    },
+    {
+      "path": "README.md",
+      "sha256": "c6051213d8ca7a87f7e1659116e24ba5c638d3152253faadbf271143d2821465",
+      "bytes": 4300,
+      "source": "personal_stockauto_project",
+      "source_sha256": "a45c3ef1ecf772a4e6881fd4b989c77a82ee5af5cb3d8aa93b1009f91a06c683",
+      "modified_during_review": true
+    },
+    {
+      "path": "config/settings.json",
+      "sha256": "69ea8dfc4197a6cdc5b02c09e1a447054c8c2d1bdff846f226a06a7c19597bfc",
+      "bytes": 1484,
+      "source": "personal_stockauto_project",
+      "source_sha256": "69ea8dfc4197a6cdc5b02c09e1a447054c8c2d1bdff846f226a06a7c19597bfc",
+      "modified_during_review": false
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "19e321466389aae7ff83bf50c9be64c26bb2be123f8d5fa44cd4c964a0b81824",
+      "bytes": 3384,
+      "source": "personal_stockauto_project",
+      "source_sha256": "f20e90ae58c60395b13d134b0ebbfaa88416e6653b94a6eb391b1bb66d6abb30",
+      "modified_during_review": true
+    },
+    {
+      "path": "docs/AUTOMATION_RULES.md",
+      "sha256": "e21392901aa8558a10acd58c99b4d520263a57c2ec2624053e3da031d9e1b045",
+      "bytes": 8070,
+      "source": "personal_stockauto_project",
+      "source_sha256": "61671eaf17ca6505e4162299816f2dd49410dcd1b909287e33fbff4bd3e214ff",
+      "modified_during_review": true
+    },
+    {
+      "path": "docs/CODE_GUIDE.md",
+      "sha256": "e4b65a12a4419e084443e927ca30b051001caf174a21a12004898161ba4555d4",
+      "bytes": 4567,
+      "source": "portfolio_review_addition"
+    },
+    {
+      "path": "docs/CODE_REVIEW.md",
+      "sha256": "8a46bfb3610dbd0aee08a634ae9a22efb9bd2896499742dabd739990a0216920",
+      "bytes": 5998,
+      "source": "personal_stockauto_project",
+      "source_sha256": "35f6b2ef6f19e4fa8ca92ffdee0a176607edd3c398ba67d5c99bcbfa07ec5210",
+      "modified_during_review": true
+    },
+    {
+      "path": "docs/USAGE.md",
+      "sha256": "5545c8e43b9f697f5e07fd70b5ee5c528fb2f723a27735ed7fac079a27a9b40b",
+      "bytes": 9538,
+      "source": "portfolio_review_addition"
+    },
+    {
+      "path": "examples/demo_without_hardware.py",
+      "sha256": "9135541038ecf47e7b299f6dc91369b8580f0397fb87265d86571cbaef9b74d1",
+      "bytes": 2156,
+      "source": "personal_stockauto_project",
+      "source_sha256": "9135541038ecf47e7b299f6dc91369b8580f0397fb87265d86571cbaef9b74d1",
+      "modified_during_review": false
+    },
+    {
+      "path": "examples/replay_result.json",
+      "sha256": "cc87879fdac1418e62a337af084640d42f8dec2c92929fb72af977a84fc979ee",
+      "bytes": 4691,
+      "source": "personal_stockauto_project",
+      "source_sha256": "cc87879fdac1418e62a337af084640d42f8dec2c92929fb72af977a84fc979ee",
+      "modified_during_review": false
+    },
+    {
+      "path": "examples/replay_sample.json",
+      "sha256": "e1d7da31de214fe005b8db0c29351865e3d9ab6bc477eef6825fd40106ee6b8a",
+      "bytes": 14142,
+      "source": "personal_stockauto_project",
+      "source_sha256": "e1d7da31de214fe005b8db0c29351865e3d9ab6bc477eef6825fd40106ee6b8a",
+      "modified_during_review": false
+    },
+    {
+      "path": "firmware/news_lcd/news_lcd.ino",
+      "sha256": "62bc8b9b3ce433abbaa073771f13338907988306661ec2b6572e32617df650d8",
+      "bytes": 10048,
+      "source": "personal_stockauto_project",
+      "source_sha256": "62bc8b9b3ce433abbaa073771f13338907988306661ec2b6572e32617df650d8",
+      "modified_during_review": false
+    },
+    {
+      "path": "requirements-kiwoom.txt",
+      "sha256": "80e31d67d29ce9977a3c33e97f71c0522a8638455416abc0156dd65657ce4614",
+      "bytes": 35,
+      "source": "personal_stockauto_project",
+      "source_sha256": "80e31d67d29ce9977a3c33e97f71c0522a8638455416abc0156dd65657ce4614",
+      "modified_during_review": false
+    },
+    {
+      "path": "requirements.txt",
+      "sha256": "021c5b0350e27c43b45521106ef1eb49a27f2f14b45e43ad0d9bee3640b1f95f",
+      "bytes": 58,
+      "source": "personal_stockauto_project",
+      "source_sha256": "021c5b0350e27c43b45521106ef1eb49a27f2f14b45e43ad0d9bee3640b1f95f",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/__init__.py",
+      "sha256": "075a3a28479598e091712beff6d1eeee8c6747a7d2e28c2369fa6faa4a2bed7e",
+      "bytes": 88,
+      "source": "personal_stockauto_project",
+      "source_sha256": "075a3a28479598e091712beff6d1eeee8c6747a7d2e28c2369fa6faa4a2bed7e",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/__main__.py",
+      "sha256": "69c988829e32b99124b70210d5494d3ab678ba6025ef71235f8f9ffc531746a1",
+      "bytes": 130,
+      "source": "personal_stockauto_project",
+      "source_sha256": "69c988829e32b99124b70210d5494d3ab678ba6025ef71235f8f9ffc531746a1",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/app.py",
+      "sha256": "a6b976a4cf4f23a95634db186f393ed1fb17d0dde389b0c423284f3e66237957",
+      "bytes": 17006,
+      "source": "personal_stockauto_project",
+      "source_sha256": "a6b976a4cf4f23a95634db186f393ed1fb17d0dde389b0c423284f3e66237957",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/broker.py",
+      "sha256": "842a072ef07f46e9e72724316d4a82fefce970f132527e4e105b08346265361b",
+      "bytes": 7323,
+      "source": "personal_stockauto_project",
+      "source_sha256": "842a072ef07f46e9e72724316d4a82fefce970f132527e4e105b08346265361b",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/engine.py",
+      "sha256": "0eecdfc44d81390e2cdd33f386599c5557eeda07a607ece1fd8aa4e08b692eb7",
+      "bytes": 10622,
+      "source": "personal_stockauto_project",
+      "source_sha256": "47aba197558dcaca243fbaeaf0c017dc7f07fdfd2fd1d9612deb4358c1d3d254",
+      "modified_during_review": true
+    },
+    {
+      "path": "stockauto/kiwoom.py",
+      "sha256": "b7d5cf46a6e7352712af0be8fe1f75f231c2c5f2567890c1ba0b07073044f2fe",
+      "bytes": 16177,
+      "source": "personal_stockauto_project",
+      "source_sha256": "b7d5cf46a6e7352712af0be8fe1f75f231c2c5f2567890c1ba0b07073044f2fe",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/market.py",
+      "sha256": "ea1c47d1e2b107401fb94572fe838a804ca49955377eeb110b3827613c942f03",
+      "bytes": 3231,
+      "source": "personal_stockauto_project",
+      "source_sha256": "ea1c47d1e2b107401fb94572fe838a804ca49955377eeb110b3827613c942f03",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/models.py",
+      "sha256": "27263b0e70f4a9c9d67aa9f7cd7ec4ddc5ea0eee7ec7c31e91791fe4303df9d8",
+      "bytes": 2472,
+      "source": "personal_stockauto_project",
+      "source_sha256": "27263b0e70f4a9c9d67aa9f7cd7ec4ddc5ea0eee7ec7c31e91791fe4303df9d8",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/news.py",
+      "sha256": "49a50d9dd907922ffd3529258762b9a3c4407d20aa5c7ed0d5c0cfd4deb75a65",
+      "bytes": 11051,
+      "source": "personal_stockauto_project",
+      "source_sha256": "49a50d9dd907922ffd3529258762b9a3c4407d20aa5c7ed0d5c0cfd4deb75a65",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/protocol.py",
+      "sha256": "74759be20a36e6be3e65a0de3f7827b142c4e2d02a7f326df24cb2c585e1c826",
+      "bytes": 2272,
+      "source": "personal_stockauto_project",
+      "source_sha256": "74759be20a36e6be3e65a0de3f7827b142c4e2d02a7f326df24cb2c585e1c826",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/replay.py",
+      "sha256": "65fa216580ea0f3e6b859333b7dff0ba57108359ea4fd2d694931615ab11256a",
+      "bytes": 9590,
+      "source": "personal_stockauto_project",
+      "source_sha256": "6cc37e441d394e1f662d65f7f9f079e4a59e04230f615695696129899d6f6ca8",
+      "modified_during_review": true
+    },
+    {
+      "path": "stockauto/risk.py",
+      "sha256": "ac7d90f0eba48a3ccc6a2b5346fb3bd24c15e9dac780bf7ab49480d68d357c51",
+      "bytes": 8154,
+      "source": "personal_stockauto_project",
+      "source_sha256": "ac7d90f0eba48a3ccc6a2b5346fb3bd24c15e9dac780bf7ab49480d68d357c51",
+      "modified_during_review": false
+    },
+    {
+      "path": "stockauto/store.py",
+      "sha256": "aa10e8da7511bb5696634c551c9b719798edb721b99e1491e243a3db586fce01",
+      "bytes": 14986,
+      "source": "personal_stockauto_project",
+      "source_sha256": "7ca521ed65f003cb572c59c96ba3bd8fc691fc5d0d96d99a9d628140e9a0040a",
+      "modified_during_review": true
+    },
+    {
+      "path": "tests/arduino_stub/Arduino.h",
+      "sha256": "079533a1ccb01252a8db44cad7101359560092f8fb63ce762359ce1b8d4361ce",
+      "bytes": 1725,
+      "source": "personal_stockauto_project",
+      "source_sha256": "079533a1ccb01252a8db44cad7101359560092f8fb63ce762359ce1b8d4361ce",
+      "modified_during_review": false
+    },
+    {
+      "path": "tests/arduino_stub/LiquidCrystal_I2C.h",
+      "sha256": "27d552faced3174f71570a93d521f1ccf33592d71e4bb2e7c8c8cbc12bb9f9c7",
+      "bytes": 536,
+      "source": "personal_stockauto_project",
+      "source_sha256": "27d552faced3174f71570a93d521f1ccf33592d71e4bb2e7c8c8cbc12bb9f9c7",
+      "modified_during_review": false
+    },
+    {
+      "path": "tests/arduino_stub/Wire.h",
+      "sha256": "35e96e5a7d717555b94d1d7b1ac0eca8a3c56fdd2e67c6b20446f31085b8c801",
+      "bytes": 137,
+      "source": "personal_stockauto_project",
+      "source_sha256": "35e96e5a7d717555b94d1d7b1ac0eca8a3c56fdd2e67c6b20446f31085b8c801",
+      "modified_during_review": false
+    },
+    {
+      "path": "tests/check_serial_contract.py",
+      "sha256": "4dc70532e14a1743cfd85916882144b30a6fbfc71de87c9408a50c9559733f76",
+      "bytes": 924,
+      "source": "personal_stockauto_project",
+      "source_sha256": "4dc70532e14a1743cfd85916882144b30a6fbfc71de87c9408a50c9559733f76",
+      "modified_during_review": false
+    },
+    {
+      "path": "tests/test_firmware.cpp",
+      "sha256": "37febc008a9f454a5ad1f324c1baf192a12e3f106f34f985fa40b8ec5525edbf",
+      "bytes": 3667,
+      "source": "personal_stockauto_project",
+      "source_sha256": "37febc008a9f454a5ad1f324c1baf192a12e3f106f34f985fa40b8ec5525edbf",
+      "modified_during_review": false
+    },
+    {
+      "path": "tests/test_improvements.py",
+      "sha256": "cd1b181b952f132e6753877e560bfaf33ed397b4d91f9ab808bde96195189e5c",
+      "bytes": 13772,
+      "source": "personal_stockauto_project",
+      "source_sha256": "cd1b181b952f132e6753877e560bfaf33ed397b4d91f9ab808bde96195189e5c",
+      "modified_during_review": false
+    },
+    {
+      "path": "tests/test_review_regressions.py",
+      "sha256": "c728ac4c5df40aa86dd6a5f440e5068c42108a3257ae432660d88d251b281de9",
+      "bytes": 5311,
+      "source": "portfolio_review_addition"
+    },
+    {
+      "path": "tests/test_system.py",
+      "sha256": "708b08d4853a7ec1282a063fc7e07363fbbff6fe5030939e114d153cc3fd205e",
+      "bytes": 13709,
+      "source": "personal_stockauto_project",
+      "source_sha256": "708b08d4853a7ec1282a063fc7e07363fbbff6fe5030939e114d153cc3fd205e",
+      "modified_during_review": false
+    }
+  ]
+}
