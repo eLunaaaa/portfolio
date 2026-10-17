@@ -55,7 +55,7 @@
 
 ### 1. Blue Witness · 임베디드·AI·서버·자동화 통합
 
-[![Blue Witness 실제 사고차·관측차 영상 병합 결과](projects/blue-witness/media/completion-report/merged-video.png)](projects/blue-witness/docs/IMPLEMENTATION_GALLERY.md)
+[![Blue Witness · V2V 기반 다중 사고 증거 수집 시스템](projects/blue-witness/media/completion-report/cover.png)](projects/blue-witness/README.md)
 
 Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영상을 선별해 서버에서 시간에 맞춰 병합하는 팀 프로젝트입니다. 2026 임베디드 소프트웨어 경진대회 본선 참가 프로젝트입니다.
 

@@ -98,6 +98,20 @@
       "original_sha256": "47afa95b69edeeb2f45fafcd5f52b0c537730fc3332089122c293b5637e3517d",
       "published_sha256": "47afa95b69edeeb2f45fafcd5f52b0c537730fc3332089122c293b5637e3517d",
       "processing": "원본 이미지 그대로"
+    },
+    {
+      "file": "cover.png",
+      "slide": 1,
+      "processing": "첫 슬라이드 렌더링 후 상단 표지 영역 선택, 하단 링크·빈 시연 입력란 제외, 1998×960px",
+      "published_sha256": "1cc231c145067619488024b046e6292e574a75d992e7bf097ce9cb9c7937bdbd"
+    },
+    {
+      "file": "witness-view.png",
+      "slide": 16,
+      "pptx_media": "ppt/media/v56-usability-2.png",
+      "original_sha256": "06c7062c8b95507f8bee0ae795f6f08ce960c716bf02a4526f50a7a07ee51a93",
+      "published_sha256": "06c7062c8b95507f8bee0ae795f6f08ce960c716bf02a4526f50a7a07ee51a93",
+      "processing": "원본 이미지 그대로"
     }
   ]
 }

@@ -1,3 +1,5 @@
+![Blue Witness · V2V 기반 다중 사고 증거 수집 시스템과 실제 시험 환경](media/completion-report/cover.png)
+
 # Blue Witness · 다중 시점 사고 영상 수집
 
 사고 차량과 주변 차량의 **사고 전 8초·후 2초 영상**을 모아 촬영 시각에 맞춰 병합하고 웹에서 확인하는 임베디드 팀 프로젝트입니다. 2026 임베디드 소프트웨어 경진대회 본선 참가 프로젝트입니다.
@@ -65,13 +67,37 @@ Raspberry Pi 5 · IMX219 · C/C++ · POSIX IPC · PyTorch · YOLOX-Tiny · ONNX 
 
 촬영 callback과 추론·인코딩·전송을 분리하고 Snapshot 참조로 사고 구간을 보호합니다. 업로더는 HTTP 성공만으로 완료하지 않고 사고·차량·파일 hash·서버 저장 상태를 확인합니다. 서버는 늦게 도착한 영상을 새 revision으로 재병합합니다. [모듈별 설계](docs/design/README.md)
 
-## 실제 구현 화면
+## 홈페이지 개발과 사용성
 
-![등록 차량과 사고별 수집·병합 상태를 조회하는 직접 구현한 웹 포털](media/completion-report/portal.png)
+FastAPI·SQLite로 차량·사고·증거와 접근 권한을 관리하고, 별도 Worker·FFmpeg로 촬영 시각을 맞춰 병합합니다. 웹에서는 **사고 찾기 → 주변 차량 시점 확인 → 사고 장면 비교** 순서로 필요한 영상을 확인할 수 있게 구성했습니다.
 
-FastAPI·SQLite로 차량별 사건과 영상 수집 상태를 관리하고, 별도 Worker·FFmpeg로 병합합니다. 늦게 도착한 영상은 병합본에 반영하며, 웹에서 전체·목격 차량·내 차량 영상과 사고 장면 0.25배속 재생을 제공합니다.
+### 차량별 사고 조회
 
-[차량 실장 → AI 학습 → 영속 업로드 → 시간 정렬·웹 → 협업·CI/CD 사진과 코드](docs/IMPLEMENTATION_GALLERY.md)
+![사용자 등록 차량과 사고별 수집·병합 상태를 조회하는 웹 포털](media/completion-report/portal.png)
+
+로그인한 사용자의 등록 차량과 사고 기록을 표시합니다. 차량별 사고를 선택하고 수집 중·병합 완료 상태를 확인할 수 있습니다.
+
+### 주변 차량 시점 확인
+
+![목격 차량 영상 모드에서 주변 차량 두 대의 시점을 비교하는 화면](media/completion-report/witness-view.png)
+
+내 차량 화면에 보이지 않는 상황을 주변 차량의 시점으로 확인합니다. 전체 영상·목격 차량 영상·내 차량 영상을 같은 사고 안에서 전환합니다.
+
+### 함께 보기·사고 장면 재생
+
+![사고차와 관측차의 영상을 함께 재생하고 사고 장면을 0.25배속으로 확인하는 화면](media/completion-report/playback.png)
+
+촬영 시각을 맞춘 여러 영상을 한 화면에서 비교하고, 사고 장면은 0.25배속으로 재생합니다. 시점 전환 시 재생 위치·배속을 유지하고 늦게 도착한 영상은 새 병합본으로 반영합니다.
+
+### 로그인과 사고별 접근
+
+| 사용자 로그인 | 임시 사고 접근 코드 |
+|---|---|
+| <img src="media/completion-report/user-login.png" width="320" alt="사용자 로그인·회원가입 화면"> | <img src="media/completion-report/event-access-code.png" width="320" alt="유효기간과 남은 시간을 표시하는 임시 사고 접근 코드"> |
+
+차량 소유권·로그인 세션을 확인해 사고 목록을 제공하고, 사고 접근 코드는 기본 5분·사고 세션은 30분으로 접근 범위와 시간을 관리합니다. 촬영 후보는 위치·화각과 AI로 선별하고 사고 전 8초·후 2초 영상만 수집합니다.
+
+[홈페이지·서버 구현 설명](docs/IMPLEMENTATION_GALLERY.md) · [인증·선별 수집 구조와 코드](docs/SERVER_SECURITY.md)
 
 ## 서버·보안 구현
 
