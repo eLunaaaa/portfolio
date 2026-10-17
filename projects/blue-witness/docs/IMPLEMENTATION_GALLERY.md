@@ -81,25 +81,24 @@ Raspberry Pi 5·BNO086 IMU·IMX219 카메라·배터리 모듈을 모형 차량�
 
 [업로더 코드](../source/uploader/README.md) · [시간 동기화 C 코드](../source/time_sync/src/time_sync.c) · [Fail-safe 설계](FAILSAFE.md) · [사건별 CSV·ACK·체크섬](../source/docs/measurements/20261008-scenarios/README.md)
 
-## 5. 협업·CI/CD · 개발과 장치 배포를 연결
+## 5. 작업 관리부터 장치 배포까지 하나의 흐름으로 연결
 
-![주간 Sprint와 기능별 Product Backlog를 관리한 실제 Trello 보드](../media/completion-report/trello.png)
+Windows VS Code에서 SSH로 VMware Ubuntu에 접속해 크로스 툴체인으로 개발했습니다. Trello·Slack·GitHub로 관리한 작업을 CI 검사와 장치 배포로 연결했습니다.
 
-Trello에서 주간 목표·작업 우선순위·담당과 진행 상태를 관리했습니다. 통신·서버 기반부터 차량 기능 통합, 실장·반복 시험, 복구 보완으로 기능을 확장했습니다.
+| Trello · 주간 목표·진행 상태 | Slack · 실험 자료·이슈 공유 |
+|---|---|
+| <img src="../media/completion-report/trello.png" width="420" alt="기능별 Backlog와 주간 Sprint를 관리하는 Trello"> | <img src="../media/completion-report/slack.png" width="420" alt="카메라 자료와 모듈 연동 기준을 공유하는 Slack"> |
 
-<details>
-<summary>Slack에서 공유한 장치 자료와 연동 기준</summary>
+### CI · 변경 영향 검사와 ARM64 산출물
 
-![카메라 자료와 화각 계산·판정 기준을 공유한 실제 팀 Slack 화면](../media/completion-report/slack.png)
+![서버·장치·통합 검사를 연결한 실제 GitHub Actions CI 성공 화면](../media/development/ci-run.png)
 
-장치 사용 자료와 실험 결과를 공유하고, 카메라 화각 같은 모듈 간 연동 기준을 협의했습니다. 화면의 자료 공유·논의는 팀 협업 기록입니다.
+**개인 담당:** CI/CD 구조·개선 방향 설계와 구축·운영 개선입니다. PR에서는 변경 영향에 맞는 검사를 선택하고 main에서는 전체 검사·빌드와 산출물을 연결했습니다. 서버 Ubuntu·Windows, Pi 6개 모듈, ArUco 오프라인 검사·FFmpeg 병합 등을 포함했습니다.
 
-</details>
+### CD · canary·smoke·순차 배포
 
-![원본 팀 저장소에서 서버·ARM64 모듈·통합 검사와 산출물 생성을 실행한 GitHub Actions](../media/completion-report/github-actions.png)
+![검증 산출물을 받아 차량에 순차 배포하고 서비스·IPC·P2P를 점검하는 실제 CD 실행 로그](../media/development/cd-rollout.png)
 
-**개인 담당:** CI/CD 구조·개선 방향 설계와 구축·운영 개선입니다. PR에서는 변경 영향에 맞는 검사를 선택하고, main에서는 전체 검사·빌드와 산출물을 연결했습니다. 서버 Ubuntu·Windows, Pi의 6개 모듈, ArUco 오프라인 검사·FFmpeg 병합 등을 자동 검사 흐름에 포함했습니다.
+수동 배포 요청을 받은 VMware 실행기가 CI에서 검증한 산출물을 사용합니다. Pi 한 대 선행 점검 후 차량별로 순차 진행하고 서비스·프로세스·IPC·P2P를 확인합니다. 화면은 배포 진행 중의 로그이며, 첫 장치의 `Smoke PASS`·`DEPLOY PASS`와 후속 차량의 P2P 준비 확인을 보여줍니다. 실패 시 이전 release로 복원하는 흐름을 구성했습니다.
 
-**배포:** 사용자가 요청한 배포는 VMware 실행기에서 검증 산출물을 받아 Pi 한 대를 선행 점검한 뒤 순차 진행합니다. 서비스·P2P smoke 검사와 실패 복원 흐름을 구성했습니다. 위 이미지는 **원본 팀 CI의 실행 화면**이며, 이 포트폴리오의 코드 검사 실행은 아래 별도 링크에서 확인할 수 있습니다.
-
-[보존된 실제 팀 workflow·배포 스크립트](../source/automation/README.md) · [CI 설계](design/CI.md) · [CD 설계](design/CD.md) · [포트폴리오 Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)
+[개발환경·CI/CD 전체 흐름](../README.md) · [실제 팀 workflow·배포 스크립트](../source/automation/README.md) · [CI 설계](design/CI.md) · [CD 설계](design/CD.md) · [포트폴리오 코드 검사](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml)

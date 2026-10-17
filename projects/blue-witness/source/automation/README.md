@@ -4,6 +4,22 @@
 
 **이민석의 기여:** CI/CD 구조와 개선 방향의 아이디어·설계, 구축·운영 개선. 변경 영향별 검사, 캐시·비용 제한, 검증 artifact 승격, canary·순차 배포와 복구 흐름까지 담당 기여 범위로 설명합니다. 팀 협업 저장소의 실제 구현이며 Git 작성자 이력은 그대로 유지합니다. 설계 기여를 모든 줄의 단독 작성과 동일시하지 않습니다.
 
+## 개발환경과 실제 실행 화면
+
+Windows VS Code → SSH → VMware Ubuntu에서 개발·크로스 빌드하고, 검증 산출물을 VMware 실행기로 받아 장치에 배포했습니다. Trello·Slack의 작업 관리·이슈 공유와 GitHub의 검사·배포 흐름을 연결했습니다.
+
+### CI · 전체 검사·빌드 성공
+
+![서버·Pi 6개 모듈·통합 검사가 성공한 실제 CI 실행](../../media/development/ci-run.png)
+
+변경 영향·SDK·서버 Ubuntu/Windows·통합 검사·ArUco·Pi 모듈을 최종 CI 결과로 연결합니다.
+
+### CD · canary·smoke·순차 배포 진행
+
+![검증 산출물 다운로드 후 차량별 배포와 P2P smoke 확인을 진행하는 CD 로그](../../media/development/cd-rollout.png)
+
+화면은 배포 진행 중의 기록입니다. 첫 차량의 서비스·프로세스·IPC·P2P 점검과 `DEPLOY PASS`, 다음 차량들의 `Fleet P2P ready` 확인을 보여줍니다. 완료된 실행 이력은 아래 링크로 연결했습니다.
+
 ## 실제 Actions 실행 근거
 
 - [main CI 성공 · 38017054195](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/actions/runs/38017054195): 기준 SHA `5148804`.

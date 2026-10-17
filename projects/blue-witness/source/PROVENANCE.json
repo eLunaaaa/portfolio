@@ -189,10 +189,12 @@
     },
     {
       "path": "automation/README.md",
-      "sha256": "32e086980e4b147be773f9435cbe3425a989d96998f81668b08724475bf95d14",
-      "bytes": 3370,
+      "sha256": "2f4cc8b025f207f89f34d6597689366eef3146057feab09888c133c87d381cd7",
+      "bytes": 4376,
       "origin": "personal_development_and_portfolio",
-      "previous_snapshot_sha256": "4060525bb3718df8ac088f66366040b95b2724fc12f01f5e93437c04e78622b4"
+      "previous_snapshot_sha256": "4060525bb3718df8ac088f66366040b95b2724fc12f01f5e93437c04e78622b4",
+      "exact_copy": false,
+      "portfolio_note": "개발환경·실제 CI/CD 실행 화면 설명 추가"
     },
     {
       "path": "automation/scripts/ci/build-pi.sh",

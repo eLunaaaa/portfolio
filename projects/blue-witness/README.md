@@ -67,6 +67,39 @@ Raspberry Pi 5 · IMX219 · C/C++ · POSIX IPC · PyTorch · YOLOX-Tiny · ONNX 
 
 촬영 callback과 추론·인코딩·전송을 분리하고 Snapshot 참조로 사고 구간을 보호합니다. 업로더는 HTTP 성공만으로 완료하지 않고 사고·차량·파일 hash·서버 저장 상태를 확인합니다. 서버는 늦게 도착한 영상을 새 revision으로 재병합합니다. [모듈별 설계](docs/design/README.md)
 
+## 개발환경·협업·CI/CD
+
+### 작업 관리부터 장치 배포까지 하나의 흐름으로 연결
+
+**Windows VS Code → SSH → VMware Ubuntu**의 크로스 툴체인 환경에서 개발했습니다. Trello의 주간 목표·작업 상태, Slack의 실험 자료·이슈 공유, GitHub의 코드 통합을 검사·빌드·장치 배포로 연결했습니다.
+
+| Trello · 일정과 작업 관리 | Slack · 실험 자료와 연동 이슈 |
+|---|---|
+| <img src="media/completion-report/trello.png" width="420" alt="주간 Sprint와 Product Backlog를 관리하는 Trello"> | <img src="media/completion-report/slack.png" width="420" alt="장치 자료와 화각·통신 기준을 공유하는 Slack"> |
+
+```text
+주간 목표·작업 분담 → 구현·Git 통합 → PR 변경 모듈 검사
+  → main 전체 CI·ARM64 빌드·산출물 보관
+  → 수동 배포 요청 → VMware 실행기 → Pi 한 대 선행 점검
+  → 차량별 순차 배포 → 서비스·IPC·P2P smoke 점검
+```
+
+**개인 담당:** CI/CD 구조 설계·구축과 운영 개선입니다. 변경 영향별 검사, 검증한 산출물의 배포 연결, 권한 사전 점검·canary·순차 배포·실패 복원 흐름을 구성하고 팀과 통합했습니다.
+
+### CI · 모듈 검사와 배포 산출물 생성
+
+![서버 Ubuntu·Windows, Pi 모듈과 통합 검사가 성공한 GitHub Actions CI 실행 화면](media/development/ci-run.png)
+
+변경 영향 선택과 SDK 준비 후 서버 Ubuntu·Windows, Pi 6개 모듈, ArUco 오프라인 검사·FFmpeg 병합을 연결했습니다. 선택된 검사 결과를 최종 CI 결과로 모으고 ARM64 빌드 산출물을 보관해 배포 대상으로 넘깁니다.
+
+### CD · 선행 점검과 차량별 순차 배포
+
+![배포 산출물 다운로드 후 canary·smoke·차량별 순차 배포를 진행하는 GitHub Actions CD 로그](media/development/cd-rollout.png)
+
+성공한 CI 산출물을 받아 Pi 한 대에 먼저 적용하고 서비스·프로세스·IPC·P2P를 점검한 뒤 다음 차량으로 진행합니다. 화면에는 `Smoke PASS`, `DEPLOY PASS`, 차량별 배포와 `Fleet P2P ready` 확인 과정이 표시돼 있습니다. 배포 실패 시 이전 release로 복원하도록 구성했습니다.
+
+[실제 팀 CI/CD 코드·실행 기록](source/automation/README.md) · [CI 설계와 검사 기준](docs/design/CI.md) · [CD 설계와 복구 흐름](docs/design/CD.md)
+
 ## 홈페이지 개발과 사용성
 
 FastAPI·SQLite로 차량·사고·증거와 접근 권한을 관리하고, 별도 Worker·FFmpeg로 촬영 시각을 맞춰 병합합니다. 웹에서는 **사고 찾기 → 주변 차량 시점 확인 → 사고 장면 비교** 순서로 필요한 영상을 확인할 수 있게 구성했습니다.

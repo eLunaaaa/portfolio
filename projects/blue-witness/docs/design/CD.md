@@ -2,6 +2,8 @@
 
 [workflow](../../source/automation/.github/workflows/deploy.yml) · [fleet 진입점](../../source/automation/scripts/deploy/deploy_fleet.sh) · [장치 적용 helper](../../source/automation/scripts/deploy/apply_release.sh)
 
+![canary·smoke 검사와 차량별 순차 배포가 진행되는 CD 로그](../../media/development/cd-rollout.png)
+
 ## 문제와 제약
 
 Pi 5대는 사고차·관측차 역할과 서비스가 다르고, 같은 P2P 그룹에 연결됩니다. 한꺼번에 바이너리를 바꾸면 어느 장치부터 잘못됐는지 찾기 어렵습니다. SSH가 된다고 서비스 재시작 권한까지 보장되지 않고, 배포 중 기존 영상·spool을 지우면 복구 자체가 손실을 만들 수 있습니다.

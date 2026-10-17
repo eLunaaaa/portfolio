@@ -1,0 +1,16 @@
+{
+  "assets": [
+    {
+      "file": "ci-run.png",
+      "source_file": "CD.png",
+      "description": "CI 전체 검사·빌드 성공 화면",
+      "sha256": "42bf5daa3f5e03b15aab4d68613d9296accee174ed704877f0bbed0dfc7a4bab"
+    },
+    {
+      "file": "cd-rollout.png",
+      "source_file": "CI.png",
+      "description": "CD canary·smoke·순차 배포 진행 화면",
+      "sha256": "e9dfac727a8f31aeeeb345f923c6f49d8ddd81b20bbc62d6cc772c2b8b085177"
+    }
+  ]
+}

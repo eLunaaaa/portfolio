@@ -2,6 +2,8 @@
 
 [보존한 workflow](../../source/automation/.github/workflows) · [검사 스크립트](../../source/automation/scripts/ci) · [설계 선택](DECISIONS.md)
 
+![서버·Pi 모듈·통합 검사와 artifact를 연결한 CI 성공 화면](../../media/development/ci-run.png)
+
 ## 기준과 목적
 
 이 폴더는 2026-10-16 원격 main `5148804`의 실제 운영 코드를 보존합니다. 초기 구축뿐 아니라 비용 최적화·SDK 정렬·Windows FFmpeg 캐시 개선 방향까지 이민석의 CI/CD 설계·구축 기여에 포함합니다. 협업 구현의 Git 작성자 이력은 유지합니다. 목적은 ‘컴파일 명령이 성공했는가’보다 **같은 계약·의존성으로 검사한 파일을 장치에 넘길 수 있는가**입니다. [실제 CI 성공 기록](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/actions/runs/38017054195)
