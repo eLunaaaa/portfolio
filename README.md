@@ -35,6 +35,22 @@
 | **6** | [뉴스·물리 버튼 기반 주식 주문](projects/stockauto-news-trader/README.md) | 뉴스·RSI 판단, 키움 연동, 주문·체결 원장, UNO LCD·승인 버튼·부저 | [구조와 상태 관리](projects/stockauto-news-trader/docs/ARCHITECTURE.md) · [검수 기록](projects/stockauto-news-trader/docs/CODE_REVIEW.md) |
 | **7** | [스마트 우산꽂이](projects/smart-umbrella-stand/README.md) | 아이디어, STM32 Master·SPI, Slave2 날씨·LCD·상태 표시 | [구조·시연](projects/smart-umbrella-stand/README.md) · [검수 기록](projects/smart-umbrella-stand/docs/CODE_REVIEW.md) |
 
+<!-- LOC:START -->
+## 프로젝트별 코드 규모
+
+| 프로젝트 | 구현 | 테스트·예제 | 빌드·CI·설정 | 합계 LOC |
+|---|---:|---:|---:|---:|
+| [Blue Witness](projects/blue-witness/docs/LOC.md) | 36,189 | 5,230 | 3,686 | 45,105 |
+| [CNN 학습·RTL 자동화](projects/configurable-cnn-rtl/docs/LOC.md) | 790 | 911 | 25 | 1,726 |
+| [엣지 AI 쓰레기 분류](projects/edge-ai-trash-sorter/docs/LOC.md) | 1,391 | 119 | 31 | 1,541 |
+| [Arduino 동적 부하 분산](projects/arduino-load-balancer/docs/LOC.md) | 571 | 187 | 13 | 771 |
+| [실시간 Linux 실험 환경](projects/embedded-linux-system-programming/docs/LOC.md) | 574 | 0 | 17 | 591 |
+| [뉴스·물리 버튼 주식 주문](projects/stockauto-news-trader/docs/LOC.md) | 1,736 | 851 | 14 | 2,601 |
+| [Smart Umbrella Stand](projects/smart-umbrella-stand/docs/LOC.md) | 596 | 77 | 14 | 687 |
+
+주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 LOC입니다. 공동 구현을 포함하며 개인 단독 작성량과는 구분합니다. [언어별 분석·집계 기준](docs/LOC.md)
+<!-- LOC:END -->
+
 ## 대표 구현과 검증
 
 ### 1. Blue Witness · 임베디드·AI·서버·자동화 통합

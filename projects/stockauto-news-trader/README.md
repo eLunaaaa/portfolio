@@ -12,6 +12,14 @@
 | 배선·실행·설정 | [사용 안내](docs/USAGE.md) |
 | 검수한 오류와 수정 | [검수 기록](docs/CODE_REVIEW.md) |
 | 실제 자동 검사 | [GitHub Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml) |
+<!-- LOC:START -->
+## 코드 규모
+
+**2,601 LOC · 28개 파일** · 구현 1,736 / 테스트·예제 851 / 빌드·CI·설정 14.
+
+주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)
+<!-- LOC:END -->
+
 
 ## 구현한 내용
 

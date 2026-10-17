@@ -1,0 +1,552 @@
+{
+  "tool": "cloc 2.10",
+  "scope": "Git tracked project files; physical code lines",
+  "projects": {
+    "blue-witness": {
+      "total": {
+        "files": 221,
+        "code": 45105,
+        "comment": 6977,
+        "blank": 7824
+      },
+      "categories": {
+        "implementation": {
+          "files": 150,
+          "code": 36189,
+          "comment": 6568,
+          "blank": 6966
+        },
+        "tests_examples": {
+          "files": 34,
+          "code": 5230,
+          "comment": 339,
+          "blank": 632
+        },
+        "build_ci_config": {
+          "files": 37,
+          "code": 3686,
+          "comment": 70,
+          "blank": 226
+        },
+        "generated": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        },
+        "external": {
+          "files": 57,
+          "code": 5282,
+          "comment": 1042,
+          "blank": 1119
+        }
+      },
+      "languages": {
+        "Bourne Shell": {
+          "files": 10,
+          "code": 1050,
+          "comment": 26,
+          "blank": 97
+        },
+        "C": {
+          "files": 16,
+          "code": 7849,
+          "comment": 1071,
+          "blank": 1180
+        },
+        "C++": {
+          "files": 2,
+          "code": 4245,
+          "comment": 239,
+          "blank": 541
+        },
+        "C/C++ Header": {
+          "files": 26,
+          "code": 1210,
+          "comment": 223,
+          "blank": 212
+        },
+        "CSS": {
+          "files": 1,
+          "code": 2348,
+          "comment": 89,
+          "blank": 498
+        },
+        "HTML": {
+          "files": 5,
+          "code": 1364,
+          "comment": 28,
+          "blank": 189
+        },
+        "JavaScript": {
+          "files": 16,
+          "code": 4459,
+          "comment": 474,
+          "blank": 699
+        },
+        "Python": {
+          "files": 109,
+          "code": 19647,
+          "comment": 4772,
+          "blank": 4154
+        },
+        "SQL": {
+          "files": 9,
+          "code": 297,
+          "comment": 11,
+          "blank": 125
+        },
+        "YAML": {
+          "files": 22,
+          "code": 2471,
+          "comment": 8,
+          "blank": 77
+        },
+        "make": {
+          "files": 5,
+          "code": 165,
+          "comment": 36,
+          "blank": 52
+        }
+      }
+    },
+    "configurable-cnn-rtl": {
+      "total": {
+        "files": 21,
+        "code": 1726,
+        "comment": 258,
+        "blank": 298
+      },
+      "categories": {
+        "implementation": {
+          "files": 11,
+          "code": 790,
+          "comment": 221,
+          "blank": 134
+        },
+        "tests_examples": {
+          "files": 8,
+          "code": 911,
+          "comment": 36,
+          "blank": 164
+        },
+        "build_ci_config": {
+          "files": 2,
+          "code": 25,
+          "comment": 1,
+          "blank": 0
+        },
+        "generated": {
+          "files": 1,
+          "code": 93,
+          "comment": 2,
+          "blank": 6
+        },
+        "external": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        }
+      },
+      "languages": {
+        "Coq": {
+          "files": 3,
+          "code": 617,
+          "comment": 0,
+          "blank": 123
+        },
+        "Python": {
+          "files": 9,
+          "code": 589,
+          "comment": 151,
+          "blank": 109
+        },
+        "Tcl/Tk": {
+          "files": 1,
+          "code": 12,
+          "comment": 0,
+          "blank": 0
+        },
+        "Verilog-SystemVerilog": {
+          "files": 7,
+          "code": 495,
+          "comment": 106,
+          "blank": 66
+        },
+        "make": {
+          "files": 1,
+          "code": 13,
+          "comment": 1,
+          "blank": 0
+        }
+      }
+    },
+    "edge-ai-trash-sorter": {
+      "total": {
+        "files": 18,
+        "code": 1541,
+        "comment": 780,
+        "blank": 263
+      },
+      "categories": {
+        "implementation": {
+          "files": 13,
+          "code": 1391,
+          "comment": 729,
+          "blank": 243
+        },
+        "tests_examples": {
+          "files": 3,
+          "code": 119,
+          "comment": 38,
+          "blank": 11
+        },
+        "build_ci_config": {
+          "files": 2,
+          "code": 31,
+          "comment": 13,
+          "blank": 9
+        },
+        "generated": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        },
+        "external": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        }
+      },
+      "languages": {
+        "Arduino Sketch": {
+          "files": 1,
+          "code": 191,
+          "comment": 95,
+          "blank": 47
+        },
+        "C": {
+          "files": 5,
+          "code": 556,
+          "comment": 298,
+          "blank": 67
+        },
+        "C++": {
+          "files": 2,
+          "code": 348,
+          "comment": 193,
+          "blank": 60
+        },
+        "C/C++ Header": {
+          "files": 4,
+          "code": 109,
+          "comment": 123,
+          "blank": 34
+        },
+        "HTML": {
+          "files": 1,
+          "code": 182,
+          "comment": 5,
+          "blank": 26
+        },
+        "JavaScript": {
+          "files": 1,
+          "code": 42,
+          "comment": 2,
+          "blank": 1
+        },
+        "Python": {
+          "files": 2,
+          "code": 82,
+          "comment": 51,
+          "blank": 19
+        },
+        "Tcl/Tk": {
+          "files": 1,
+          "code": 22,
+          "comment": 13,
+          "blank": 8
+        },
+        "make": {
+          "files": 1,
+          "code": 9,
+          "comment": 0,
+          "blank": 1
+        }
+      }
+    },
+    "arduino-load-balancer": {
+      "total": {
+        "files": 12,
+        "code": 771,
+        "comment": 436,
+        "blank": 37
+      },
+      "categories": {
+        "implementation": {
+          "files": 4,
+          "code": 571,
+          "comment": 319,
+          "blank": 23
+        },
+        "tests_examples": {
+          "files": 7,
+          "code": 187,
+          "comment": 117,
+          "blank": 14
+        },
+        "build_ci_config": {
+          "files": 1,
+          "code": 13,
+          "comment": 0,
+          "blank": 0
+        },
+        "generated": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        },
+        "external": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        }
+      },
+      "languages": {
+        "Arduino Sketch": {
+          "files": 2,
+          "code": 346,
+          "comment": 169,
+          "blank": 7
+        },
+        "C++": {
+          "files": 2,
+          "code": 130,
+          "comment": 68,
+          "blank": 4
+        },
+        "C/C++ Header": {
+          "files": 5,
+          "code": 177,
+          "comment": 141,
+          "blank": 9
+        },
+        "Python": {
+          "files": 2,
+          "code": 105,
+          "comment": 58,
+          "blank": 17
+        },
+        "make": {
+          "files": 1,
+          "code": 13,
+          "comment": 0,
+          "blank": 0
+        }
+      }
+    },
+    "embedded-linux-system-programming": {
+      "total": {
+        "files": 5,
+        "code": 591,
+        "comment": 221,
+        "blank": 81
+      },
+      "categories": {
+        "implementation": {
+          "files": 4,
+          "code": 574,
+          "comment": 221,
+          "blank": 74
+        },
+        "tests_examples": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        },
+        "build_ci_config": {
+          "files": 1,
+          "code": 17,
+          "comment": 0,
+          "blank": 7
+        },
+        "generated": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        },
+        "external": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        }
+      },
+      "languages": {
+        "C": {
+          "files": 2,
+          "code": 541,
+          "comment": 189,
+          "blank": 64
+        },
+        "C/C++ Header": {
+          "files": 2,
+          "code": 33,
+          "comment": 32,
+          "blank": 10
+        },
+        "make": {
+          "files": 1,
+          "code": 17,
+          "comment": 0,
+          "blank": 7
+        }
+      }
+    },
+    "stockauto-news-trader": {
+      "total": {
+        "files": 28,
+        "code": 2601,
+        "comment": 719,
+        "blank": 347
+      },
+      "categories": {
+        "implementation": {
+          "files": 16,
+          "code": 1736,
+          "comment": 524,
+          "blank": 209
+        },
+        "tests_examples": {
+          "files": 11,
+          "code": 851,
+          "comment": 194,
+          "blank": 138
+        },
+        "build_ci_config": {
+          "files": 1,
+          "code": 14,
+          "comment": 1,
+          "blank": 0
+        },
+        "generated": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        },
+        "external": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        }
+      },
+      "languages": {
+        "Arduino Sketch": {
+          "files": 1,
+          "code": 154,
+          "comment": 32,
+          "blank": 15
+        },
+        "C++": {
+          "files": 1,
+          "code": 42,
+          "comment": 17,
+          "blank": 1
+        },
+        "C/C++ Header": {
+          "files": 3,
+          "code": 37,
+          "comment": 8,
+          "blank": 0
+        },
+        "Python": {
+          "files": 22,
+          "code": 2354,
+          "comment": 661,
+          "blank": 331
+        },
+        "make": {
+          "files": 1,
+          "code": 14,
+          "comment": 1,
+          "blank": 0
+        }
+      }
+    },
+    "smart-umbrella-stand": {
+      "total": {
+        "files": 17,
+        "code": 687,
+        "comment": 409,
+        "blank": 121
+      },
+      "categories": {
+        "implementation": {
+          "files": 15,
+          "code": 596,
+          "comment": 373,
+          "blank": 110
+        },
+        "tests_examples": {
+          "files": 1,
+          "code": 77,
+          "comment": 36,
+          "blank": 8
+        },
+        "build_ci_config": {
+          "files": 1,
+          "code": 14,
+          "comment": 0,
+          "blank": 3
+        },
+        "generated": {
+          "files": 1,
+          "code": 8,
+          "comment": 5,
+          "blank": 1
+        },
+        "external": {
+          "files": 0,
+          "code": 0,
+          "comment": 0,
+          "blank": 0
+        }
+      },
+      "languages": {
+        "C": {
+          "files": 7,
+          "code": 430,
+          "comment": 229,
+          "blank": 57
+        },
+        "C/C++ Header": {
+          "files": 7,
+          "code": 129,
+          "comment": 148,
+          "blank": 37
+        },
+        "Python": {
+          "files": 2,
+          "code": 114,
+          "comment": 32,
+          "blank": 24
+        },
+        "make": {
+          "files": 1,
+          "code": 14,
+          "comment": 0,
+          "blank": 3
+        }
+      }
+    }
+  }
+}

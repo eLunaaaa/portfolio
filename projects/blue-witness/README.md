@@ -19,6 +19,14 @@
 | 학습 이력·개선 전후 결과 | [학습 곡선·모델 비교](analysis/model-results/README.md) · [비교 HTML](analysis/model-results/index.html) |
 | 웹·업로드·영상 병합 | [서버 코드](source/server/README.md) · [서버 설계](docs/design/SERVER.md) |
 | 자동 빌드와 회귀 검사 | [이 저장소 Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml) · [팀 CI/CD 코드](source/automation/README.md) |
+<!-- LOC:START -->
+## 코드 규모
+
+**45,105 LOC · 221개 파일** · 구현 36,189 / 테스트·예제 5,230 / 빌드·CI·설정 3,686.
+
+주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)
+<!-- LOC:END -->
+
 
 ## 개인 기여와 협업
 

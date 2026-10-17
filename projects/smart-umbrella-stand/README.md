@@ -5,6 +5,14 @@
 ![스마트 우산꽂이 실제 완성품: 건조·승강부, LCD와 수위 다이얼](media/prototype.png)
 
 **개인 담당:** 아이디어 제안, Master의 상태 판단·SPI 통신·ML 추론, Slave2의 기상 API·LCD·수위 표시. [사진으로 보는 동작과 구현](docs/IMPLEMENTATION_GALLERY.md)
+<!-- LOC:START -->
+## 코드 규모
+
+**687 LOC · 17개 파일** · 구현 596 / 테스트·예제 77 / 빌드·CI·설정 14.
+
+주석·빈 줄·외부 코드·자동 생성 파일을 제외한 프로젝트 규모입니다. [언어별·범주별 분석](docs/LOC.md)
+<!-- LOC:END -->
+
 
 ## 프로젝트 요약
 

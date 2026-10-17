@@ -21,11 +21,11 @@
     },
     {
       "path": "README.md",
-      "sha256": "551704a0a109a8a223c9c2ba4cac113418917c4b86dabbd1759e3aeeda9fc2c2",
-      "bytes": 4864,
+      "sha256": "c2188bf1bd70517bba4ab45b8e630fe1b5324c1afdd35848071ad6f3b84fc1b3",
+      "bytes": 5154,
       "source": "personal_stockauto_project",
       "source_sha256": "551704a0a109a8a223c9c2ba4cac113418917c4b86dabbd1759e3aeeda9fc2c2",
-      "modified_during_review": false
+      "modified_during_review": true
     },
     {
       "path": "config/settings.json",
