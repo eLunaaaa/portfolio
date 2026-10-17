@@ -122,6 +122,8 @@ FastAPI·SQLite로 차량·사고·증거와 접근 권한을 관리하고, 별�
 
 [Epoch별 결과·모델 비교·BBox·영상 판정](analysis/model-results/README.md) · [묶음·Confidence를 선택하는 HTML](analysis/model-results/index.html)
 
+[상세 AI 평가 HTML](analysis/model-results/evaluation-report.html)에서는 Confidence 0.001~1.00, 이전·개선 모델 8개 묶음, 클래스·차량별 오분류와 영상 단위 판단을 확인할 수 있습니다. 최신 시연 3,314프레임에서 Confidence 0.60의 검출률은 **94.09%**, 부재 오탐률은 **0.73%**입니다. 학습에 사용한 47프레임을 포함하는 내부 평가이며, 비교 후보 0.75와 실장치 적용값 0.60을 구분했습니다.
+
 ## 검증 자료
 
 - **코드 검사:** 서버 Python 74개, 웹 Node.js 51개, 학습·런타임 계약 44개 회귀 검사. Uploader 큐 중복·재시작 복구·ACK 불일치·HTTP 전송 검사.

@@ -33,5 +33,17 @@
       "source": "validation_epoch_005.json",
       "sha256": "debe15236f332f773de4e4fdbe11a20370e7fe61b03e5407c38d2afb5d084741"
     }
-  ]
+  ],
+  "attached_evaluation": {
+    "source": "evaluation_report.html",
+    "source_sha256": "d580b30f8ab190280ffd5ed9c963450db47f26680521e20560268aa38ab202a5",
+    "published_file": "evaluation-report.html",
+    "published_sha256": "a3032b360baa357f32324aecbb762380cbdc25a22ae0ad90dfcb8ea47269c1b2",
+    "processing": [
+      "기존 정답·예측·집계와 상호작용 유지",
+      "재평가에서 사용하지 않는 로컬 image 경로 제거",
+      "추가 파일을 요구하는 링크 정리·현재 요약/JSON으로 연결",
+      "문서 제목과 실장치/비교 후보 설정 설명 정리"
+    ]
+  }
 }

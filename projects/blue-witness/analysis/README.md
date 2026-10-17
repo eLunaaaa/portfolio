@@ -21,6 +21,10 @@
 - 프레임 판정과 실제 장치의 시간축 선별은 다릅니다. 배포 설정은 Confidence 0.60, class별 NMS IoU 0.65, 6프레임 간격 추론, 최근 3회 중 2회 검출입니다.
 - 평가 모델은 YOLOX-Tiny 2-class `tiny_blur_removed_v009_b8`, epoch 1, `dataset_v009`입니다. 로컬 학습 release 기록의 0.55와 후속 팀 검증에서 선정한 0.60은 서로 다른 시점의 설정입니다.
 
+## 상세 AI 평가 화면
+
+[전체 상호작용 평가 HTML](model-results/evaluation-report.html)에서 Confidence 0.001~1.00을 조절하고 클래스·차량별 결과, 유무 혼동행렬과 시간축 영상 판정을 비교할 수 있습니다. [최신 시연의 0.51·0.60·0.75 비교 조건과 수치](model-results/README.md#상세-상호작용-평가)
+
 ## 근거 파일과 재현
 
 | 자료 | 내용 |
