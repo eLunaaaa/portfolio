@@ -1,0 +1,37 @@
+{
+  "model": "tiny_blur_removed_v009_b8",
+  "files": [
+    {
+      "source": "evaluation_report.html",
+      "sha256": "d580b30f8ab190280ffd5ed9c963450db47f26680521e20560268aa38ab202a5"
+    },
+    {
+      "source": "blur_comparison/comparison_summary.json",
+      "sha256": "2415bb9f5d13c8641b5daa822d81e234fa4a4f9c252923f2a02847ed35760bf8"
+    },
+    {
+      "source": "training.jsonl",
+      "sha256": "cf5c8963427f38f29af249840ae01fd01e0edde99090e107089f565aa7414855"
+    },
+    {
+      "source": "validation_epoch_001.json",
+      "sha256": "48f7376fa1fccd326ee4a7697bafd61ea1059310a88b519acb3b15ac7c4c1b42"
+    },
+    {
+      "source": "validation_epoch_002.json",
+      "sha256": "ab92d40e3c5edb8f1950f5f84cdb78ad18e26673bfdaa4514ab197076ebb8247"
+    },
+    {
+      "source": "validation_epoch_003.json",
+      "sha256": "0d2c1280bf48f23439e1ed406dbcafbb4dd08b36b8f24d82ac87f2ad0bfa4d31"
+    },
+    {
+      "source": "validation_epoch_004.json",
+      "sha256": "8e0228506a631bcfdc5113c359544310fcfa30643814dbb39b1c20e7cc3a4518"
+    },
+    {
+      "source": "validation_epoch_005.json",
+      "sha256": "debe15236f332f773de4e4fdbe11a20370e7fe61b03e5407c38d2afb5d084741"
+    }
+  ]
+}

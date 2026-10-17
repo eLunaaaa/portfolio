@@ -45,6 +45,8 @@ Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영
 
 - **설계·구현:** 촬영 세션별 데이터 분리, YOLOX-Tiny 학습·ONNX 계약 검증, 영속 업로드 큐·저장 ACK, 지연 영상 재병합, 시간 동기화 IPC·스레드 진행 감시.
 - **협업·자동화:** Slack·Git·Trello를 활용한 팀 개발과 CI/CD 설계·구축. 검증한 산출물을 수동 장치 배포로 연결했습니다.
+- **서버·보안:** TLS 인증서 검증, 노드 API Key·SHA-256, 사용자·차량·사고별 접근 제어. [설계와 코드](projects/blue-witness/docs/SERVER_SECURITY.md)
+- **학습 결과:** 검증 mAP@0.50:0.95 **57.95%**, 동일 조건 내부 모델 비교에서 부재 오탐률 **3.69%→1.17%**. [학습 곡선·비교 조건](projects/blue-witness/analysis/model-results/README.md)
 - **확인 자료:** [담당 모듈과 협업 기여](projects/blue-witness/docs/CODE_GUIDE.md) · [설계 결정](projects/blue-witness/docs/design/DECISIONS.md) · [실제 장치·웹·AI·CI 화면](projects/blue-witness/docs/IMPLEMENTATION_GALLERY.md) · [평가 CSV·분석](projects/blue-witness/analysis/README.md).
 
 업로더는 개인 설계·팀 구현으로, 카메라·추론 런타임과 공통 IPC는 팀 구현 및 개인 학습·배포 연동으로 표시했습니다. 담당 모듈·공통 의존성·테스트를 이 저장소에 함께 포함했습니다.

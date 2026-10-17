@@ -1,0 +1,40 @@
+{
+  "source_sha256": "3ca6fdc6514061d4d7788c24216b6362e14042ede38d8bb140e0071b49d0395c",
+  "assets": [
+    {
+      "file": "prototype.png",
+      "page": 77,
+      "sha256": "6bfa8e37ab55084ec53a317b19cdbddbb8f0c0c0da306777c5dc5cfebc223300"
+    },
+    {
+      "file": "drying-mechanism.png",
+      "page": 78,
+      "sha256": "0875ca03a39e01915adde2a760872ab61a4c0a0beb9ea0813fc5ce1dc8e989f7"
+    },
+    {
+      "file": "water-alert.png",
+      "page": 85,
+      "sha256": "cf42cc55ddfaa96c7311c8192bcaf4ba74b5c314e5da0fb05b52d4e97bd84bb9"
+    },
+    {
+      "file": "lcd-water.png",
+      "page": 86,
+      "sha256": "6084fa6e1f1468ce5fd95812f84a9c1cc801c52ece5add3f712fb178b581347d"
+    },
+    {
+      "file": "lcd-temperature.png",
+      "page": 88,
+      "sha256": "93b073e91c4e03953e2c171c2d87b7f5dd90c71bb91a25f069942cce81f9891e"
+    },
+    {
+      "file": "lcd-weather.png",
+      "page": 89,
+      "sha256": "7ff06cd530a9578cc7d1e99b412f6c6f501f332291ba79203a06014bcb6f1173"
+    },
+    {
+      "file": "system-roles.png",
+      "page": 5,
+      "sha256": "299e11da5f3d3831c7c6dd8f30ac2df8913670654532012484f2b5dc762418f6"
+    }
+  ]
+}

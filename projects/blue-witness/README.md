@@ -15,6 +15,8 @@
 | 대안과 선택 이유 | [설계 결정표](docs/design/DECISIONS.md) |
 | 영상 보존·재전송·ACK | [Uploader 전체 모듈](source/uploader/README.md) · [Fail-safe](docs/FAILSAFE.md) |
 | 데이터 준비·학습·ONNX | [학습 파이프라인](source/model_training/README.md) · [평가 분석](analysis/README.md) |
+| 서버 인증·권한·TLS | [서버·보안 설계](docs/SERVER_SECURITY.md) |
+| 학습 이력·개선 전후 결과 | [학습 곡선·모델 비교](analysis/model-results/README.md) · [비교 HTML](analysis/model-results/index.html) |
 | 웹·업로드·영상 병합 | [서버 코드](source/server/README.md) · [서버 설계](docs/design/SERVER.md) |
 | 자동 빌드와 회귀 검사 | [이 저장소 Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml) · [팀 CI/CD 코드](source/automation/README.md) |
 
@@ -56,6 +58,29 @@ Raspberry Pi 5 · IMX219 · C/C++ · POSIX IPC · PyTorch · YOLOX-Tiny · ONNX 
 FastAPI·SQLite로 차량별 사건과 영상 수집 상태를 관리하고, 별도 Worker·FFmpeg로 병합합니다. 늦게 도착한 영상은 병합본에 반영하며, 웹에서 전체·목격 차량·내 차량 영상과 사고 장면 0.25배속 재생을 제공합니다.
 
 [차량 실장 → AI 학습 → 영속 업로드 → 시간 정렬·웹 → 협업·CI/CD 사진과 코드](docs/IMPLEMENTATION_GALLERY.md)
+
+## 서버·보안 구현
+
+차량 업로드부터 사용자 열람까지 **전송 암호화·장치 인증·파일 무결성·조회 권한**을 나누어 구현했습니다.
+
+- **서버 처리:** FastAPI·SQLite 저장 → 기본 12초 수집 창 → 별도 Worker·FFmpeg 시간 정렬·병합. 늦은 영상은 새 revision에 반영합니다.
+- **전송·차량 인증:** TLS 1.2 이상·CA·서버 hostname/IP SAN 검증, 등록 노드 API Key 해시·활성 상태 확인.
+- **저장 무결성:** SHA-256·사고/차량 ID와 서버 저장 ACK를 대조하고, 응답 유실 시 저장 상태를 재조회합니다.
+- **열람 권한:** 비밀번호 해시·사용자 세션·차량 소유권, 기본 5분 사고 접근 코드·30분 사고 세션, 실패 횟수 제한과 HttpOnly 쿠키.
+
+[구현 이유·보호 대상·관련 코드](docs/SERVER_SECURITY.md)
+
+## AI 학습과 개선 결과
+
+![YOLOX-Tiny의 학습 손실과 검증 mAP 곡선](analysis/model-results/training-curve.png)
+
+5 epoch 중 검증 mAP@0.50:0.95가 가장 높은 **epoch 1**을 선택했습니다. 선택 모델의 검증 **mAP@0.50 70.57% / mAP@0.50:0.95 57.95%**입니다.
+
+![이전 모델과 개선 모델의 같은 조건 비교](analysis/model-results/model-comparison.png)
+
+동일 프레임·정답·Confidence 0.60으로 비교했을 때 전체 12,873프레임의 **유무 검출률 96.51%→97.62%, 부재 시 오탐률 3.69%→1.17%**를 기록했습니다. 전체·최신 시연은 학습 자료를 포함한 내부 비교이며, 운영 임계값 선정에 사용했습니다.
+
+[Epoch별 결과·모델 비교·BBox·영상 판정](analysis/model-results/README.md) · [묶음·Confidence를 선택하는 HTML](analysis/model-results/index.html)
 
 ## 검증 자료
 

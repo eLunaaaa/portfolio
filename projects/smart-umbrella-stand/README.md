@@ -2,7 +2,11 @@
 
 습도·수위·우산 감지 센서와 기상청 단기예보를 결합해 우산 건조와 상태 표시를 자동화한 임베디드 시스템 프로젝트입니다. STM32F103 보드 3대가 센싱/구동, 중앙 제어, 날씨/LCD 처리를 분담하며 SPI로 통신합니다.
 
-## 제출용 프로젝트 요약
+![스마트 우산꽂이 실제 완성품: 건조·승강부, LCD와 수위 다이얼](media/prototype.png)
+
+**개인 담당:** 아이디어 제안, Master의 상태 판단·SPI 통신·ML 추론, Slave2의 기상 API·LCD·수위 표시. [사진으로 보는 동작과 구현](docs/IMPLEMENTATION_GALLERY.md)
+
+## 프로젝트 요약
 
 | 항목 | 내용 |
 |---|---|
@@ -10,7 +14,6 @@
 | 사용 기술 | C, STM32F103, SPI, ADC/DMA, PWM, Python, NumPy |
 | 핵심 기여 | 아이디어 제안, Master 제어·통신, Slave2 날씨·표시 기능 |
 | 검증 | 하드웨어 독립 C 테스트, ASan/UBSan, Python 학습 파이프라인 확인 |
-| 공개 범위 | 사용자 로직 모듈과 학습 도구. 전체 보드 실행 프로젝트는 미포함 |
 
 코드 분석과 수정 내역은 [검증 기록](docs/CODE_REVIEW.md)에 정리했습니다.
 
@@ -36,7 +39,7 @@ Slave1의 센서 취득·팬·승강부는 팀원이 담당한 영역이며, 공
 
 ## 공개본에서 반영한 개선 사항
 
-보고서 부록의 개발 코드를 GitHub 공개용으로 옮기면서 다음 사항을 수정했습니다.
+통신 정합성·오류 복구·날짜 처리와 모델 판정 로직을 다음과 같이 개선했습니다.
 
 - Wi-Fi SSID·비밀번호·기상청 API 키를 제거하고 `secrets.example.h` 구조로 변경
 - C 구조체 padding에 의존하던 센서 패킷을 명시적인 6바이트 wire format으로 통일
@@ -164,8 +167,8 @@ firmware/
 └── slave2/              # secrets template, SPI response state machine
 ml/                      # UART data collection and model training
 docs/                    # architecture and technical corrections
-hardware/                # wiring/BOM artifacts placeholder
-media/                   # photos and demo asset guide
+hardware/                # 배선·부품 구성 안내
+media/                   # 완성품·건조부·LCD·수위 시연 사진
 tests/                    # host tests for protocol/date/control logic
 ```
 
