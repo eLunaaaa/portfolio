@@ -2,7 +2,7 @@
 
 # Blue Witness · 다중 시점 사고 영상 수집
 
-사고 차량과 주변 차량의 **사고 전 8초·후 2초 영상**을 모아 촬영 시각에 맞춰 병합하고 웹에서 확인하는 임베디드 팀 프로젝트입니다. 2026 임베디드 소프트웨어 경진대회 본선 참가 프로젝트입니다.
+사고 차량과 주변 차량의 **사고 전 8초·후 2초 영상**을 모아 촬영 시각에 맞춰 병합하고 웹에서 확인하는 임베디드 팀 프로젝트입니다. **제24회 임베디드SW경진대회 자동차/모빌리티 부문 결선 진출팀 ACE**의 프로젝트입니다. [결선 참가 요청 공문](docs/evidence/2026-embedded-sw-finals-invitation-ace.pdf)
 
 **이민석 담당:** 차량 검출 모델 학습·배포, 서버·웹, 시간 동기화 상태 서비스, 전체 Fail-safe 설계·Uploader 전체 개발, CI/CD 설계·구축.
 
@@ -12,6 +12,7 @@
 
 | 먼저 확인할 내용 | 자료 |
 |---|---|
+| 결선 진출 공식 근거 | [참가 요청 공문 PDF](docs/evidence/2026-embedded-sw-finals-invitation-ace.pdf) · [문서 정보·미리보기](docs/EVIDENCE.md#결선-진출-공식-근거) |
 | 실제 장치·AI 검수·웹·CI 화면 | [사진으로 보는 개인 구현](docs/IMPLEMENTATION_GALLERY.md) |
 | 실제 구현 파일과 읽는 순서 | [코드 안내](source/README.md) · [기여 구분](docs/CODE_GUIDE.md) |
 | 대안과 선택 이유 | [설계 결정표](docs/design/DECISIONS.md) |

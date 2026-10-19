@@ -57,7 +57,7 @@
 
 [![Blue Witness · V2V 기반 다중 사고 증거 수집 시스템](projects/blue-witness/media/completion-report/cover.png)](projects/blue-witness/README.md)
 
-Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영상을 선별해 서버에서 시간에 맞춰 병합하는 팀 프로젝트입니다. 2026 임베디드 소프트웨어 경진대회 본선 참가 프로젝트입니다.
+Raspberry Pi 차량들이 사고 전후 영상을 확보하고, AI로 목격 영상을 선별해 서버에서 시간에 맞춰 병합하는 팀 프로젝트입니다. **제24회 임베디드SW경진대회 자동차/모빌리티 부문 결선 진출팀 ACE**의 프로젝트입니다. [결선 참가 요청 공문](projects/blue-witness/docs/evidence/2026-embedded-sw-finals-invitation-ace.pdf)
 
 - **설계·구현:** 촬영 세션별 데이터 분리, YOLOX-Tiny 학습·ONNX 계약 검증, 영속 업로드 큐·저장 ACK, 지연 영상 재병합, 시간 동기화 IPC·스레드 진행 감시.
 - **협업·자동화:** Slack·Git·Trello를 활용한 팀 개발과 CI/CD 설계·구축. 검증한 산출물을 수동 장치 배포로 연결했습니다.
@@ -84,6 +84,13 @@ Zybo의 카메라 촬영·AI 분류와 Arduino 제어, 적재량 전송·웹 대
 - **확인 자료:** [개인 담당·구현·시연](projects/edge-ai-trash-sorter/README.md) · [시스템 구조](projects/edge-ai-trash-sorter/docs/ARCHITECTURE.md).
 
 ## Awards & Activities
+
+### 제24회 임베디드SW경진대회 · 자동차/모빌리티 부문 결선 진출
+
+- **프로젝트·팀:** Blue Witness · ACE
+- **성과:** 자동차/모빌리티 부문 **결선 진출**
+- **공식 근거:** 한국임베디드AX산업협회 결선 참가 요청 공문 · 2026년 10월 19일 발급
+- **확인 자료:** [공문 PDF](projects/blue-witness/docs/evidence/2026-embedded-sw-finals-invitation-ace.pdf) · [문서 정보·미리보기](projects/blue-witness/docs/EVIDENCE.md#결선-진출-공식-근거)
 
 ### 2024 KHU Valley Start-up 10기 데모데이
 

@@ -1,5 +1,24 @@
 # 기여·측정 자료
 
+## 결선 진출 공식 근거
+
+한국임베디드AX산업협회가 경희대학교에 발송한 공문에 **자동차/모빌리티 부문 결선 진출팀 ACE**와 참가학생 **이민석**이 명시돼 있습니다.
+
+| 항목 | 공문 내용 |
+|---|---|
+| 문서명 | 제24회 임베디드SW경진대회 결선 참가 요청 |
+| 발급기관 | 한국임베디드AX산업협회 |
+| 문서번호·발급일 | AI융합팀 2026-3253 · 2026년 10월 19일 |
+| 수신 | 경희대학교 |
+| 부문·팀명 | 자동차/모빌리티 · ACE |
+| 참가학생 | 김우석·이민석·이성욱 |
+| 결선 일정 | 2026년 11월 6일 12:30~17:30 |
+| 결선 장소 | 중소기업DMC타워(서울 마포구) |
+
+[원본 공문 PDF](evidence/2026-embedded-sw-finals-invitation-ace.pdf)
+
+<p align="center"><a href="evidence/2026-embedded-sw-finals-invitation-ace.pdf"><img src="../media/official/2026-finals-invitation.png" width="520" alt="한국임베디드AX산업협회가 ACE와 참가학생 이민석을 결선 진출팀으로 명시한 공식 참가 요청 공문"></a></p>
+
 ## 개인 역할과 구현
 
 [기여 안내](CODE_GUIDE.md)는 담당 모듈·대표 기여 커밋·협업 역할을 연결합니다. [소스 manifest](../source/PROVENANCE.json)는 원본 기준과 파일 hash를 기록합니다. 실제 코드는 모두 이 저장소의 [source/](../source/README.md)에서 확인할 수 있습니다.
