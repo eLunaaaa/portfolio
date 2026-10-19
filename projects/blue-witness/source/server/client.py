@@ -88,6 +88,10 @@ def measure_time_offset() -> tuple[str, float | None, str]:
     return "MEASURED", offset_ms, report
 
 
+# 기능: 사고 영상 업로드를 명령행에서 실행한다.
+# 입력: 명령행 EVENT_ID, VEHICLE_ID, VIDEO_PATH.
+# 출력: 시간 오차와 요청 결과를 출력하며, 잘못된 인자·경로는 종료 코드 1.
+# 구조·이유: chrony 측정값과 사건 시각을 메타데이터에 묶어 영상과 함께 서버로 전송한다.
 def main() -> None:
     if len(sys.argv) != 4:
         print(

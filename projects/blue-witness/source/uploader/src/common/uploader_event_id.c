@@ -10,6 +10,10 @@
 #define SEOUL_UTC_OFFSET_SECONDS (9LL * 60LL * 60LL)
 #define EVENT_VEHICLE_ID_SIZE 32U
 
+/* 기능: 사건 식별자에 넣을 차량 ID를 정규화한다.
+ * 입력: 원본 ID source, 고정 크기 output, 오류 버퍼·크기.
+ * 출력·구조: 성공 0과 대문자 ID 또는 실패 -1. 밑줄·하이픈을 제외하고 영숫자와 길이를 검사한다.
+ */
 static int compact_vehicle_id(
     const char *source,
     char output[EVENT_VEHICLE_ID_SIZE],
@@ -45,6 +49,10 @@ static int compact_vehicle_id(
     return 0;
 }
 
+/* 기능: 사고 시각과 차량 ID로 서버 규격의 사건 ID를 만든다.
+ * 입력: 출력 버퍼·크기, Unix 나노초 시각, 사고 차량 ID, 오류 버퍼·크기.
+ * 출력·구조: 성공 0과 EVT_날짜_시각밀리초_차량 형식 문자열, 실패 -1. UTC+9를 적용하고 달력 범위와 버퍼 잘림을 검사한다.
+ */
 int event_id_build(
     char *output,
     size_t output_size,

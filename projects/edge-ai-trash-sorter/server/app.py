@@ -18,6 +18,10 @@ def create_app():
     data = {zone: {kind: None for kind in ("ge", "ca", "gl", "pe")}
             for zone in ("t1", "t2")}
 
+    # 기능: 쓰레기통 현황 대시보드의 첫 화면을 제공한다.
+    # 입력: GET / 요청; 별도 인자 없음.
+    # 출력: index.html을 렌더링한 HTML.
+    # 구조·이유: 센서 상태는 별도 API로 받아 화면과 상태 전송을 분리한다.
     @app.get("/")
     # 기능: 관제 대시보드의 첫 화면을 반환합니다.
     # 입력: HTTP GET /.
@@ -26,6 +30,10 @@ def create_app():
     def home():
         return render_template("index.html")
 
+    # 기능: 위치별 쓰레기통 적재 상태를 반환한다.
+    # 입력: 현재 공유 data와 GET 상태 조회 요청.
+    # 출력: 위치별 상태 JSON과 Cache-Control: no-store 헤더.
+    # 구조·이유: 잠금 안에서 복사한 스냅샷을 반환해 동시 갱신 충돌과 오래된 캐시 표시를 줄인다.
     @app.get("/status")
     # 기능: 모든 위치·종류의 현재 포화 상태를 조회합니다.
     # 입력: HTTP GET /status.
@@ -38,6 +46,10 @@ def create_app():
         response.headers["Cache-Control"] = "no-store"
         return response
 
+    # 기능: 장치가 보낸 적재·비움 상태를 반영한다.
+    # 입력: 위치 bin_id, 동작 action(fill·empty), 분류 type_id.
+    # 출력: 성공 안내 또는 잘못된 위치 404·동작/분류 400.
+    # 구조·이유: 입력을 검증한 뒤 잠금 안에서 해당 분류를 갱신한다. al은 위치 내 전체 분류를 뜻한다.
     @app.get("/<bin_id>/<action>/<type_id>")
     # 기능: 센서가 보고한 위치·종류별 포화 상태를 저장합니다.
     # 입력: URL의 bin_id: t1/t2, action: fill/empty, type_id: ge/ca/gl/pe/al.
@@ -58,6 +70,10 @@ def create_app():
         response.headers["Cache-Control"] = "no-store"
         return response
 
+    # 기능: 전체 적재 상태를 미확인으로 초기화한다.
+    # 입력: 공유 쓰레기통 상태 data.
+    # 출력: 초기화 안내 문자열.
+    # 구조·이유: 잠금 안에서 모든 값을 None으로 바꿔 비어 있음과 아직 측정하지 않음을 구분한다.
     @app.post("/reset")
     # 기능: 저장된 모든 상태를 미확인 상태로 초기화합니다.
     # 입력: HTTP POST /reset.

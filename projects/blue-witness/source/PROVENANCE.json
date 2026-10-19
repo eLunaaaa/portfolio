@@ -108,12 +108,13 @@
     },
     {
       "path": "ai/inference.cpp",
-      "sha256": "a21b93d760969555f350a54f7e8ac2734b7da844858ccc4f4144bb59efd85352",
-      "bytes": 113162,
+      "sha256": "88daa8d85e15ffe3d389e03bfe257e238bd6ed422acd4b98a0d66b3c1dc5bbde",
+      "bytes": 113349,
       "source": "ai/inference.cpp",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "a21b93d760969555f350a54f7e8ac2734b7da844858ccc4f4144bb59efd85352",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "ai/inference_config.h",
@@ -135,12 +136,13 @@
     },
     {
       "path": "ai/video_processor.cpp",
-      "sha256": "c3248c3159ec0c93616a1401be545d5d008800d5d388773bb1ace19d9b15126c",
-      "bytes": 63008,
+      "sha256": "f56f564d7ceccee0e74ca04906629ae6eb79a5ff7dddc699decb00df7d7e1ceb",
+      "bytes": 63194,
       "source": "ai/video_processor.cpp",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "c3248c3159ec0c93616a1401be545d5d008800d5d388773bb1ace19d9b15126c",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "automation/.github/actionlint.yaml",
@@ -207,12 +209,13 @@
     },
     {
       "path": "automation/scripts/ci/check-server.py",
-      "sha256": "f6e435749345d714b0692293d3b0b87257fe54240b1d0f6a792d6261490d3323",
-      "bytes": 9001,
+      "sha256": "f7ab390e57110382f6ec518ab31e4241331b7b50af2f808d4ade683132eda37d",
+      "bytes": 11393,
       "source": "scripts/ci/check-server.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "f6e435749345d714b0692293d3b0b87257fe54240b1d0f6a792d6261490d3323",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "automation/scripts/ci/install-host-deps.sh",
@@ -225,21 +228,23 @@
     },
     {
       "path": "automation/scripts/ci/select-ci.py",
-      "sha256": "f1fdfd781887664dd37a5b219338504d3da4ed672c042e7945bdf6d9efbf619f",
-      "bytes": 1125,
+      "sha256": "a39a3c0bd51040b051f3c3935b010da379f89f7ed9bd74dc2289a31df58555ac",
+      "bytes": 1506,
       "source": "scripts/ci/select-ci.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "f1fdfd781887664dd37a5b219338504d3da4ed672c042e7945bdf6d9efbf619f",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "automation/scripts/ci/setup-windows-ffmpeg.py",
-      "sha256": "b596afc209fec1c49d8e9168eef0665c0dcf60cfab836e10efde56719f131c93",
-      "bytes": 3965,
+      "sha256": "6a7e9504e6d403772fde23bdff7517b2ec26995b2653209091af61bb12fa6599",
+      "bytes": 5624,
       "source": "scripts/ci/setup-windows-ffmpeg.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "b596afc209fec1c49d8e9168eef0665c0dcf60cfab836e10efde56719f131c93",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "automation/scripts/ci/test_apt_archive_cache.py",
@@ -603,12 +608,13 @@
     },
     {
       "path": "ipc/ipc.c",
-      "sha256": "a0eef2862826c8f5e6b9ef1df9e9d28954d44147c5301e9b46daee3d7700d71d",
-      "bytes": 4149,
+      "sha256": "1b9ede56eacfae2e12a23fe0c60b75650ff2eaad75f1acec0cd62daafbac6a90",
+      "bytes": 7132,
       "source": "ipc/ipc.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "a0eef2862826c8f5e6b9ef1df9e9d28954d44147c5301e9b46daee3d7700d71d",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "ipc/ipc.h",
@@ -639,12 +645,13 @@
     },
     {
       "path": "ipc/runtime_watchdog.h",
-      "sha256": "019a18473fcbc2496950beac5d7a2adb75488d9d68b5cb156683680a8880bab5",
-      "bytes": 6078,
+      "sha256": "ffc85eab4a7cb4710816838e28ffb8e3b8db832abd5bf4e7d46c75670a027a45",
+      "bytes": 8520,
       "source": "ipc/runtime_watchdog.h",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "019a18473fcbc2496950beac5d7a2adb75488d9d68b5cb156683680a8880bab5",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "ipc/sensor_protocol.h",
@@ -971,12 +978,13 @@
     },
     {
       "path": "model_training/register_recordings.py",
-      "sha256": "9753f7d667545e8538d81108be0c91645d6932c4eedec2b2e258fe9e6de27ae4",
-      "bytes": 23943,
+      "sha256": "eb912ad368a48bcac3a5d89b5b88858af181cb845a0496e69636ae79df79ffd9",
+      "bytes": 24889,
       "source": "model_training/register_recordings.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "9753f7d667545e8538d81108be0c91645d6932c4eedec2b2e258fe9e6de27ae4",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "model_training/requirements.txt",
@@ -989,12 +997,13 @@
     },
     {
       "path": "model_training/review_annotations.py",
-      "sha256": "3bde5bd1b6971617d54d1f0e8f97e75be6a5a4af390446477e42a520a8a87033",
-      "bytes": 35077,
+      "sha256": "5f696092803277fa9b7b38a69421b4f4ce89edc72be50d93f68ed46bf02fd9de",
+      "bytes": 39678,
       "source": "model_training/review_annotations.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "3bde5bd1b6971617d54d1f0e8f97e75be6a5a4af390446477e42a520a8a87033",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "model_training/runs/.gitkeep",
@@ -1007,12 +1016,13 @@
     },
     {
       "path": "model_training/runtime_contract.py",
-      "sha256": "0eb2785892368ca71211ffc8f652ada18f97b118369cc0937e5bd482d4bc64fd",
-      "bytes": 1741,
+      "sha256": "de2358ea8dc63d4834d6ad7f2eac63a3d511225911eefc90810a03f3e300c066",
+      "bytes": 2457,
       "source": "model_training/runtime_contract.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "0eb2785892368ca71211ffc8f652ada18f97b118369cc0937e5bd482d4bc64fd",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "model_training/sync_recordings.py",
@@ -1664,12 +1674,13 @@
     },
     {
       "path": "server/backend/app/api/account.py",
-      "sha256": "1b028282edb043019fc4c1d58beb1ea13b0ca803de229b3db4c3f43589a9f0b2",
-      "bytes": 7973,
+      "sha256": "3ff6d5429fe9cbbf12778698d49a60fc67b8778f83213761742f7f6d1f4fc714",
+      "bytes": 8545,
       "source": "server/backend/app/api/account.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "1b028282edb043019fc4c1d58beb1ea13b0ca803de229b3db4c3f43589a9f0b2",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/api/admin.py",
@@ -1691,12 +1702,13 @@
     },
     {
       "path": "server/backend/app/api/evidence.py",
-      "sha256": "22075669e14f0dcfd7e8ff7434c9ac9a23c3d12257de197977499e63788ee6bd",
-      "bytes": 22492,
+      "sha256": "2f5e1d2e51d78a6d16f2ba4cc94396c15c080d1fdc329463eda796beef127620",
+      "bytes": 23771,
       "source": "server/backend/app/api/evidence.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "22075669e14f0dcfd7e8ff7434c9ac9a23c3d12257de197977499e63788ee6bd",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/api/health.py",
@@ -1727,12 +1739,13 @@
     },
     {
       "path": "server/backend/app/api/pages.py",
-      "sha256": "adc4c961e19e63d535fc973fb50bda284f4678dca9eebc29edfa7a81c6aeca03",
-      "bytes": 1650,
+      "sha256": "3f1fbd618834da4c4e8b324b86d4c48b43464fb66b4a98dce9430a49d9cf4b0b",
+      "bytes": 2917,
       "source": "server/backend/app/api/pages.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "adc4c961e19e63d535fc973fb50bda284f4678dca9eebc29edfa7a81c6aeca03",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/api/portal.py",
@@ -1772,21 +1785,23 @@
     },
     {
       "path": "server/backend/app/cli/assign_vehicle.py",
-      "sha256": "1dd998eeb7e27ff07d5f24cca6191f16dc1fbcc32a36922ba4d6278b650b11fe",
-      "bytes": 1360,
+      "sha256": "dda7a1d62a16c0962eb7f9a3991ab4c0ee6190fb0b053c9602690f3f3f1e9e7d",
+      "bytes": 1800,
       "source": "server/backend/app/cli/assign_vehicle.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "1dd998eeb7e27ff07d5f24cca6191f16dc1fbcc32a36922ba4d6278b650b11fe",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/cli/create_admin.py",
-      "sha256": "f8b09260700795cde31cd29b0106751ed4f7f65c2133181e6549668469565973",
-      "bytes": 1250,
+      "sha256": "2a6a0086e18d45cf94a70f3e3bb23c061bfc7f44481765340bd1b8c793f4d049",
+      "bytes": 1737,
       "source": "server/backend/app/cli/create_admin.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "f8b09260700795cde31cd29b0106751ed4f7f65c2133181e6549668469565973",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/cli/issue_access_code.py",
@@ -2024,12 +2039,13 @@
     },
     {
       "path": "server/backend/app/db/profile_repository.py",
-      "sha256": "3d33e5bdf5a8df84e99167fa57f3c27be5b54efba9f9a5889365539867be1908",
-      "bytes": 1664,
+      "sha256": "d3af372315a5374e63c781a28663485335813eda05d71c4168faa20f13695119",
+      "bytes": 2323,
       "source": "server/backend/app/db/profile_repository.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "3d33e5bdf5a8df84e99167fa57f3c27be5b54efba9f9a5889365539867be1908",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/db/schema.sql",
@@ -2132,12 +2148,13 @@
     },
     {
       "path": "server/backend/app/schemas/vehicle.py",
-      "sha256": "87c9ae84393ea9958798a8cf8d979f08ea29adc1fa1e083ca7e558a23cd275a7",
-      "bytes": 4419,
+      "sha256": "ab991362f651ef9b234a66e801f19f4258f869d0a959b2716ac827ae865c8137",
+      "bytes": 4887,
       "source": "server/backend/app/schemas/vehicle.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "87c9ae84393ea9958798a8cf8d979f08ea29adc1fa1e083ca7e558a23cd275a7",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/__init__.py",
@@ -2186,12 +2203,13 @@
     },
     {
       "path": "server/backend/app/services/communication_log.py",
-      "sha256": "b4d9fb260455f8aa121668ebae491f3725855becf072c5ed1fb9020e46093ab8",
-      "bytes": 7001,
+      "sha256": "eb04d27925a608c239416df7f586d04d0445a92dd440347c4d3b61ef3e221622",
+      "bytes": 8104,
       "source": "server/backend/app/services/communication_log.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "b4d9fb260455f8aa121668ebae491f3725855becf072c5ed1fb9020e46093ab8",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/event_identity_service.py",
@@ -2231,12 +2249,13 @@
     },
     {
       "path": "server/backend/app/services/password_policy.py",
-      "sha256": "bffc8f41e2d018c818aeedde45becbd359d2980d9fa97b84d37ef79fdaa04368",
-      "bytes": 661,
+      "sha256": "9199c300b59035bb7f69802a109be922832b42f37ddf52399fe39b5b2ba0a1b7",
+      "bytes": 984,
       "source": "server/backend/app/services/password_policy.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "bffc8f41e2d018c818aeedde45becbd359d2980d9fa97b84d37ef79fdaa04368",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/portal_access_service.py",
@@ -2249,30 +2268,33 @@
     },
     {
       "path": "server/backend/app/services/portal_service.py",
-      "sha256": "04905259e41a46e92dfe34e493343470e56aeec2d6a56ec3aec32da168a4bb39",
-      "bytes": 13190,
+      "sha256": "c4c0bb32350b9f08b291fc9326bda1746e575c446d955f59306a81a0ab383d45",
+      "bytes": 13541,
       "source": "server/backend/app/services/portal_service.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "2b660aa901bc3cca21397eaae55d11bde94a7623990e912be7ec6f742cac210c",
-      "exact_copy": false
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/profile_service.py",
-      "sha256": "d81b96b3d23ac8ffaacfc768677635e8cd0728a72dd0e45c4609dc38b299c32c",
-      "bytes": 3722,
+      "sha256": "881f8dd20d4b13a25ef9d177a1ff0c02a36e91457ad01b091cc28e16ce0cd570",
+      "bytes": 4360,
       "source": "server/backend/app/services/profile_service.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "d81b96b3d23ac8ffaacfc768677635e8cd0728a72dd0e45c4609dc38b299c32c",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/storage.py",
-      "sha256": "e75c4060255a950f17004ff7cefc49d2a08ea42c76300255735e67f4c9f1be28",
-      "bytes": 11421,
+      "sha256": "28b60e736cab46b2a2b6d74b961063096f03809009e739a635c90cb10e2fdd2b",
+      "bytes": 11770,
       "source": "server/backend/app/services/storage.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "e75c4060255a950f17004ff7cefc49d2a08ea42c76300255735e67f4c9f1be28",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/timestamp_normalization.py",
@@ -2294,21 +2316,23 @@
     },
     {
       "path": "server/backend/app/services/vehicle_maintenance_service.py",
-      "sha256": "df2e83c1bd53cc935ae945edd98fae183280dba67f90c75d6a51cf6083718122",
-      "bytes": 2110,
+      "sha256": "421b5913270a3fb28f07adaf862e074daab6a33dc3e83f7160220405ba6dd8ea",
+      "bytes": 3497,
       "source": "server/backend/app/services/vehicle_maintenance_service.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "df2e83c1bd53cc935ae945edd98fae183280dba67f90c75d6a51cf6083718122",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/vehicle_operation_service.py",
-      "sha256": "5bd58ba3be956f5f46f1dc371dd62dc86f4ffb53e4dc4cc8593a2e3712f57ff3",
-      "bytes": 3336,
+      "sha256": "c037ca3a11a3cdf7706c15ae4b99f7fa7e512746640fd9e05145fb27417c6c06",
+      "bytes": 3676,
       "source": "server/backend/app/services/vehicle_operation_service.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "5bd58ba3be956f5f46f1dc371dd62dc86f4ffb53e4dc4cc8593a2e3712f57ff3",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/backend/app/services/vehicle_service.py",
@@ -2769,12 +2793,13 @@
     },
     {
       "path": "server/client.py",
-      "sha256": "bb273c60510c4501cdac4bc0ade96641820faa8659aa0c3038892b6b729704fa",
-      "bytes": 3521,
+      "sha256": "be2b0c915a56e21ca64d31c1ba4e9ca40e4380b869f344460f12771596cffeb4",
+      "bytes": 3867,
       "source": "server/client.py",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "bb273c60510c4501cdac4bc0ade96641820faa8659aa0c3038892b6b729704fa",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "server/docs/ARCHITECTURE.md",
@@ -2850,12 +2875,13 @@
     },
     {
       "path": "time_sync/src/time_sync.c",
-      "sha256": "59a14928e2658fc3ffac277de3bb7594314d314bb82d8eedd095aa1a8aefb6ac",
-      "bytes": 39313,
+      "sha256": "a39a42432cca459cf5ee538d176435dc39d9a9f2f772dad956fd1a5377580da8",
+      "bytes": 39899,
       "source": "time_sync/src/time_sync.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "59a14928e2658fc3ffac277de3bb7594314d314bb82d8eedd095aa1a8aefb6ac",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/.gitignore",
@@ -3028,21 +3054,23 @@
     },
     {
       "path": "uploader/src/common/uploader_event_id.c",
-      "sha256": "e40067a0373697979f61b2b3eb973cc1963f94ca15955eb9dbe7801f888f529c",
-      "bytes": 2848,
+      "sha256": "625b6ecaef92083ad1b0d9446c6cde2cb3396f48021264891d1f7cc37b925352",
+      "bytes": 3475,
       "source": "uploader/src/common/uploader_event_id.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "e40067a0373697979f61b2b3eb973cc1963f94ca15955eb9dbe7801f888f529c",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/src/common/uploader_log.c",
-      "sha256": "be258e754304a4c6355513461a38295303432e9fd9c8db8c3bec3dc8c69179f1",
-      "bytes": 18317,
+      "sha256": "e183567206be4a83d4061d47610f1f7563c28eff82b9bd4e53e2790cbcc6480a",
+      "bytes": 19420,
       "source": "uploader/src/common/uploader_log.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "be258e754304a4c6355513461a38295303432e9fd9c8db8c3bec3dc8c69179f1",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/src/ingest/uploader_spool.c",
@@ -3055,21 +3083,23 @@
     },
     {
       "path": "uploader/src/queue/uploader_queue.c",
-      "sha256": "fd5006a2742d994b5de5118d983ae577380ee84139033daf8938564d48cd1747",
-      "bytes": 32628,
+      "sha256": "d8b86df00299dbe7f75c5b978173ec9acef41cd6897e31a9c54a535bfdc01dac",
+      "bytes": 32951,
       "source": "uploader/src/queue/uploader_queue.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "fd5006a2742d994b5de5118d983ae577380ee84139033daf8938564d48cd1747",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/src/uploader.c",
-      "sha256": "7701d8034a6ac3103ad540a3c3ed843749d2a4fcd272f29e1ddd26af6fc2f698",
-      "bytes": 101285,
+      "sha256": "17604103e1bd6f9198436b20a43191c5ebe12a515f3f1f4fd0d5960b912ee348",
+      "bytes": 102604,
       "source": "uploader/src/uploader.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "7701d8034a6ac3103ad540a3c3ed843749d2a4fcd272f29e1ddd26af6fc2f698",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/src/worker/uploader_ack.c",
@@ -3091,21 +3121,23 @@
     },
     {
       "path": "uploader/src/worker/uploader_http.c",
-      "sha256": "b03ffb95e7896283f05c186a2486a7402c837d0b310ae3f672341ad08f14f133",
-      "bytes": 34023,
+      "sha256": "5d700b19bdfc57c7b4cc30a98758eaca04fc69c681ab873f8e2b8814a3b2246f",
+      "bytes": 35123,
       "source": "uploader/src/worker/uploader_http.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "b03ffb95e7896283f05c186a2486a7402c837d0b310ae3f672341ad08f14f133",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/src/worker/uploader_metadata.c",
-      "sha256": "ec700e96679534b388fe9f6399efec293accc0536ce18da7bbc6d5a88b428caa",
-      "bytes": 14677,
+      "sha256": "f6a0d4962a2ea13b9341f33aa6b33ed966eb253ed71702a5b841f789a8c0c49c",
+      "bytes": 16163,
       "source": "uploader/src/worker/uploader_metadata.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "ec700e96679534b388fe9f6399efec293accc0536ce18da7bbc6d5a88b428caa",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/src/worker/uploader_sha256.c",
@@ -3118,12 +3150,13 @@
     },
     {
       "path": "uploader/src/worker/uploader_tls.c",
-      "sha256": "888a779d92b2ac2da0c7aff77a9e9ab0f5ff9c55746106d48ef703c030db9cd0",
-      "bytes": 6989,
+      "sha256": "29551533d74b97fe9ad947a57ec11d2757567b49c9910bccb75b6395b0e7785b",
+      "bytes": 10274,
       "source": "uploader/src/worker/uploader_tls.c",
       "upstream_commit": "514880419f84a5fc0488652f0f2cb873d04e33b8",
       "upstream_sha256": "888a779d92b2ac2da0c7aff77a9e9ab0f5ff9c55746106d48ef703c030db9cd0",
-      "exact_copy": true
+      "exact_copy": false,
+      "portfolio_note": "한국어 파일·함수 설명 보완"
     },
     {
       "path": "uploader/tests/core_regression.c",

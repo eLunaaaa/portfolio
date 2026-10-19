@@ -172,6 +172,10 @@ static int parse_server_url(
     return 0;
 }
 
+/* 기능: 주소를 검사하고 HTTPS용 공통 TLS 컨텍스트를 준비한다.
+ * 입력: 서버 URL, CA 경로, 오류 출력 버퍼·크기.
+ * 출력·구조: 준비 성공 0, 주소·CA 준비 실패 -1. HTTP 또는 이미 준비된 컨텍스트는 추가 생성 없이 처리한다.
+ */
 int http_client_prepare(const char *server_url, const char *ca_file,
                         char *error, size_t error_size)
 {
@@ -182,6 +186,10 @@ int http_client_prepare(const char *server_url, const char *ca_file,
     return worker_tls_context != NULL ? 0 : -1;
 }
 
+/* 기능: HTTP 작업자가 사용하는 TLS 자원을 정리한다.
+ * 입력: 전역 활성 연결과 worker_tls_context.
+ * 출력·구조: 반환값 없음. TLS 세션을 닫고 컨텍스트를 해제한 뒤 NULL로 설정한다.
+ */
 void http_client_cleanup(void)
 {
     uploader_tls_close(&active_tls_connection);
@@ -242,6 +250,10 @@ static int wait_for_connect(
  */
 static _Thread_local uint32_t transfer_progress_ms = UPLOADER_LOCAL_PROGRESS_MS;
 
+/* 기능: 소켓 송수신과 작업자 감시에 사용할 제한 시간을 설정한다.
+ * 입력: socket_fd와 밀리초 timeout_ms.
+ * 출력·구조: 반환값 없음. SO_RCVTIMEO·SO_SNDTIMEO를 요청하고 watchdog에는 10초 여유를 더한다. setsockopt 반환값은 이 함수에서 검사하지 않는다.
+ */
 static void set_transfer_timeout(
     int socket_fd,
     int timeout_ms)
@@ -401,6 +413,10 @@ static int connect_server(
     return socket_fd;
 }
 
+/* 기능: TLS 세션과 연결 소켓을 함께 닫는다.
+ * 입력: 사용이 끝난 socket_fd.
+ * 출력·구조: 반환값 없음. OpenSSL 자원을 먼저 해제한 뒤 fd를 닫아 연결 수명 관리를 한곳에 모은다.
+ */
 static void close_connection(int socket_fd)
 {
     uploader_tls_close(&active_tls_connection);

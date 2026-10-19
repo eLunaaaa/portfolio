@@ -1,3 +1,4 @@
+# 파일 역할: 장치의 증거 영상 업로드·중복 확인·동일 원본 복구를 처리하는 API. 인증·메타데이터·저장 상태를 연결한다.
 import json
 import sqlite3
 from dataclasses import replace
@@ -253,11 +254,19 @@ def get_evidence_storage_status(
     )
 
 
+# 기능: 재전송 영상이 최초 원본과 같은지 검사한다.
+# 입력: 기존 업로드 기록 existing과 수신 파일의 SHA-256 문자열 sha256.
+# 출력: 일치하거나 기존 해시가 없으면 None; 불일치하면 HTTP 409.
+# 구조·이유: 원본이 다른 영상으로 교체되는 것을 막기 위해 기록된 해시를 먼저 대조한다.
 def require_original_hash_match(existing: ExistingEvidenceUpload, sha256: str) -> None:
     if existing.content_sha256 is not None and existing.content_sha256 != sha256:
         raise HTTPException(409, detail="ORIGINAL_HASH_CONFLICT: 최초 원본과 다른 영상임.")
 
 
+# 기능: 동일 원본의 재전송을 요청하는 복구 상태로 전환한다.
+# 입력: 기존 업로드 기록 existing과 재전송 대상 sha256.
+# 출력: 정상 반환 없이 HTTP 404 발생; 해시 충돌 시 HTTP 409.
+# 구조·이유: 해시 검증 → 복구 대기 기록 → 404 응답으로 기존 송신기의 POST 재전송 경로를 유도한다.
 def request_original_repair(existing: ExistingEvidenceUpload, sha256: str) -> None:
     require_original_hash_match(existing, sha256)
     mark_evidence_repair_pending(existing.event_id, existing.vehicle_id, sha256)
@@ -265,6 +274,10 @@ def request_original_repair(existing: ExistingEvidenceUpload, sha256: str) -> No
     raise HTTPException(404, detail="ORIGINAL_REPAIR_REQUIRED: 같은 원본을 다시 전송해야 함.")
 
 
+# 기능: 재수신한 원본의 저장 상태를 확정한다.
+# 입력: 기존 사건 기록 existing과 디스크에 저장한 파일 정보 stored.
+# 출력: 갱신된 ExistingEvidenceUpload; STORED가 아니면 HTTP 500.
+# 구조·이유: 기존 메타데이터로 repair 등록 후 DB를 다시 조회하며 동시 재시도의 중복 등록은 재조회로 확인한다.
 def complete_original_repair(
     existing: ExistingEvidenceUpload, stored: StoredFile,
 ) -> ExistingEvidenceUpload:

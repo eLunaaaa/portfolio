@@ -17,6 +17,10 @@ URL = f"https://github.com/GyanD/codexffmpeg/releases/download/{VERSION}/{ARCHIV
 SHA256 = "4705843ccaaf54257c16ad90f3e952ece33c17df964ecf7bfdbb0f49c7171077"
 
 
+# 기능: 다운로드한 FFmpeg 압축 파일의 무결성을 검사한다.
+# 입력: 압축 파일 Path.
+# 출력: 일치 시 None; 고정 SHA-256과 다르면 RuntimeError.
+# 구조·이유: 1MB 단위로 읽어 큰 파일을 메모리에 모두 올리지 않고 해시를 비교한다.
 def verify_archive(path):
     digest = hashlib.sha256()
     with path.open("rb") as source:
@@ -26,6 +30,10 @@ def verify_archive(path):
         raise RuntimeError(f"FFmpeg archive SHA-256 mismatch: {path}")
 
 
+# 기능: 해시를 검증한 FFmpeg 압축 파일을 준비한다.
+# 입력: 캐시 디렉터리 cache_dir.
+# 출력: 검증된 압축 파일 Path; 다운로드·검증 실패 시 예외.
+# 구조·이유: 캐시도 매번 검증하며 새 파일은 임시 .part에 받아 검증 후 교체하고 실패 잔여물을 정리한다.
 def get_archive(cache_dir):
     cache_dir.mkdir(parents=True, exist_ok=True)
     archive = cache_dir / ARCHIVE_NAME
@@ -55,6 +63,10 @@ def get_archive(cache_dir):
     return archive
 
 
+# 기능: 압축 해제에 사용할 7-Zip 실행 경로를 찾는다.
+# 입력: PATH와 ProgramFiles 환경.
+# 출력: 실행 파일 경로 문자열; 찾지 못하면 RuntimeError.
+# 구조·이유: PATH를 우선 확인하고 표준 설치 경로를 검사해 Windows 실행 환경 차이를 처리한다.
 def find_7zip():
     executable = shutil.which("7z")
     if executable:
@@ -65,6 +77,10 @@ def find_7zip():
     raise RuntimeError("7-Zip is required to extract FFmpeg.")
 
 
+# 기능: Windows CI용 FFmpeg를 설치하고 다음 단계에 경로를 전달한다.
+# 입력: 캐시 디렉터리와 압축 해제 설치 디렉터리.
+# 출력: 검증된 bin 디렉터리 Path와 GitHub Actions 환경 파일 갱신.
+# 구조·이유: 해시 검증 → 압축 해제 → 실행 파일 쌍·고정 버전 확인 후에만 GITHUB_PATH와 준비 완료 출력을 기록한다.
 def setup(cache_dir, install_dir):
     archive = get_archive(cache_dir)
     seven_zip = find_7zip()
@@ -98,6 +114,10 @@ def setup(cache_dir, install_dir):
     return bin_dir
 
 
+# 기능: 환경 변수로 Windows FFmpeg 설치를 시작한다.
+# 입력: FFMPEG_CACHE_DIR·FFMPEG_INSTALL_DIR 환경 변수.
+# 출력: 성공 0, 설정·파일·명령 실행 실패 1.
+# 구조·이유: 경로를 절대 경로로 바꿔 setup에 전달하고 실패 이유는 표준 오류로 출력해 CI가 중단되게 한다.
 def main():
     try:
         setup(Path(os.environ["FFMPEG_CACHE_DIR"]).resolve(),

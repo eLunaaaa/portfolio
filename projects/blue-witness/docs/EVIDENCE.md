@@ -38,5 +38,3 @@
 | [실제 포트폴리오 Actions](https://github.com/eLunaaaa/portfolio/actions/workflows/portfolio-ci.yml) | 이 저장소 commit을 대상으로 실행한 job·로그 |
 
 AI 자료는 **당시 임계값 선정을 위한 프레임 평가 기록**입니다. 독립 시험 점수와 BBox mAP는 별도 지표이므로 평가 조건·집계 방식을 [분석 안내](../analysis/README.md)에 함께 표시했습니다.
-
-대회 운영 대화방 이미지는 다른 참가자 개인정보가 포함되어 정리 자료에서 제거했습니다.

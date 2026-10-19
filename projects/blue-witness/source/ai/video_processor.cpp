@@ -1,3 +1,4 @@
+/* 파일 역할: 영상 프레임의 수집·버퍼링과 사건 구간 영상 처리를 담당하는 팀 공통 모듈. 프레임 풀·링 버퍼·작업 스레드를 연결한다. */
 /* 사고차량용 영상 처리 프로세스: AI 추론 없이 사고 영상을 저장·전송한다. */
 #include <libcamera/control_ids.h>
 #include <libcamera/formats.h>

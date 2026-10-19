@@ -14,7 +14,7 @@
 | 공통 IPC | [ipc](../source/ipc/README.md) · [watchdog](../source/ipc/runtime_watchdog.h) | 팀 공통 소켓·메시지·스레드 감시 |
 | CI/CD | [automation](../source/automation/README.md) | 실제 팀 workflow·검사·배포 코드 |
 
-원본 저장소 접근 없이 위 파일과 [파일별 출처](../source/PROVENANCE.json)를 확인할 수 있습니다. 아래 원본 커밋 링크는 협업 이력의 추가 참고 자료입니다.
+[파일별 출처](../source/PROVENANCE.json)와 아래 커밋에서 구현·협업 이력을 확인할 수 있습니다.
 
 ## 개인 작성 LOC
 

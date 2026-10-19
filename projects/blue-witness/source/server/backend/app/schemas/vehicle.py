@@ -1,3 +1,4 @@
+# 파일 역할: 차량 생성·변경 요청의 Pydantic 스키마. API 경계에서 문자열 형식과 필수 항목을 검증한다.
 import re
 from typing import Literal
 
@@ -173,6 +174,10 @@ class VehicleVerificationResponse(BaseModel):
 class VehicleNicknameRequest(BaseModel):
     display_name: str = Field(min_length=1, max_length=80)
 
+    # 기능: 차량 표시 이름의 공백과 형식을 정규화한다.
+    # 입력: 검증 중인 문자열 value와 Pydantic 클래스 cls.
+    # 출력: 공통 텍스트 검증을 통과한 문자열.
+    # 구조·이유: VehicleCreateRequest.clean_text를 재사용해 생성·수정 요청의 입력 규칙을 맞춘다.
     @field_validator("display_name")
     @classmethod
     def clean_display_name(cls, value: str) -> str:

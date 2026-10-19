@@ -3,20 +3,20 @@ projects/blue-witness/source/ai/Makefile,ai,make,build_ci_config,45,0,0,45,0,838
 projects/blue-witness/source/ai/deploy/deploy.sh,ai,Bourne Shell,build_ci_config,95,0,0,95,0,50e1677393ad074ac6c8f2a7a05c9b983a1f02340177a28a567fbfcd79010864
 projects/blue-witness/source/ai/deploy/install-service.sh,ai,Bourne Shell,build_ci_config,118,0,0,118,0,e1c6ce43834d44caab7730bed2e4118698adcaf92d361e007ccfced176d286b1
 projects/blue-witness/source/ai/evidence_handoff.h,ai,C/C++ Header,implementation,332,0,0,332,0,14f5153c5020dce0f72896f3880090f2514122f147787bc60208108306cc5567
-projects/blue-witness/source/ai/inference.cpp,ai,C++,implementation,2548,0,0,2548,0,a21b93d760969555f350a54f7e8ac2734b7da844858ccc4f4144bb59efd85352
+projects/blue-witness/source/ai/inference.cpp,ai,C++,implementation,2548,0,0,2548,0,88daa8d85e15ffe3d389e03bfe257e238bd6ed422acd4b98a0d66b3c1dc5bbde
 projects/blue-witness/source/ai/inference_config.h,ai,C/C++ Header,implementation,6,0,0,6,0,1203d209c7beb3e7c9111aaa1a6796680ec551015b1ac7bc2ecc4e19f5e510d6
 projects/blue-witness/source/ai/runtime_support.h,ai,C/C++ Header,implementation,66,0,0,66,0,85fda967f97fb6b8fcf59178ec79866aef941a969a568b9f4b333dce67deb193
-projects/blue-witness/source/ai/video_processor.cpp,ai,C++,implementation,1697,0,0,1697,0,c3248c3159ec0c93616a1401be545d5d008800d5d388773bb1ace19d9b15126c
+projects/blue-witness/source/ai/video_processor.cpp,ai,C++,implementation,1697,0,0,1697,0,f56f564d7ceccee0e74ca04906629ae6eb79a5ff7dddc699decb00df7d7e1ceb
 projects/blue-witness/source/automation/.github/actionlint.yaml,automation,YAML,build_ci_config,4,4,0,0,0,5f45775562e3156d9e3d2e92bf518401a1240176066331a1e7a4fdde71adbc29
 projects/blue-witness/source/automation/.github/workflows/ci.yml,automation,YAML,build_ci_config,187,48,139,0,0,a5717cdc0480041e7314275baafc8f49139e136b20eec01a690f445ed581337b
 projects/blue-witness/source/automation/.github/workflows/deploy.yml,automation,YAML,build_ci_config,119,77,42,0,0,46ee3ebea4e0348cc6bfc98700d8a0df8f980dac41c5419b6a1861daf729b0e4
 projects/blue-witness/source/automation/.github/workflows/integration.yml,automation,YAML,build_ci_config,36,15,21,0,0,e829f72b0029c87ae258b00d461a5034b72ccc8fae9365c8488ccdc6e96d92e6
 projects/blue-witness/source/automation/.github/workflows/pi-component.yml,automation,YAML,build_ci_config,160,27,133,0,0,b305ef3dff1ff6788774939f568a957133ea560822e771a8d7ae61632ae20b66
 projects/blue-witness/source/automation/scripts/ci/build-pi.sh,automation,Bourne Shell,build_ci_config,61,57,4,0,0,13525d8d3a828ee053bbb0ec4449754e12b3707ce1c9d513c575a59be2874df3
-projects/blue-witness/source/automation/scripts/ci/check-server.py,automation,Python,implementation,188,0,188,0,0,f6e435749345d714b0692293d3b0b87257fe54240b1d0f6a792d6261490d3323
+projects/blue-witness/source/automation/scripts/ci/check-server.py,automation,Python,implementation,188,0,188,0,0,f7ab390e57110382f6ec518ab31e4241331b7b50af2f808d4ade683132eda37d
 projects/blue-witness/source/automation/scripts/ci/install-host-deps.sh,automation,Bourne Shell,build_ci_config,94,0,94,0,0,741feb0ee706ec7fced5e864e20683a3b53d63c72e1c2d52c7179166cdf60570
-projects/blue-witness/source/automation/scripts/ci/select-ci.py,automation,Python,implementation,20,0,20,0,0,f1fdfd781887664dd37a5b219338504d3da4ed672c042e7945bdf6d9efbf619f
-projects/blue-witness/source/automation/scripts/ci/setup-windows-ffmpeg.py,automation,Python,implementation,94,0,94,0,0,b596afc209fec1c49d8e9168eef0665c0dcf60cfab836e10efde56719f131c93
+projects/blue-witness/source/automation/scripts/ci/select-ci.py,automation,Python,implementation,20,0,20,0,0,a39a3c0bd51040b051f3c3935b010da379f89f7ed9bd74dc2289a31df58555ac
+projects/blue-witness/source/automation/scripts/ci/setup-windows-ffmpeg.py,automation,Python,implementation,94,0,94,0,0,6a7e9504e6d403772fde23bdff7517b2ec26995b2653209091af61bb12fa6599
 projects/blue-witness/source/automation/scripts/ci/test_apt_archive_cache.py,automation,Python,tests_examples,83,0,83,0,0,17f6e6dc6e26de28390b8c1e7515ac708f56d09d488bf3b3d36b4fce85d68ee9
 projects/blue-witness/source/automation/scripts/ci/test_install_host_deps.py,automation,Python,tests_examples,143,0,142,0,1,60cce799c2ba4eb5b584af9ad020bafafc89fe1b673e00917e7d9f26ee860096
 projects/blue-witness/source/automation/scripts/ci/test_select_ci.py,automation,Python,tests_examples,37,0,37,0,0,c3dd300bbc5f73a47f2e8d29a29a64d7cce4576ce6521e693f69f9e22d8f5316
@@ -27,11 +27,11 @@ projects/blue-witness/source/automation/scripts/deploy/deploy_fleet.sh,automatio
 projects/blue-witness/source/ipc/accident_protocol.h,ipc,C/C++ Header,implementation,20,0,0,20,0,c2d90f3f6c597591c3970b0ab40984149e6793af0a56dd4766521723c7ad0249
 projects/blue-witness/source/ipc/filter_protocol.h,ipc,C/C++ Header,implementation,12,0,0,12,0,91877a3ca6d09a918943d0d63e16550d08c46a0e9a50f01f7ba2f000858204d2
 projects/blue-witness/source/ipc/inference_protocol.h,ipc,C/C++ Header,implementation,11,0,0,11,0,5fc577431636512f6d2bb603afe0b727d154dd1f532389854c36103000e7b327
-projects/blue-witness/source/ipc/ipc.c,ipc,C,implementation,206,0,0,206,0,a0eef2862826c8f5e6b9ef1df9e9d28954d44147c5301e9b46daee3d7700d71d
+projects/blue-witness/source/ipc/ipc.c,ipc,C,implementation,206,0,0,206,0,1b9ede56eacfae2e12a23fe0c60b75650ff2eaad75f1acec0cd62daafbac6a90
 projects/blue-witness/source/ipc/ipc.h,ipc,C/C++ Header,implementation,34,0,0,34,0,c89e5297f353793225c63e14e1b14af9d62952523e0b6ccad16b0aa1c02f41f1
 projects/blue-witness/source/ipc/p2p_protocol.h,ipc,C/C++ Header,implementation,20,0,0,20,0,a6454b137c72f5e35c1325b9411be925ef608ddc11551b747eaea6dadab334e5
 projects/blue-witness/source/ipc/protocol.h,ipc,C/C++ Header,implementation,40,0,0,40,0,6e6214b96217ac97e71a37fb432ef5bb256ebd8a7b32073712d982eebffd2747
-projects/blue-witness/source/ipc/runtime_watchdog.h,ipc,C/C++ Header,implementation,164,0,0,164,0,019a18473fcbc2496950beac5d7a2adb75488d9d68b5cb156683680a8880bab5
+projects/blue-witness/source/ipc/runtime_watchdog.h,ipc,C/C++ Header,implementation,164,0,0,164,0,ffc85eab4a7cb4710816838e28ffb8e3b8db832abd5bf4e7d46c75670a027a45
 projects/blue-witness/source/ipc/sensor_protocol.h,ipc,C/C++ Header,implementation,11,0,0,11,0,ada8eceb9a4b60e816726636cebc7b2bdda88a134e56e3dd651b349b472d4c51
 projects/blue-witness/source/ipc/time_sync_protocol.h,ipc,C/C++ Header,implementation,39,0,0,39,0,cd7aa183e7e62380c834a8c9643a330f5270865092fe0b63626b458546b3315d
 projects/blue-witness/source/ipc/uploader_ipc_protocol.h,ipc,C/C++ Header,implementation,69,0,0,69,0,ca126ccea6c70e30ed3d23ac8e68c8a31bf981dad33542f2222ec11de1ab7362
@@ -61,9 +61,9 @@ projects/blue-witness/source/model_training/evaluate.py,model_training,Python,im
 projects/blue-witness/source/model_training/export_coco.py,model_training,Python,implementation,425,425,0,0,0,117ef6136e7ff87b3f9733e7e9cf5fd0c313c50d92c70db6e1dc61694411527e
 projects/blue-witness/source/model_training/export_onnx.py,model_training,Python,implementation,139,124,15,0,0,74c59da46e24c0f126f62a101066c3dc5f4e8675bea58816d3c50576b115f324
 projects/blue-witness/source/model_training/prepare_dataset.py,model_training,Python,implementation,490,479,11,0,0,a8868eddae79d778bd47e9bec12db9f63a6ff29ea183a3457606118af8313a75
-projects/blue-witness/source/model_training/register_recordings.py,model_training,Python,implementation,358,186,172,0,0,9753f7d667545e8538d81108be0c91645d6932c4eedec2b2e258fe9e6de27ae4
-projects/blue-witness/source/model_training/review_annotations.py,model_training,Python,implementation,590,574,16,0,0,3bde5bd1b6971617d54d1f0e8f97e75be6a5a4af390446477e42a520a8a87033
-projects/blue-witness/source/model_training/runtime_contract.py,model_training,Python,implementation,32,0,32,0,0,0eb2785892368ca71211ffc8f652ada18f97b118369cc0937e5bd482d4bc64fd
+projects/blue-witness/source/model_training/register_recordings.py,model_training,Python,implementation,358,186,172,0,0,eb912ad368a48bcac3a5d89b5b88858af181cb845a0496e69636ae79df79ffd9
+projects/blue-witness/source/model_training/review_annotations.py,model_training,Python,implementation,590,574,16,0,0,5f696092803277fa9b7b38a69421b4f4ce89edc72be50d93f68ed46bf02fd9de
+projects/blue-witness/source/model_training/runtime_contract.py,model_training,Python,implementation,32,0,32,0,0,de2358ea8dc63d4834d6ad7f2eac63a3d511225911eefc90810a03f3e300c066
 projects/blue-witness/source/model_training/sync_recordings.py,model_training,Python,implementation,359,359,0,0,0,2e42fdb8e89eb3bad65a6bc90c68bc927ce4f4755348efa6f010ef6367d36d40
 projects/blue-witness/source/model_training/tests/test_pipeline.py,model_training,Python,tests_examples,1236,938,263,0,35,eeed895676980a0b92d56155470cb0dba2fd661974a0a62030ec7d718a7ff88b
 projects/blue-witness/source/model_training/tests/test_runtime_contract.py,model_training,Python,tests_examples,31,0,31,0,0,c8a3f49844c52e1cc583deae69b3cdf9aa2d4cac98d78b038e212bcfdaf0296f
@@ -72,19 +72,19 @@ projects/blue-witness/source/model_training/validate_dataset.py,model_training,P
 projects/blue-witness/source/model_training/yolox_runtime.py,model_training,Python,implementation,208,208,0,0,0,30d552102cd46d9ac5707c3389586d84b34ea71af5a0b54d7a43335127e1ecd8
 projects/blue-witness/source/server/Makefile,server,make,build_ci_config,11,0,11,0,0,c088ad5cf1b738b8a550d7963a171343389af8131012a5c8ff2caf8f5d249511
 projects/blue-witness/source/server/backend/app/api/access.py,server,Python,implementation,139,139,0,0,0,710f1bf59fca99127c014dfdc42ccc075691b73e98edffa2f358ef861a921f16
-projects/blue-witness/source/server/backend/app/api/account.py,server,Python,implementation,224,224,0,0,0,1b028282edb043019fc4c1d58beb1ea13b0ca803de229b3db4c3f43589a9f0b2
+projects/blue-witness/source/server/backend/app/api/account.py,server,Python,implementation,224,224,0,0,0,3ff6d5429fe9cbbf12778698d49a60fc67b8778f83213761742f7f6d1f4fc714
 projects/blue-witness/source/server/backend/app/api/admin.py,server,Python,implementation,327,327,0,0,0,9d813c59cf235f54a4b56876dea0b7ccefcc223544052348ba5fcbf2c700caa2
 projects/blue-witness/source/server/backend/app/api/dependencies.py,server,Python,implementation,65,65,0,0,0,f283df22ba866ea83b9668e0d7f3ba9ca3823a31ecb996b11d02d3ce0fb4639c
-projects/blue-witness/source/server/backend/app/api/evidence.py,server,Python,implementation,644,568,76,0,0,22075669e14f0dcfd7e8ff7434c9ac9a23c3d12257de197977499e63788ee6bd
+projects/blue-witness/source/server/backend/app/api/evidence.py,server,Python,implementation,644,568,76,0,0,2f5e1d2e51d78a6d16f2ba4cc94396c15c080d1fdc329463eda796beef127620
 projects/blue-witness/source/server/backend/app/api/health.py,server,Python,implementation,39,39,0,0,0,e83c4edb0e89062ceb642ccbcfd85834ba71c1eef247ac6f3bc2de5a7a615bf9
 projects/blue-witness/source/server/backend/app/api/node_dependencies.py,server,Python,implementation,77,77,0,0,0,368afe20eb18603a99c78155c0b7589dba487b02c8531bb2b119f64e7309702e
 projects/blue-witness/source/server/backend/app/api/nodes.py,server,Python,implementation,69,69,0,0,0,46f106baa43a56a5ed1c6d50fb7756094827aeee489e234365d1c178c2384c35
-projects/blue-witness/source/server/backend/app/api/pages.py,server,Python,implementation,57,57,0,0,0,adc4c961e19e63d535fc973fb50bda284f4678dca9eebc29edfa7a81c6aeca03
+projects/blue-witness/source/server/backend/app/api/pages.py,server,Python,implementation,57,57,0,0,0,3f1fbd618834da4c4e8b324b86d4c48b43464fb66b4a98dce9430a49d9cf4b0b
 projects/blue-witness/source/server/backend/app/api/portal.py,server,Python,implementation,355,355,0,0,0,2fa2ba3b696f5db3ae515ab5f85add3f1efd60a9bbccd561b47f6c56312035fa
 projects/blue-witness/source/server/backend/app/api/time_sync.py,server,Python,implementation,22,22,0,0,0,00ffe98d2a9a792ee9e178f9c30b5881c7930fd5976cba762f472d8f3997c68c
 projects/blue-witness/source/server/backend/app/api/vehicles.py,server,Python,implementation,137,136,1,0,0,37717ce1608399d6c63df26382de5158440ffdefbb2f028e2d8d6d612aa6517e
-projects/blue-witness/source/server/backend/app/cli/assign_vehicle.py,server,Python,implementation,54,54,0,0,0,1dd998eeb7e27ff07d5f24cca6191f16dc1fbcc32a36922ba4d6278b650b11fe
-projects/blue-witness/source/server/backend/app/cli/create_admin.py,server,Python,implementation,46,46,0,0,0,f8b09260700795cde31cd29b0106751ed4f7f65c2133181e6549668469565973
+projects/blue-witness/source/server/backend/app/cli/assign_vehicle.py,server,Python,implementation,54,54,0,0,0,dda7a1d62a16c0962eb7f9a3991ab4c0ee6190fb0b053c9602690f3f3f1e9e7d
+projects/blue-witness/source/server/backend/app/cli/create_admin.py,server,Python,implementation,46,46,0,0,0,2a6a0086e18d45cf94a70f3e3bb23c061bfc7f44481765340bd1b8c793f4d049
 projects/blue-witness/source/server/backend/app/cli/issue_access_code.py,server,Python,implementation,53,53,0,0,0,2b25e2e59ba56af174926136c0c4cf5831b9cfb2cc726f20ca35e35542eb8809
 projects/blue-witness/source/server/backend/app/cli/merge_event.py,server,Python,implementation,137,137,0,0,0,ae456963abf3a0ea59db10cd69bc26defbba680362264d96a5fabb6a45a4ca1b
 projects/blue-witness/source/server/backend/app/cli/provision_node.py,server,Python,implementation,79,79,0,0,0,2f2f196d0ee1988c5bc130f05d546a349ddddf864a9727855cec46b46ccd88d0
@@ -111,7 +111,7 @@ projects/blue-witness/source/server/backend/app/db/migrations/009_portal_vehicle
 projects/blue-witness/source/server/backend/app/db/migrations/010_user_profiles.sql,server,SQL,implementation,5,5,0,0,0,3cd5ab4a583332f1e454753a71108f114e4abcf891732ffb4a1452b95ce0e565
 projects/blue-witness/source/server/backend/app/db/node_repository.py,server,Python,implementation,189,181,0,0,8,5c8eae0949cf8ffd835a53bc1bc1da85faddd0b9f41c88f0a182c50ae37faf2e
 projects/blue-witness/source/server/backend/app/db/portal_repository.py,server,Python,implementation,268,264,0,0,4,b6fed614706c10d0ceb06e7370e2077b7f4e3f122135e014eb0c9e08ecdc5139
-projects/blue-witness/source/server/backend/app/db/profile_repository.py,server,Python,implementation,27,27,0,0,0,3d33e5bdf5a8df84e99167fa57f3c27be5b54efba9f9a5889365539867be1908
+projects/blue-witness/source/server/backend/app/db/profile_repository.py,server,Python,implementation,27,27,0,0,0,d3af372315a5374e63c781a28663485335813eda05d71c4168faa20f13695119
 projects/blue-witness/source/server/backend/app/db/schema.sql,server,SQL,implementation,65,64,1,0,0,0433bb05c56308c91e448ac21d0543ca01a5e914877170f11df8d47ab9819dcf
 projects/blue-witness/source/server/backend/app/db/upload_replay_repository.py,server,Python,implementation,93,88,4,0,1,f5308416d516c44070bffbac7b729894bd739ffd64f0aa33be7680fb23c0673f
 projects/blue-witness/source/server/backend/app/db/vehicle_maintenance_repository.py,server,Python,implementation,195,182,0,0,13,9972ee68667a7fdc0da064a992438eb8444deeeaabe04d7a5d183c3af9ad3074
@@ -122,25 +122,25 @@ projects/blue-witness/source/server/backend/app/schemas/access.py,server,Python,
 projects/blue-witness/source/server/backend/app/schemas/account.py,server,Python,implementation,41,41,0,0,0,e739875bf3adfa3ab051bce5847648e82269459e030d5e0bd57d57d870d50990
 projects/blue-witness/source/server/backend/app/schemas/admin_actions.py,server,Python,implementation,45,45,0,0,0,8636ce1de80a7d33998132c4af466ee624b06391a2dbd024937a68460f9f37bd
 projects/blue-witness/source/server/backend/app/schemas/portal.py,server,Python,implementation,80,78,0,0,2,bf3d635359756e6444fba2b3e948f3bef16c251f132fa25b4ccd53623c122a0c
-projects/blue-witness/source/server/backend/app/schemas/vehicle.py,server,Python,implementation,104,91,13,0,0,87c9ae84393ea9958798a8cf8d979f08ea29adc1fa1e083ca7e558a23cd275a7
+projects/blue-witness/source/server/backend/app/schemas/vehicle.py,server,Python,implementation,104,91,13,0,0,ab991362f651ef9b234a66e801f19f4258f869d0a959b2716ac827ae865c8137
 projects/blue-witness/source/server/backend/app/services/access_service.py,server,Python,implementation,341,341,0,0,0,19984ee1e32e977444e07b40c338c82cd294b79fc063eb2f39cd006ca724735f
 projects/blue-witness/source/server/backend/app/services/account_service.py,server,Python,implementation,251,251,0,0,0,fb9d7a340b691ef4bef0935989c4d4aa76401358379580ac1221f86e1c5c810a
 projects/blue-witness/source/server/backend/app/services/admin_cleanup_service.py,server,Python,implementation,346,307,39,0,0,54b9b943e52cae14117cb038d87dd844e12e68d64b4589e49308e0b3c2e010ce
 projects/blue-witness/source/server/backend/app/services/collection_service.py,server,Python,implementation,138,134,4,0,0,6b88c5df42db395ed748e0f8b267ba336583d881fc1eaa36b20166be877ae4b5
-projects/blue-witness/source/server/backend/app/services/communication_log.py,server,Python,implementation,100,100,0,0,0,b4d9fb260455f8aa121668ebae491f3725855becf072c5ed1fb9020e46093ab8
+projects/blue-witness/source/server/backend/app/services/communication_log.py,server,Python,implementation,100,100,0,0,0,eb04d27925a608c239416df7f586d04d0445a92dd440347c4d3b61ef3e221622
 projects/blue-witness/source/server/backend/app/services/event_identity_service.py,server,Python,implementation,136,133,0,0,3,5ed75f8172150a40ff5d367d9c7eb11fc6dba669fdf9ad39087f78dfb5aa23bb
 projects/blue-witness/source/server/backend/app/services/failsafe_verification.py,server,Python,implementation,313,308,0,0,5,361a04b271865b35d1631ae97275c1c8e49bfa87a869bd3abbc5c292ba58b1a4
 projects/blue-witness/source/server/backend/app/services/merge_worker.py,server,Python,implementation,427,427,0,0,0,b7747d7e423a52f6ba89b27cb114de06b0737a2eba999a0e6df0c47a070ea1a9
 projects/blue-witness/source/server/backend/app/services/node_auth_service.py,server,Python,implementation,142,142,0,0,0,eaf3924576bde0b0ecb097511046ebaf499d5d681f43063ddb063e4e40edffad
-projects/blue-witness/source/server/backend/app/services/password_policy.py,server,Python,implementation,9,9,0,0,0,bffc8f41e2d018c818aeedde45becbd359d2980d9fa97b84d37ef79fdaa04368
+projects/blue-witness/source/server/backend/app/services/password_policy.py,server,Python,implementation,9,9,0,0,0,9199c300b59035bb7f69802a109be922832b42f37ddf52399fe39b5b2ba0a1b7
 projects/blue-witness/source/server/backend/app/services/portal_access_service.py,server,Python,implementation,102,100,1,0,1,25c552eb01f0d49548c6c62cc6e6cef0f1cea84d79c83d5dc53a912b012445d8
-projects/blue-witness/source/server/backend/app/services/portal_service.py,server,Python,implementation,369,351,0,0,18,04905259e41a46e92dfe34e493343470e56aeec2d6a56ec3aec32da168a4bb39
-projects/blue-witness/source/server/backend/app/services/profile_service.py,server,Python,implementation,69,69,0,0,0,d81b96b3d23ac8ffaacfc768677635e8cd0728a72dd0e45c4609dc38b299c32c
-projects/blue-witness/source/server/backend/app/services/storage.py,server,Python,implementation,331,289,42,0,0,e75c4060255a950f17004ff7cefc49d2a08ea42c76300255735e67f4c9f1be28
+projects/blue-witness/source/server/backend/app/services/portal_service.py,server,Python,implementation,369,351,0,0,18,c4c0bb32350b9f08b291fc9326bda1746e575c446d955f59306a81a0ab383d45
+projects/blue-witness/source/server/backend/app/services/profile_service.py,server,Python,implementation,69,69,0,0,0,881f8dd20d4b13a25ef9d177a1ff0c02a36e91457ad01b091cc28e16ce0cd570
+projects/blue-witness/source/server/backend/app/services/storage.py,server,Python,implementation,331,289,42,0,0,28b60e736cab46b2a2b6d74b961063096f03809009e739a635c90cb10e2fdd2b
 projects/blue-witness/source/server/backend/app/services/timestamp_normalization.py,server,Python,implementation,103,103,0,0,0,12a7bd083e761aa3dab9f7df09c69e992c2420c1e080a4cc72ffbafe3226e3fa
 projects/blue-witness/source/server/backend/app/services/user_access_code_service.py,server,Python,implementation,132,129,0,0,3,913ebd1243eef54d15e58623ba45cacbc6a1ba7bb602b135e070380e4499f06e
-projects/blue-witness/source/server/backend/app/services/vehicle_maintenance_service.py,server,Python,implementation,69,69,0,0,0,df2e83c1bd53cc935ae945edd98fae183280dba67f90c75d6a51cf6083718122
-projects/blue-witness/source/server/backend/app/services/vehicle_operation_service.py,server,Python,implementation,72,70,0,0,2,5bd58ba3be956f5f46f1dc371dd62dc86f4ffb53e4dc4cc8593a2e3712f57ff3
+projects/blue-witness/source/server/backend/app/services/vehicle_maintenance_service.py,server,Python,implementation,69,69,0,0,0,421b5913270a3fb28f07adaf862e074daab6a33dc3e83f7160220405ba6dd8ea
+projects/blue-witness/source/server/backend/app/services/vehicle_operation_service.py,server,Python,implementation,72,70,0,0,2,c037ca3a11a3cdf7706c15ae4b99f7fa7e512746640fd9e05145fb27417c6c06
 projects/blue-witness/source/server/backend/app/services/vehicle_service.py,server,Python,implementation,52,52,0,0,0,e6625393f52aa74a0e16749e5d77233988363587c1aac00362d61c49f5ac7bc9
 projects/blue-witness/source/server/backend/app/services/video_merger.py,server,Python,implementation,1062,1062,0,0,0,e859e97805769709e0f02c027c986f9f6336018d47df42fdad65d281846ff93b
 projects/blue-witness/source/server/backend/frontend/pages/account.html,server,HTML,implementation,55,55,0,0,0,44dc29bf35c780fd63f9606ff4238db6ecd1e9c2af231ba1961924f975f78b8f
@@ -184,12 +184,12 @@ projects/blue-witness/source/server/backend/tests/test_vehicle_maintenance.py,se
 projects/blue-witness/source/server/backend/tests/test_vehicle_registration.cjs,server,JavaScript,tests_examples,319,36,283,0,0,bae94b392b618fec4a1e19c90b3277a4e7cda71001dcd78a3dbf951f76867607
 projects/blue-witness/source/server/backend/tests/test_video_views.cjs,server,JavaScript,tests_examples,153,153,0,0,0,fbd15bc96dcc6e82894554ec44bffa2d7c726660b3af72ac62cf873acf9d351b
 projects/blue-witness/source/server/backend/tests/test_video_views.py,server,Python,tests_examples,108,108,0,0,0,7b28e949e82e7d55012806d1a42499fcc1b7d3360644dea87137812cde80604d
-projects/blue-witness/source/server/client.py,server,Python,implementation,112,112,0,0,0,bb273c60510c4501cdac4bc0ade96641820faa8659aa0c3038892b6b729704fa
+projects/blue-witness/source/server/client.py,server,Python,implementation,112,112,0,0,0,be2b0c915a56e21ca64d31c1ba4e9ca40e4380b869f344460f12771596cffeb4
 projects/blue-witness/source/server/main.py,server,Python,implementation,94,91,0,0,3,5fc4864f17abbd55e44cab1391609f44ee661948ac193eb08093d52a31f388d7
 projects/blue-witness/source/time_sync/Makefile,time_sync,make,build_ci_config,29,28,1,0,0,170d2fbc548284a88d3160d265d3058b34dbe475f197241c852681ca65fc286c
 projects/blue-witness/source/time_sync/deploy/deploy.sh,time_sync,Bourne Shell,build_ci_config,70,36,34,0,0,a4b74392f0df90b7664dbac7c0c8bed9fb66c38ca9af0386110c9790f9f23c8d
 projects/blue-witness/source/time_sync/deploy/install-service.sh,time_sync,Bourne Shell,build_ci_config,82,62,20,0,0,7ccc6ed956f9996fe28312f981b99f9cc0fe3f51c346c332e4d1de6068c5f6f8
-projects/blue-witness/source/time_sync/src/time_sync.c,time_sync,C,implementation,845,666,179,0,0,59a14928e2658fc3ffac277de3bb7594314d314bb82d8eedd095aa1a8aefb6ac
+projects/blue-witness/source/time_sync/src/time_sync.c,time_sync,C,implementation,845,666,179,0,0,a39a42432cca459cf5ee538d176435dc39d9a9f2f772dad956fd1a5377580da8
 projects/blue-witness/source/uploader/Makefile,uploader,make,build_ci_config,59,58,1,0,0,252ab164bd63358c8c6f87a90bcd550e022820513309d413bba8dc2d8e233cfd
 projects/blue-witness/source/uploader/deploy/deploy.sh,uploader,Bourne Shell,build_ci_config,80,51,29,0,0,0fcf3272795a0d8660c1e549d232021f08ee1c17c32f4b840a3db6c339888643
 projects/blue-witness/source/uploader/deploy/install-service.sh,uploader,Bourne Shell,build_ci_config,95,74,21,0,0,2747dcd4e2f00dff11f7bd60f98cc57029f6e31a31ac1b3dd560491f319cd221
@@ -205,17 +205,17 @@ projects/blue-witness/source/uploader/include/uploader_sha256.h,uploader,C/C++ H
 projects/blue-witness/source/uploader/include/uploader_spool.h,uploader,C/C++ Header,implementation,45,45,0,0,0,20d582234fb139634d54eb40af993ee0612ab553aa15835eda31e73ff0b4d1c0
 projects/blue-witness/source/uploader/include/uploader_tls.h,uploader,C/C++ Header,implementation,23,23,0,0,0,5b29356a702ea63cae26a617b39c85806a2480aa0adb3d8f7f4273651c205748
 projects/blue-witness/source/uploader/include/uploader_watchdog.h,uploader,C/C++ Header,implementation,6,0,6,0,0,14cfb21b0a37282ceb395ff9c15fbe64d5efd958dc956a3dc804ecd1e5ef12fa
-projects/blue-witness/source/uploader/src/common/uploader_event_id.c,uploader,C,implementation,90,90,0,0,0,e40067a0373697979f61b2b3eb973cc1963f94ca15955eb9dbe7801f888f529c
-projects/blue-witness/source/uploader/src/common/uploader_log.c,uploader,C,implementation,361,361,0,0,0,be258e754304a4c6355513461a38295303432e9fd9c8db8c3bec3dc8c69179f1
+projects/blue-witness/source/uploader/src/common/uploader_event_id.c,uploader,C,implementation,90,90,0,0,0,625b6ecaef92083ad1b0d9446c6cde2cb3396f48021264891d1f7cc37b925352
+projects/blue-witness/source/uploader/src/common/uploader_log.c,uploader,C,implementation,361,361,0,0,0,e183567206be4a83d4061d47610f1f7563c28eff82b9bd4e53e2790cbcc6480a
 projects/blue-witness/source/uploader/src/ingest/uploader_spool.c,uploader,C,implementation,696,692,4,0,0,c04137a49cd612aa0c1dc277d5abfb72eefa843ff9e0bc5c4e644c862a36b624
-projects/blue-witness/source/uploader/src/queue/uploader_queue.c,uploader,C,implementation,899,859,40,0,0,fd5006a2742d994b5de5118d983ae577380ee84139033daf8938564d48cd1747
-projects/blue-witness/source/uploader/src/uploader.c,uploader,C,implementation,2366,2266,100,0,0,7701d8034a6ac3103ad540a3c3ed843749d2a4fcd272f29e1ddd26af6fc2f698
+projects/blue-witness/source/uploader/src/queue/uploader_queue.c,uploader,C,implementation,899,859,40,0,0,d8b86df00299dbe7f75c5b978173ec9acef41cd6897e31a9c54a535bfdc01dac
+projects/blue-witness/source/uploader/src/uploader.c,uploader,C,implementation,2366,2266,100,0,0,17604103e1bd6f9198436b20a43191c5ebe12a515f3f1f4fd0d5960b912ee348
 projects/blue-witness/source/uploader/src/worker/uploader_ack.c,uploader,C,implementation,349,343,6,0,0,af101187ba5daaca16f055c9eef4ec9150af13772be03f21b04858fd1191ae4e
 projects/blue-witness/source/uploader/src/worker/uploader_config.c,uploader,C,implementation,100,100,0,0,0,608bd92535bb5ea50e45034055dbcd426b97a7acfe6f90ee2735fc471e76e26f
-projects/blue-witness/source/uploader/src/worker/uploader_http.c,uploader,C,implementation,987,935,49,0,3,b03ffb95e7896283f05c186a2486a7402c837d0b310ae3f672341ad08f14f133
-projects/blue-witness/source/uploader/src/worker/uploader_metadata.c,uploader,C,implementation,397,280,117,0,0,ec700e96679534b388fe9f6399efec293accc0536ce18da7bbc6d5a88b428caa
+projects/blue-witness/source/uploader/src/worker/uploader_http.c,uploader,C,implementation,987,935,49,0,3,5d700b19bdfc57c7b4cc30a98758eaca04fc69c681ab873f8e2b8814a3b2246f
+projects/blue-witness/source/uploader/src/worker/uploader_metadata.c,uploader,C,implementation,397,280,117,0,0,f6a0d4962a2ea13b9341f33aa6b33ed966eb253ed71702a5b841f789a8c0c49c
 projects/blue-witness/source/uploader/src/worker/uploader_sha256.c,uploader,C,implementation,282,279,3,0,0,d0a067e2d88ea16ed33763a47ee3f98375ca5fec204334de994e0033b7098123
-projects/blue-witness/source/uploader/src/worker/uploader_tls.c,uploader,C,implementation,165,164,0,0,1,888a779d92b2ac2da0c7aff77a9e9ab0f5ff9c55746106d48ef703c030db9cd0
+projects/blue-witness/source/uploader/src/worker/uploader_tls.c,uploader,C,implementation,165,164,0,0,1,29551533d74b97fe9ad947a57ec11d2757567b49c9910bccb75b6395b0e7785b
 projects/blue-witness/source/uploader/tests/core_regression.c,uploader,C,tests_examples,30,0,0,0,30,fe7e6df6dd373800e14c3225038860b791ccb2c79315391fca42a69181ddfca8
 projects/blue-witness/source/uploader/tests/http_transport_smoke.c,uploader,C,tests_examples,40,40,0,0,0,53fc19496e11bce36fe1c7a8231749ee73f96b25e758f52e84024ee85b1ee6c4
 projects/blue-witness/source/uploader/tests/ingest_smoke.c,uploader,C,tests_examples,36,36,0,0,0,f24cc5cb866e8b451ae7b6aa3d02651c3d21f1177a86b07c239ef78bd211823f

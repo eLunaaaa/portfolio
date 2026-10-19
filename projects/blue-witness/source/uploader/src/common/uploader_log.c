@@ -194,6 +194,10 @@ static const uploader_event_description_t event_descriptions[] =
 };
 
 
+/* 기능: 이벤트 코드에 대응하는 운영 설명을 찾는다.
+ * 입력: 이벤트 이름 event.
+ * 출력·구조: 정적 설명 테이블의 항목 포인터 또는 미등록·NULL이면 NULL. 사람이 읽는 로그에 상황·다음 동작을 연결한다.
+ */
 static const uploader_event_description_t *find_event_description(
     const char *event
 )
@@ -259,6 +263,10 @@ static uploader_log_view_t configured_log_view(void)
 }
 
 
+/* 기능: 로그 심각도를 한국어 표시로 바꾼다.
+ * 입력: 로그 수준 문자열 level.
+ * 출력·구조: ERROR는 오류, WARN은 주의, 그 외는 진행. 원래 이벤트 코드와 함께 읽을 표시용 문자열이다.
+ */
 static const char *human_level(const char *level)
 {
     if (level != NULL && strcmp(level, "ERROR") == 0)
@@ -275,6 +283,10 @@ static const char *human_level(const char *level)
 }
 
 
+/* 기능: 기계가 수집할 수 있는 한 줄 로그를 출력한다.
+ * 입력: 시각·밀리초·수준·구성요소·이벤트·상세 설명.
+ * 출력·구조: stderr 출력; 반환값 없음. 고정된 key=value 순서로 기록해 이벤트별 검색을 돕는다.
+ */
 static void print_structured_log(
     const char *timestamp,
     long milliseconds,
@@ -297,6 +309,10 @@ static void print_structured_log(
 }
 
 
+/* 기능: 장치 운영자가 읽을 한국어 상황 로그를 출력한다.
+ * 입력: 시각·밀리초·수준·구성요소·이벤트·상세 설명.
+ * 출력·구조: stderr 출력; 반환값 없음. 등록된 설명이 있으면 현재 상황과 다음 동작을 함께 보여 준다.
+ */
 static void print_human_log(
     const char *timestamp,
     long milliseconds,

@@ -75,6 +75,10 @@ typedef struct {
 
 static volatile sig_atomic_t stop_requested = 0;
 
+/* 기능: 단조 증가 시계에 맞춘 조건 변수를 생성한다.
+ * 입력: 초기화할 condition 포인터.
+ * 출력·구조: pthread 상태 코드. 속성 생성·시계 선택·조건 변수 초기화 후 속성을 해제한다.
+ */
 static int monotonic_cond_init(pthread_cond_t *condition)
 {
     pthread_condattr_t attributes;
@@ -584,6 +588,10 @@ close_pipe:
     return -1;
 }
 
+/* 기능: chrony 측정 결과를 공통 시간 동기화 상태로 변환한다.
+ * 입력: 허용 오차 max_offset_ms와 출력 status.
+ * 출력·구조: 반환값 없음; 측정 시각·오차·동기화 상태·설명을 status에 기록. tracking 실행 결과를 파싱하고 소스 동기화와 오차 조건을 구분한다.
+ */
 static void collect_chrony_sample(
     double max_offset_ms,
     time_sync_status_t *status)

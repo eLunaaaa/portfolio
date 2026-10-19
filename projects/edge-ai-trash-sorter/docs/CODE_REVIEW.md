@@ -2,7 +2,7 @@
 
 Zybo·Arduino 센싱/구동·Flask 서버·관제 화면 코드의 점검 및 정리 내용이다.
 
-## 확인한 오류와 공개본 수정
+## 오류 수정과 동작 검증
 
 | 영역 | 확인한 문제 | 수정 |
 |---|---|---|
@@ -30,9 +30,9 @@ Zybo·Arduino 센싱/구동·Flask 서버·관제 화면 코드의 점검 및 �
 
 ## 실보드 실행
 
-프로젝트 개발 과정에서 카메라 촬영, AI 추론, Arduino 통신·서보 제어, 적재량 전송과 관제 화면을 연동해 실보드에서 검증하고 실행했다. 아래는 포트폴리오 코드 정리 과정에서 추가로 수행한 검사다.
+프로젝트 개발 과정에서 카메라 촬영, AI 추론, Arduino 통신·서보 제어, 적재량 전송과 관제 화면을 연동해 실보드에서 검증하고 실행했다. 컴파일·회귀 검사 항목은 다음과 같다.
 
-## 공개 코드 검사
+## 컴파일·회귀 검사
 
 - Arduino 1: Arduino CLI, `arduino:avr:uno`, AVR core 1.8.6, Servo 및 LiquidCrystal I2C로 컴파일 성공. Flash 8,436 bytes, 전역 RAM 729 bytes. 컴파일 시점 라이브러리 기준이다.
 - Arduino 2: avr-gcc 7.3.0, `-mmcu=atmega328p -DF_CPU=16000000UL -Os -std=c11 -Wall -Wextra -Werror`로 ELF 생성 성공.

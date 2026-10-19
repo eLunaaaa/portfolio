@@ -1,6 +1,6 @@
 # Protocol
 
-공개본 Master와 Slave는 아래 규격을 같이 사용한다. 다중 바이트 정수는 little-endian이다.
+Master와 Slave는 아래 통신 규격을 사용한다. 다중 바이트 정수는 little-endian이다.
 
 ## PC → Master UART
 
@@ -41,4 +41,4 @@ Master 출력:
 [4..7]  convolution result int32
 ```
 
-Master는 worker별 pending 작업과 결과 번호를 확인한다. read만으로 결과를 지우지 않으며 명시적 ACK에 맞춰 slot을 해제한다. signed int8 곱의 9항 합계가 16비트 범위를 넘을 수 있어 공개본은 int32 결과를 사용한다.
+Master는 worker별 pending 작업과 결과 번호를 확인한다. read만으로 결과를 지우지 않으며 명시적 ACK에 맞춰 slot을 해제한다. signed int8 곱의 9항 합계가 16비트 범위를 넘을 수 있어 int32 결과를 사용한다.

@@ -1,3 +1,7 @@
+/* 파일 역할: OpenSSL 기반 업로더 TLS 연결·인증서 검증·제한 시간 송수신 계층.
+ * HTTP 계층이 제공하는 비차단 소켓을 사용하고 CA·서버 이름을 검증한 뒤 암호화한다.
+ * 전체 전송 기한과 무진행 기한을 함께 적용해 작업자가 소켓에서 무한 대기하지 않게 한다.
+ */
 #define _POSIX_C_SOURCE 200809L
 
 #include "uploader_tls.h"
@@ -14,6 +18,12 @@
 
 #include "uploader_watchdog.h"
 
+/*
+ * 기능: 시간 제한 계산에 쓸 단조 증가 시각을 읽는다.
+ * 입력: 없음.
+ * 출력: 밀리초 시각, clock_gettime 실패 시 -1.
+ * 구조·이유: CLOCK_MONOTONIC을 사용해 시스템 벽시계 보정이 전송 기한 계산에 영향을 주지 않게 한다.
+ */
 long long uploader_tls_now_ms(void)
 {
     struct timespec now;
@@ -21,6 +31,12 @@ long long uploader_tls_now_ms(void)
     return (long long)now.tv_sec * 1000LL + now.tv_nsec / 1000000LL;
 }
 
+/*
+ * 기능: 기한 내에 소켓이 읽기·쓰기 가능한 상태가 되는지 기다린다.
+ * 입력: fd, poll 이벤트, 절대 기한 deadline_ms, 오류 버퍼와 크기·분류명.
+ * 출력: 준비 시 0, 시간 초과·소켓 오류 시 -1과 오류 문자열.
+ * 구조·이유: 남은 시간을 계산해 poll하고 EINTR는 재시도한다. 대기 전에 watchdog 진행 기한을 갱신한다.
+ */
 static int wait_socket(int fd, short events, long long deadline_ms,
                        char *error, size_t size, const char *category)
 {
@@ -44,6 +60,12 @@ static int wait_socket(int fd, short events, long long deadline_ms,
     }
 }
 
+/*
+ * 기능: 서버 인증에 사용할 TLS 클라이언트 컨텍스트를 생성한다.
+ * 입력: CA 파일 경로와 오류 버퍼·크기.
+ * 출력: SSL_CTX 포인터 또는 실패 시 NULL과 오류 문자열.
+ * 구조·이유: 최소 TLS 1.2와 서버 인증서 검증을 설정한다. 성공한 컨텍스트는 호출자가 SSL_CTX_free로 해제한다.
+ */
 SSL_CTX *uploader_tls_context_create(const char *ca_file, char *error, size_t size)
 {
     SSL_CTX *context;
@@ -67,6 +89,12 @@ SSL_CTX *uploader_tls_context_create(const char *ca_file, char *error, size_t si
 }
 
 /* OpenSSL 검증 API가 IP SAN 또는 DNS SAN을 검사한다. 직접 인증서 필드를 파싱하지 않는다. */
+/*
+ * 기능: 서버 인증서와 서버 신원을 검증하며 TLS 연결을 수립한다.
+ * 입력: TLS context, 출력 connection, 비차단 fd, host, 접속·전송·무진행 기한과 오류 버퍼.
+ * 출력: 성공 0과 초기화된 connection, 실패 -1과 오류 문자열.
+ * 구조·이유: 호스트가 IPv4면 IP SAN, 그 외는 호스트 이름과 SNI를 설정한다. WANT_READ/WRITE는 접속 기한까지 poll로 재시도한다.
+ */
 int uploader_tls_connect(SSL_CTX *context, uploader_tls_connection_t *connection,
                          int fd, const char *host, long long connect_deadline_ms,
                          int transfer_timeout_ms, int stall_timeout_ms,
@@ -121,6 +149,12 @@ int uploader_tls_connect(SSL_CTX *context, uploader_tls_connection_t *connection
     return 0;
 }
 
+/*
+ * 기능: TLS 읽기·쓰기의 재시도와 시간 제한을 공통 처리한다.
+ * 입력: connection, 데이터 포인터·길이, 쓰기 여부 writing, 오류 버퍼·크기.
+ * 출력: 처리한 바이트 수, 읽기 정상 종료 0, 실패 -1.
+ * 구조·이유: SSL_read/write 후 WANT_READ/WRITE를 대기한다. 한 번의 성공량만 반환하므로 전체 길이 누적은 상위 계층이 담당한다.
+ */
 static ssize_t tls_io(uploader_tls_connection_t *connection, void *data, size_t length,
                       int writing, char *error, size_t size)
 {
@@ -155,18 +189,36 @@ static ssize_t tls_io(uploader_tls_connection_t *connection, void *data, size_t 
     }
 }
 
+/*
+ * 기능: TLS 연결로 데이터 일부를 전송한다.
+ * 입력: connection, 읽기 전용 data·length, 오류 버퍼·크기.
+ * 출력: 실제 송신 바이트 수 또는 -1.
+ * 구조·이유: 공통 tls_io를 쓰기 모드로 호출한다. 부분 송신이면 호출자가 남은 데이터를 다시 전달한다.
+ */
 ssize_t uploader_tls_write(uploader_tls_connection_t *connection,
                            const void *data, size_t length, char *error, size_t size)
 {
     return tls_io(connection, (void *)data, length, 1, error, size);
 }
 
+/*
+ * 기능: TLS 연결에서 데이터를 읽는다.
+ * 입력: connection, 출력 data·버퍼 길이, 오류 버퍼·크기.
+ * 출력: 수신 바이트 수, 정상 TLS 종료 0, 실패 -1.
+ * 구조·이유: 공통 tls_io를 읽기 모드로 사용하며 HTTP 메시지 경계 해석은 상위 계층이 담당한다.
+ */
 ssize_t uploader_tls_read(uploader_tls_connection_t *connection,
                           void *data, size_t length, char *error, size_t size)
 {
     return tls_io(connection, data, length, 0, error, size);
 }
 
+/*
+ * 기능: TLS 세션을 종료하고 OpenSSL 객체를 해제한다.
+ * 입력: connection.
+ * 출력: connection->ssl을 NULL로 변경; 반환값 없음.
+ * 구조·이유: 비차단 shutdown을 한 번 시도한 뒤 SSL_free한다. 소켓 fd는 여기서 닫지 않으므로 호출자가 별도로 관리한다.
+ */
 void uploader_tls_close(uploader_tls_connection_t *connection)
 {
     if (connection->ssl != NULL) {

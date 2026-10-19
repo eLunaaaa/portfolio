@@ -16,6 +16,10 @@ class VehicleOperationDeniedError(PermissionError):
     """차량 소유권 또는 일회용 확인 권한이 유효하지 않음."""
 
 
+# 기능: 사용자가 해당 차량을 소유하는지 확인한다.
+# 입력: 진행 중인 SQLite connection, 사용자 ID, 차량 ID.
+# 출력: 소유 관계가 있으면 None; 없으면 VehicleOperationDeniedError.
+# 구조·이유: 같은 연결에서 user_vehicles를 조회해 이후 차량 조작 전에 소유권을 검사한다.
 def require_owned_vehicle(
     connection: sqlite3.Connection,
     user_id: int,

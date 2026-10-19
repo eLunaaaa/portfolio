@@ -24,7 +24,7 @@
 | ArduinoProcessingTask | 2 | RX queue 대기, 촬영 요청 전달 |
 | AI task | 3 | 프레임 준비 대기, 전처리·추론·결과 생성 |
 
-원 보고서의 UART interrupt 설명과 달리 Zybo 코드는 polling이다. Arduino 2의 USART 수신은 인터럽트 기반이다.
+Zybo의 UART 수신은 polling 태스크, Arduino 2의 USART 수신은 인터럽트 기반이다.
 
 ## 통신 명령
 

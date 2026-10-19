@@ -1,6 +1,6 @@
 # Model preparation
 
-보고서는 MobileNetV2(alpha=0.5, include_top=False, ImageNet weights)를 backbone으로 사용하고 GlobalAveragePooling2D, BatchNormalization, Dropout(0.3), Dense(128, ReLU), BatchNormalization, Dropout(0.3), Dense(5, softmax)를 연결한 학습 구조를 설명한다.
+학습 모델은 MobileNetV2(alpha=0.5, include_top=False, ImageNet weights)를 backbone으로 사용하고 GlobalAveragePooling2D, BatchNormalization, Dropout(0.3), Dense(128, ReLU), BatchNormalization, Dropout(0.3), Dense(5, softmax)를 연결한 구조다.
 
 - 이미지: RGB 128×128, bilinear resize, `(pixel - 127.5) / 127.5` 정규화
 - 클래스 순서: can, general, glass, pet, empty

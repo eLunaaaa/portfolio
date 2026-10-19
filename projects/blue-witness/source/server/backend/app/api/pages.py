@@ -1,3 +1,4 @@
+# 파일 역할: 브라우저 경로별 HTML 화면을 제공하는 FastAPI 라우터. 데이터 조회·권한 검사는 각 API와 의존성에서 수행한다.
 from pathlib import Path
 
 from fastapi import APIRouter, Depends
@@ -34,6 +35,10 @@ def account_page() -> FileResponse:
     return FileResponse(PAGES_ROOT / "account.html")
 
 
+# 기능: 첫 접속을 로그인 화면으로 안내한다.
+# 입력: 추가 인자 없음; GET / 요청.
+# 출력: /login으로 이동시키는 RedirectResponse.
+# 구조·이유: 초기 진입점을 하나로 모아 사용자가 로그인 화면에서 서비스를 시작하게 한다.
 @router.get(
     "/",
     include_in_schema=False,
@@ -44,6 +49,10 @@ def root_page() -> RedirectResponse:
     )
 
 
+# 기능: 로그인 화면 HTML을 제공한다.
+# 입력: 추가 인자 없음; GET /login 요청.
+# 출력: login.html의 FileResponse.
+# 구조·이유: 페이지 파일을 전달하며 실제 로그인 처리는 별도의 인증 API가 담당한다.
 @router.get(
     "/login",
     include_in_schema=False,
@@ -54,6 +63,10 @@ def login_page() -> FileResponse:
     )
 
 
+# 기능: 사용자 포털 화면의 HTML을 제공한다.
+# 입력: 추가 인자 없음; GET /portal 요청.
+# 출력: portal.html의 FileResponse.
+# 구조·이유: 화면 제공과 사고·차량 데이터 조회를 분리하며 API가 각 요청의 접근 권한을 확인한다.
 @router.get(
     "/portal",
     include_in_schema=False,
@@ -64,6 +77,10 @@ def portal_page() -> FileResponse:
     )
 
 
+# 기능: 관리 화면의 HTML을 제공한다.
+# 입력: 추가 인자 없음; GET /admin 요청.
+# 출력: admin.html의 FileResponse.
+# 구조·이유: 이 함수는 화면 파일을 전달하고 관리 데이터·명령의 권한 검사는 별도 API에서 수행한다.
 @router.get(
     "/admin",
     include_in_schema=False,

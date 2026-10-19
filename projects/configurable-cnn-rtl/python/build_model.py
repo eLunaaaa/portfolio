@@ -51,9 +51,9 @@ class QuantizedConv2d(nn.Module):
 class QuantizedLinear(nn.Module):
     """완전연결 출력의 Q3.4 변환을 선택적으로 적용하는 계층"""
     # 기능: 계층 파라미터와 내부 연산 객체 초기화
-    # 입력: 채널·특징 수와 커널·stride
+    # 입력: 입력 특징 수 in_features, 출력 특징 수 out_features
     # 출력: 초기화된 계층 객체
-    # 처리 구조: PyTorch 계층을 생성하고 출력 변환 옵션을 초기화
+    # 처리 구조: nn.Linear를 구성하고 출력의 Q3.4 양자화 사용 여부를 초기화
     def __init__(self, in_features, out_features):
         super().__init__()
         self.fc = nn.Linear(in_features, out_features, bias=True)

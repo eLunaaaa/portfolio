@@ -286,6 +286,10 @@ def merge_work(config_path: Path, source_dirs: list[Path]) -> dict[str, int]:
     counts = {"added": 0, "updated": 0, "duplicate": 0}
     classes, instances = class_maps(settings)
 
+    # 기능: JSONL 레코드를 고유 식별자별로 색인한다.
+    # 입력: JSONL 경로 path와 키 이름 key.
+    # 출력: 식별자 → 레코드 dict; 중복 식별자는 DatasetContractError.
+    # 구조·이유: 원본 행 수와 색인 크기를 비교해 dict 생성 중 중복 행이 덮이는 문제를 발견한다.
     def indexed(path: Path, key: str) -> dict[str, dict[str, Any]]:
         records = read_jsonl(path)
         result = {record[key]: record for record in records}
@@ -293,12 +297,20 @@ def merge_work(config_path: Path, source_dirs: list[Path]) -> dict[str, int]:
             raise DatasetContractError(f"중복 식별자가 있습니다: {path}")
         return result
 
+    # 기능: 등록 이미지 경로가 frames 하위에 있는지 검사한다.
+    # 입력: 작업 디렉터리 directory와 상대 경로 value.
+    # 출력: 해석한 절대 Path; frames 밖이면 DatasetContractError.
+    # 구조·이유: resolve 후 경로 포함 관계를 확인해 외부 파일 참조를 차단한다.
     def image_path(directory: Path, value: str) -> Path:
         path = (directory / value).resolve()
         if not path.is_relative_to(directory.resolve() / "frames"):
             raise DatasetContractError(f"사진 경로가 frames 폴더 밖입니다: {value}")
         return path
 
+    # 기능: 두 주석 레코드의 검수 상태와 객체 목록을 비교한다.
+    # 입력: 주석 dict a와 b.
+    # 출력: status와 objects가 모두 같으면 True.
+    # 구조·이유: 촬영 기록 병합 시 라벨의 실질적 변경 여부를 판별한다.
     def same_labels(a: dict[str, Any], b: dict[str, Any]) -> bool:
         return a["status"] == b["status"] and a["objects"] == b["objects"]
 

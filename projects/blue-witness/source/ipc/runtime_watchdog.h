@@ -1,3 +1,7 @@
+/* 파일 역할: 주요 작업자의 진행 기한을 감시하고 systemd watchdog에 서비스 상태를 알린다.
+ * 각 작업자는 자기 슬롯의 단조 증가 기한을 갱신한다. 하나라도 멈추면 알림을 중단한다.
+ * pthread·원자 연산·Unix datagram을 사용하며 libsystemd 연결 없이 동작한다.
+ */
 #ifndef ACE_RUNTIME_WATCHDOG_H
 #define ACE_RUNTIME_WATCHDOG_H
 
@@ -31,6 +35,12 @@ typedef struct {
     uint64_t interval_ns;
 } ace_watchdog_t;
 
+/*
+ * 기능: 감시용 단조 증가 시각을 읽는다.
+ * 입력: 없음.
+ * 출력: 나노초 시각 또는 시계 조회 실패 시 0.
+ * 구조·이유: CLOCK_MONOTONIC으로 시스템 시각 보정과 독립적으로 작업자 기한을 비교한다.
+ */
 static inline uint64_t ace_watchdog_now_ns(void)
 {
     struct timespec now;
@@ -39,6 +49,12 @@ static inline uint64_t ace_watchdog_now_ns(void)
     return (uint64_t)now.tv_sec * UINT64_C(1000000000) + (uint64_t)now.tv_nsec;
 }
 
+/*
+ * 기능: 작업자 슬롯의 다음 진행 기한을 갱신한다.
+ * 입력: watchdog, 슬롯 번호 slot, 허용 지연 timeout_ms.
+ * 출력: 원자적으로 갱신된 deadline_ns; 반환값 없음.
+ * 구조·이유: 현재 시각에 제한 시간을 더하고 정수 오버플로는 포화 처리한다. 슬롯 범위를 벗어나면 무시한다.
+ */
 static inline void ace_watchdog_progress(ace_watchdog_t *watchdog,
                                           unsigned slot, uint64_t timeout_ms)
 {
@@ -53,6 +69,12 @@ static inline void ace_watchdog_progress(ace_watchdog_t *watchdog,
                      __ATOMIC_RELEASE);
 }
 
+/*
+ * 기능: systemd의 NOTIFY_SOCKET으로 상태 메시지를 전송한다.
+ * 입력: READY=1·WATCHDOG=1 등의 message와 환경 변수 NOTIFY_SOCKET.
+ * 출력: 성공 또는 미설정 시 0, 경로·소켓·송신 오류 시 -1.
+ * 구조·이유: 파일 시스템·추상 Unix 주소를 모두 처리하며 임시 datagram fd는 송신 후 닫는다.
+ */
 static inline int ace_watchdog_notify(const char *message)
 {
     const char *path = getenv("NOTIFY_SOCKET");
@@ -85,6 +107,12 @@ static inline int ace_watchdog_notify(const char *message)
     return result;
 }
 
+/*
+ * 기능: 모든 작업자의 진행 기한을 주기적으로 검사한다.
+ * 입력: ace_watchdog_t를 가리키는 스레드 argument.
+ * 출력: 종료 시 NULL; 정상 주기마다 WATCHDOG=1 전송.
+ * 구조·이유: 하나라도 기한을 넘기면 스레드를 종료해 알림을 중단한다. 다른 작업자의 진행이 정체 상태를 숨기지 못하게 한다.
+ */
 static inline void *ace_watchdog_thread(void *argument)
 {
     ace_watchdog_t *watchdog = (ace_watchdog_t *)argument;
@@ -115,6 +143,12 @@ static inline void *ace_watchdog_thread(void *argument)
 
 /* Call once before worker creation. Slot names must outlive the watchdog.
  * The first progress update replaces the 60-second initialization allowance. */
+/*
+ * 기능: 슬롯을 초기화하고 systemd 감시 알림 스레드를 시작한다.
+ * 입력: watchdog, 수명이 충분한 작업자 이름 배열 names, 슬롯 수 count.
+ * 출력: 성공 0, 설정·스레드·알림 오류 -1.
+ * 구조·이유: 초기 60초 유예를 설정하고 WATCHDOG_PID/USEC를 검사한다. 감시 미설정 시 READY만 보내며 작업자 생성 전에 한 번 호출한다.
+ */
 static inline int ace_watchdog_start(ace_watchdog_t *watchdog,
                                       const char *const names[], unsigned count)
 {
@@ -169,6 +203,12 @@ static inline int ace_watchdog_start(ace_watchdog_t *watchdog,
     return 0;
 }
 
+/*
+ * 기능: 감시 스레드를 종료하고 자원을 회수한다.
+ * 입력: 초기화된 watchdog.
+ * 출력: stop·started 상태 갱신; 반환값 없음.
+ * 구조·이유: 원자적으로 종료를 요청한 뒤 pthread_join한다. 미시작 상태에서는 아무 작업도 하지 않는다.
+ */
 static inline void ace_watchdog_stop(ace_watchdog_t *watchdog)
 {
     if (watchdog->started) {

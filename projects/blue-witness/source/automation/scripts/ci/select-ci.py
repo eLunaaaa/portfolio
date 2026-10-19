@@ -5,6 +5,10 @@ import os
 PI_COMPONENTS = ("sensor", "filter", "p2p", "ai", "time_sync", "uploader")
 
 
+# 기능: 변경 경로와 이벤트에 따라 CI 작업 집합을 결정한다.
+# 입력: 매칭 구성요소 matches, 이벤트 event, Git ref.
+# 출력: 구성요소 JSON과 server·contracts·aruco 실행 여부 문자열의 dict.
+# 구조·이유: 수동 실행은 전체 검사를 선택하고 main의 Pi 변경은 배포에 필요한 모든 Pi 바이너리를 빌드한다.
 def select_checks(matches, event, ref):
     full = event == "workflow_dispatch"
     selected = [name for name in PI_COMPONENTS if full or name in matches]

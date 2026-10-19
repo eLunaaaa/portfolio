@@ -3,6 +3,10 @@ from app.db.database import get_database_connection
 from contextlib import closing
 
 
+# 기능: 사용자의 프로필 이미지 파일명을 조회한다.
+# 입력: 사용자 기본키 user_id.
+# 출력: 등록된 image_name 또는 프로필 행이 없으면 None.
+# 구조·이유: 매개변수 바인딩으로 조회하고 연결을 닫아 파일 경로 처리와 DB 접근을 분리한다.
 def get_profile_image_name(user_id: int) -> str | None:
     with closing(get_database_connection()) as connection, connection:
         row = connection.execute(
@@ -11,6 +15,10 @@ def get_profile_image_name(user_id: int) -> str | None:
     return row["image_name"] if row else None
 
 
+# 기능: 프로필 이미지와 사용자 간 연결을 저장한다.
+# 입력: 사용자 기본키 user_id, 저장을 마친 이미지 파일명 image_name.
+# 출력: 반환값 없음; 실패 시 DB 예외.
+# 구조·이유: INSERT ON CONFLICT로 신규 등록과 기존 파일명·수정 시각 갱신을 하나의 트랜잭션으로 처리한다.
 def save_profile_image_name(user_id: int, image_name: str) -> None:
     with closing(get_database_connection()) as connection, connection:
         connection.execute(

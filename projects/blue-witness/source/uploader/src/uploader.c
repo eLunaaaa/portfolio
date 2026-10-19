@@ -56,11 +56,19 @@ enum { WATCHDOG_INGEST, WATCHDOG_QUEUE, WATCHDOG_WORKER };
 static ace_watchdog_t process_watchdog;
 static _Thread_local unsigned watchdog_slot = WATCHDOG_INGEST;
 
+/* 기능: 현재 스레드의 업로더 감시 기한을 갱신한다.
+ * 입력: 허용 정체 시간 timeout_ms.
+ * 출력·구조: 반환값 없음. 스레드별 watchdog_slot을 공통 감시기에 전달한다.
+ */
 void uploader_watchdog_progress(uint32_t timeout_ms)
 {
     ace_watchdog_progress(&process_watchdog, watchdog_slot, timeout_ms);
 }
 
+/* 기능: 수신·큐·전송 작업자의 진행 감시를 시작한다.
+ * 입력: 전역 process_watchdog와 세 슬롯 이름.
+ * 출력·구조: 성공 0 또는 감시 시작 오류. 스풀 복구 중에는 아직 시작하지 않은 worker 슬롯의 기한을 유예한다.
+ */
 static int start_process_watchdog(void)
 {
     static const char *const slots[] = {"ingest", "queue", "worker"};
@@ -73,6 +81,10 @@ static int start_process_watchdog(void)
     return result;
 }
 
+/* 기능: 단조 증가 시계 기준 조건 변수를 초기화한다.
+ * 입력: 초기화할 pthread_cond_t 포인터.
+ * 출력·구조: pthread 상태 코드. 조건 속성을 CLOCK_MONOTONIC으로 설정해 벽시계 변경에 따른 대기 오류를 줄인다.
+ */
 static int monotonic_cond_init(pthread_cond_t *condition)
 {
     pthread_condattr_t attributes;
@@ -468,6 +480,10 @@ static int runtime_pop_command(
     return 0;
 }
 
+/* 기능: 대기 중인 작업자에게 작업 상태 변경을 알린다.
+ * 입력: 공유 runtime.
+ * 출력·구조: 반환값 없음. mutex 안에서 세대 번호를 증가시키고 모든 조건 대기자를 깨워 변경을 재검사하게 한다.
+ */
 static void runtime_publish_work_change(uploader_runtime_t *runtime)
 {
     pthread_mutex_lock(&runtime->mutex);
@@ -1154,6 +1170,10 @@ static const char *transport_error_event(const char *error)
     return NULL;
 }
 
+/* 기능: 전송 이벤트의 로그 심각도를 결정한다.
+ * 입력: 이벤트 이름 event(NULL 가능).
+ * 출력·구조: CA·인증서·호스트 검증 실패는 ERROR, 나머지는 WARN 문자열. 인증 설정 실패를 일반 재시도 경고와 구분한다.
+ */
 static const char *transport_error_level(const char *event)
 {
     return event != NULL &&

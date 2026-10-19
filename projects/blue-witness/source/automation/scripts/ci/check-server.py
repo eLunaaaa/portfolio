@@ -21,6 +21,10 @@ BACKEND = ROOT / "server" / "backend"
 sys.path.insert(0, str(BACKEND))
 
 
+# 기능: CI의 HTTPS 검사에 사용할 임시 인증서를 만든다.
+# 입력: 임시 작업 디렉터리 root.
+# 출력: 개인 키와 인증서의 Path 두 개.
+# 구조·이유: localhost·127.0.0.1용 RSA 인증서를 하루 유효 기간으로 생성한다. 운영 인증서와 분리된 테스트 전용 자료다.
 def certificate(root):
     from cryptography import x509
     from cryptography.hazmat.primitives import hashes, serialization
@@ -48,6 +52,10 @@ def certificate(root):
     return key_path, cert_path
 
 
+# 기능: 격리된 DB를 사용하는 검사 서버를 구동한다.
+# 입력: DB 경로·포트·선택 TLS 키/인증서를 포함한 args.
+# 출력: 서버 종료까지 실행; 반환값 없음.
+# 구조·이유: DB 경로를 지정한 뒤 실제 앱을 import하고 루프백 주소에서 uvicorn을 실행한다.
 def serve(args):
     # The subprocess uses its own temporary DB while running the actual app lifespan.
     from app.db import database
@@ -59,6 +67,10 @@ def serve(args):
                 ssl_keyfile=args.key, ssl_certfile=args.cert)
 
 
+# 기능: 실제 프로세스로 HTTP 또는 HTTPS 상태 확인을 수행한다.
+# 입력: TLS 사용 여부 tls.
+# 출력: 검사 통과 시 None; 서버 조기 종료·시간 초과·잘못된 상태는 예외.
+# 구조·이유: 임시 DB·사용 가능한 포트로 서버를 띄워 health 응답을 확인하고 종료 시 프로세스와 임시 파일을 정리한다.
 def health(tls):
     with TemporaryDirectory(prefix="ace-server-ci-") as directory:
         root = Path(directory)
@@ -113,6 +125,10 @@ def health(tls):
                         process.wait(timeout=5)
 
 
+# 기능: CI에서 필요한 영상 도구의 실행 가능 여부를 확인한다.
+# 입력: PATH 환경의 ffmpeg와 ffprobe.
+# 출력: 각 도구 버전 출력; 누락·실행 실패·10초 초과 시 예외.
+# 구조·이유: 단순 경로 존재 검사에 그치지 않고 -version 명령의 종료 상태까지 검사한다.
 def verify_media_tools():
     tools = {name: shutil.which(name) for name in ("ffmpeg", "ffprobe")}
     missing = [name for name, path in tools.items() if path is None]
@@ -134,6 +150,10 @@ def verify_media_tools():
         print(version[0] if version else f"{name} executable verified", flush=True)
 
 
+# 기능: 서버와 프런트엔드 회귀 검사를 실행한다.
+# 입력: 저장소의 app·tests와 Python·Node 실행 환경.
+# 출력: 검사 출력; 문법 오류·테스트 실패·시간 초과 시 예외.
+# 구조·이유: Python 컴파일 → unittest → Node 테스트 순으로 수행하며 병합 워커는 비활성화한다.
 def contracts():
     for path in (BACKEND / "app", BACKEND / "tests"):
         if not compileall.compile_dir(path, quiet=1):
@@ -149,6 +169,10 @@ def contracts():
                    cwd=ROOT, check=True, timeout=60)
 
 
+# 기능: 생성한 짧은 영상으로 실제 병합 경로를 검사한다.
+# 입력: ffmpeg·ffprobe 및 병합 서비스.
+# 출력: 검사 결과 출력; 명령 실패·결과 검증 실패 시 예외.
+# 구조·이유: 임시 샘플 영상과 증거 레코드를 만들고 실제 병합 및 결과 미디어 검사를 수행한다.
 def merge_fixture():
     from app.db.merge_repository import EvidenceRecord
     from app.services import video_merger
@@ -184,6 +208,10 @@ def merge_fixture():
         print(f"FFmpeg merge PASS: {output.stat().st_size} bytes", flush=True)
 
 
+# 기능: CI 서버 검사의 실행 모드를 선택한다.
+# 입력: 명령행 quick·integration·serve와 서버용 선택 인자.
+# 출력: 검사 실행 결과 또는 서버 구동; 실패는 예외·CLI 오류.
+# 구조·이유: serve는 격리 서버를 실행하고 나머지는 공통 검사 후 integration에서 영상 병합 검사를 추가한다.
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("quick", "integration", "serve"))

@@ -11,7 +11,7 @@ Raspberry Pi 5의 실시간 Linux 실험 환경과 UDP 기준 측정 도구를 �
 | 빌드·실행 방법 | [개인 코드 실행 안내](source/README.md) |
 | 원본과 개인 기여 근거 | [원본 저장소](https://github.com/kingwooseok/ACEteam_Bachelor_thesis) · [UDP 구현 커밋](https://github.com/kingwooseok/ACEteam_Bachelor_thesis/commit/05722a5) · [주석·설명 보강](https://github.com/kingwooseok/ACEteam_Bachelor_thesis/commit/440f477) |
 
-포트폴리오에는 개인 구현 시점 `440f477`의 UDP 모듈을 보존했습니다. 팀 최신 연구 구조는 `2048af3`에서 확인했으며, 이후의 드라이버·XDP·PHC 보정·분석 구현 전체를 개인 코드로 복사하지 않았습니다.
+개인 구현 기준 버전은 `440f477`입니다. UDP 송수신·실험 설정을 담당했으며, 후속 드라이버·XDP·PHC 보정·분석 모듈은 팀 연구 영역입니다.
 <!-- LOC:START -->
 ## 코드 규모와 기술적 과제
 

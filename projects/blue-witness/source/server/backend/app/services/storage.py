@@ -190,6 +190,10 @@ def sync_directory_chain(directory: Path) -> None:
         current = current.parent
 
 
+# 기능: 영상 파일과 상위 디렉터리의 저장 내용을 동기화한다.
+# 입력: 저장을 마친 파일의 Path.
+# 출력: 반환값 없음; 파일 열기·동기화 실패는 예외.
+# 구조·이유: OS별 파일 열기 권한을 맞춰 fsync하고 디렉터리 체인을 동기화해 저장 완료 응답의 내구성을 높인다.
 def sync_stored_file(path: Path) -> None:
     # Windows FlushFileBuffers에는 쓰기 권한을 가진 핸들이 필요함.
     with path.open("r+b" if os.name == "nt" else "rb") as stored:

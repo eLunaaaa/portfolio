@@ -129,6 +129,10 @@ class ReviewSession:
     원본 640×480 좌표로 저장하므로 창 크기가 달라져도 COCO bbox 계약은 변하지 않는다.
     """
 
+    # 기능: 라벨 검수 화면의 데이터와 조작 상태를 초기화한다.
+    # 입력: 클래스·차량 설정 settings와 작업 폴더 work_dir.
+    # 출력: 프레임 색인·라벨·선택 객체·드래그 상태가 준비된 객체.
+    # 구조·이유: manifest와 annotation 식별자 집합을 대조하고 미완료 프레임부터 이어서 검수하도록 시작 위치를 정한다.
     def __init__(self, settings: dict[str, Any], work_dir: Path) -> None:
         self.settings = settings
         self.work_dir = work_dir
@@ -158,6 +162,10 @@ class ReviewSession:
         self.display_offset = (0, 0)
         self.display_scale = 1.0
 
+    # 기능: 검수가 끝나지 않은 첫 프레임을 찾는다.
+    # 입력: 객체의 frames와 annotations.
+    # 출력: 미완료 프레임 인덱스; 모두 완료했으면 0.
+    # 구조·이유: approved·negative·rejected 상태를 완료로 간주해 중단한 작업부터 재개한다.
     def _resume_index(self) -> int:
         for index, frame in enumerate(self.frames):
             status = self.annotations[frame["frame_id"]]["status"]
@@ -165,14 +173,26 @@ class ReviewSession:
                 return index
         return 0
 
+    # 기능: 현재 선택한 프레임 정보를 제공한다.
+    # 입력: 객체의 현재 인덱스 self.index.
+    # 출력: manifest의 프레임 dict 참조.
+    # 구조·이유: 화면 조작 코드가 동일한 현재 프레임을 기준으로 동작하게 한다.
     @property
     def frame(self) -> dict[str, Any]:
         return self.frames[self.index]
 
+    # 기능: 현재 프레임의 라벨 정보를 제공한다.
+    # 입력: 현재 프레임 ID와 annotations 색인.
+    # 출력: 해당 프레임의 수정 가능한 주석 dict 참조.
+    # 구조·이유: 프레임 순서와 라벨 저장 순서가 달라도 식별자로 정확히 연결한다.
     @property
     def annotation(self) -> dict[str, Any]:
         return self.annotations[self.frame["frame_id"]]
 
+    # 기능: 현재 프레임 이미지를 메모리에 읽는다.
+    # 입력: 작업 폴더와 현재 프레임 image_path.
+    # 출력: self.image와 유효 범위로 조정된 선택 객체 번호; 반환값 없음.
+    # 구조·이유: 바이트를 OpenCV로 디코딩해 한글 경로를 지원하고 읽기 실패는 DatasetContractError로 알린다.
     def load_image(self) -> None:
         path = self.work_dir / self.frame["image_path"]
         self.image = cv2.imdecode(
@@ -193,6 +213,10 @@ class ReviewSession:
         )
         atomic_write_jsonl(self.frame_manifest_path, self.frames)
 
+    # 기능: 현재 프레임의 검수 상태를 변경한다.
+    # 입력: 목표 상태 status와 현재 객체 라벨.
+    # 출력: 주석 상태 변경; 잘못된 승인 라벨은 DatasetContractError.
+    # 구조·이유: 승인 전 클래스·차량 일치와 중복 차량을 검사하며 negative 지정 시 객체 목록을 비운다.
     def set_status(self, status: str) -> None:
         if status == "approved":
             if not self.annotation["objects"]:
@@ -221,6 +245,10 @@ class ReviewSession:
             self.selected_object = 0
         self.annotation["status"] = status
 
+    # 기능: 선택 객체의 차종을 다음 항목으로 바꾼다.
+    # 입력: 현재 선택 객체와 설정의 차종 순서.
+    # 출력: 객체의 차종·차량 인스턴스와 검수 상태 변경; 반환값 없음.
+    # 구조·이유: 차종을 순환하고 그 차종의 첫 차량을 지정한 뒤 재검수 상태로 전환한다.
     def cycle_class(self) -> None:
         objects = self.annotation["objects"]
         if not objects:
@@ -234,6 +262,10 @@ class ReviewSession:
         self._sync_fixed_label(item)
         self.annotation["status"] = "manual_review_required"
 
+    # 기능: 선택 객체의 차량 인스턴스를 다음 항목으로 바꾼다.
+    # 입력: 현재 객체와 차종별 차량 목록.
+    # 출력: vehicle_instance와 검수 상태 변경; 반환값 없음.
+    # 구조·이유: 차종 안에서 인스턴스를 순환하고 고정 라벨 정보를 함께 동기화한다.
     def cycle_instance(self) -> None:
         objects = self.annotation["objects"]
         if not objects:
@@ -291,6 +323,10 @@ class ReviewSession:
         self.set_status(status)
         self.move(1)
 
+    # 기능: 현재 선택한 객체의 박스를 삭제한다.
+    # 입력: 현재 프레임의 객체 목록과 선택 번호.
+    # 출력: 박스 목록·선택 번호·검수 상태 변경; 반환값 없음.
+    # 구조·이유: 삭제 후 선택 번호를 범위 안으로 조정하고 승인된 프레임도 다시 검수하도록 표시한다.
     def delete_selected(self) -> None:
         objects = self.annotation["objects"]
         if objects:
@@ -458,6 +494,10 @@ class ReviewSession:
             return None
         return resized
 
+    # 기능: 현재 라벨을 저장하고 다른 프레임으로 이동한다.
+    # 입력: 상대 이동량 offset.
+    # 출력: 현재 인덱스·이미지·선택 상태 변경; 반환값 없음.
+    # 구조·이유: 순환 인덱스로 이동하되 순방향 인접 프레임에만 고정 박스를 이어 적용하고 나머지 이동에서는 해제한다.
     def move(self, offset: int) -> None:
         wraps = self.index + offset < 0 or self.index + offset >= len(self.frames)
         self.save()
@@ -470,6 +510,10 @@ class ReviewSession:
             self.fixed_bbox = None
         self.load_image()
 
+    # 기능: 검수 진행량과 승인 객체의 차종별 개수를 집계한다.
+    # 입력: 메모리에 있는 전체 annotations.
+    # 출력: 미완료 프레임 수와 차종별 Counter의 튜플.
+    # 구조·이유: 완료 상태를 제외해 남은 작업을 세고 approved 객체만 차종 통계에 포함한다.
     def counts(self) -> tuple[int, Counter[str]]:
         remaining = 0
         class_counts: Counter[str] = Counter()
@@ -482,6 +526,10 @@ class ReviewSession:
                 )
         return remaining, class_counts
 
+    # 기능: 박스·선택 핸들·라벨 정보를 그린 검수 화면을 만든다.
+    # 입력: 현재 이미지, 객체 라벨과 화면 상태.
+    # 출력: 주석을 시각화한 OpenCV 이미지 배열.
+    # 구조·이유: 원본을 복사한 캔버스에 객체별 박스와 상태를 그려 원본 픽셀을 보존한다.
     def draw(self) -> Any:
         canvas = self.image.copy()
         for index, item in enumerate(self.annotation["objects"]):
@@ -709,12 +757,20 @@ def run_review(config_path: Path) -> None:
         cv2.destroyAllWindows()
 
 
+# 기능: 검수 도구의 실행 인자를 읽는다.
+# 입력: 명령행 --config(기본 config.yaml).
+# 출력: config Path를 포함한 argparse.Namespace.
+# 구조·이유: 설정 파일 선택을 GUI 로직과 분리한다.
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", type=Path, default=Path("config.yaml"))
     return parser.parse_args()
 
 
+# 기능: 영상 프레임 라벨 검수 프로그램을 시작한다.
+# 입력: 명령행 설정 파일 경로.
+# 출력: 성공 0, 데이터·파일·OpenCV 오류 1.
+# 구조·이유: 절대 경로의 설정으로 run_review를 실행하고 오류를 표준 오류에 출력한다.
 def main() -> int:
     args = parse_args()
     try:

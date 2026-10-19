@@ -9,12 +9,20 @@
 #include <string.h>
 #include <sys/stat.h>
 
+/* 기능: JSON에서 허용하는 연속 공백을 건너뛴다.
+ * 입력: NUL로 끝나는 문자열의 현재 위치 p.
+ * 출력·구조: 공백 다음 첫 문자 포인터. 버퍼를 수정하지 않아 구문 검사 함수들이 같은 입력을 순회할 수 있다.
+ */
 static const char *json_space(const char *p)
 {
     while (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n') p++;
     return p;
 }
 
+/* 기능: JSON 문자열의 종료 위치와 escape 형식을 검사한다.
+ * 입력: 시작 따옴표를 가리키는 p.
+ * 출력·구조: 닫는 따옴표 다음 포인터 또는 잘못된 형식이면 NULL. 제어 문자·escape·4자리 유니코드 escape를 검사한다.
+ */
 static const char *json_string_end(const char *p)
 {
     unsigned int index;
@@ -37,6 +45,10 @@ static const char *json_string_end(const char *p)
     return *p == '"' ? p + 1 : NULL;
 }
 
+/* 기능: JSON 값 하나를 재귀적으로 검사하고 끝을 찾는다.
+ * 입력: 값 시작 p와 현재 중첩 깊이 depth.
+ * 출력·구조: 값 다음 포인터 또는 구문 오류·32단계 초과 시 NULL. 객체·배열·문자열·상수·숫자를 구분해 처리한다.
+ */
 static const char *json_value_end(const char *p, unsigned int depth)
 {
     char closing;
@@ -86,6 +98,10 @@ static const char *json_value_end(const char *p, unsigned int depth)
     return p;
 }
 
+/* 기능: 메타데이터가 완결된 JSON 객체인지 검사한다.
+ * 입력: JSON 문자열 json(NULL 가능).
+ * 출력·구조: 유효하면 1, 아니면 0. 최상위 객체와 값 뒤의 남은 문자를 검사해 잘린 데이터·덧붙은 데이터를 거른다.
+ */
 int metadata_json_is_valid(const char *json)
 {
     const char *end;
@@ -94,6 +110,10 @@ int metadata_json_is_valid(const char *json)
     return end != NULL && *json_space(end) == '\0';
 }
 
+/* 기능: 메타데이터를 검증하고 이전 버전 action_id 필드를 제거한다.
+ * 입력: 수정 가능한 json, 길이·제거 여부 출력 포인터, 오류 버퍼·크기.
+ * 출력·구조: 성공 0과 수정된 길이·removed, 실패 -1. 최상위 action_id만 제거하며 중복 필드·잘못된 값 형식은 거부한다.
+ */
 int metadata_prepare_http(char *json, size_t *size, int *removed,
                           char *error, size_t error_size)
 {

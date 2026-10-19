@@ -308,6 +308,10 @@ static int recover_legacy_metadata_failures(queue_db_t *db)
     }
 }
 
+/* 기능: 재시작 후 복구할 수 있는 영속 업로드 큐 DB를 연다.
+ * 입력: 출력 db, SQLite 파일 경로, 오류 버퍼·크기.
+ * 출력·구조: 성공 0과 열린 DB, 실패 -1. WAL·FULL 동기화 → 스키마·마이그레이션·색인 → 이전 실패 기록 복구 순으로 준비한다.
+ */
 int queue_db_open(
     queue_db_t *db,
     const char *database_path,

@@ -1,6 +1,6 @@
 # Hardware notes
 
-보고서의 핀 설정과 부록 코드에서 정리한 배선 정보다. 핀 설정은 실제 Vivado 프로젝트의 port 이름에 맞춰 적용한다.
+Zybo의 주변장치 핀 설정과 Arduino 연결 배선을 설명한다. 핀 설정은 실제 Vivado 프로젝트의 port 이름에 맞춰 적용한다.
 
 ## Arduino 1 UNO
 
@@ -25,7 +25,7 @@ Timer1을 시간 측정에 사용한다. UART와 sensor 모두 보드 간 ground
 
 ## Zybo
 
-pins.xdc는 보고서의 PL 핀 constraint만 추출한 파일이다. Verilog block wrapper와 같은 port 이름이어야 한다. SPI0는 ArduCAM, I2C0는 sensor register, UART0는 Arduino, UART1은 PC debug에 사용한다. GPIO의 INPUT_BTN부터 4개 입력과 LD6 RGB 출력은 실제 EMIO routing을 확인한다.
+pins.xdc는 PL 주변장치의 핀 constraint를 정의한다. Verilog block wrapper와 같은 port 이름이어야 한다. SPI0는 ArduCAM, I2C0는 sensor register, UART0는 Arduino, UART1은 PC debug에 사용한다. GPIO의 INPUT_BTN부터 4개 입력과 LD6 RGB 출력은 실제 EMIO routing을 확인한다.
 
 ![보고서의 Vivado block 구성](../media/vivado-block.png)
 

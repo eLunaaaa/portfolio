@@ -47,6 +47,6 @@ python3 -c 'import render; render.reconcile(); print("12,873프레임 집계 대
 
 ## 출처와 버전
 
-분석 자료·코드는 [팀 저장소의 고정 버전 `5148804`](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/docs/measurements/ai-evaluation)에서 가져왔습니다. 개인 학습 구현과 **팀 통합 모델 평가 증거**를 구분합니다. 원본 영상·가중치·개인 경로의 실제 파일은 포함하지 않습니다. [원본 연결 기록](measurements/ai-evaluation/source_manifest.json)은 원본 공개본의 기록이며 이 포트폴리오의 폴더 구조를 뜻하지 않습니다.
+평가 기준 버전은 [팀 저장소 `5148804`](https://github.com/kingwooseok/2026ESWContest_mobility_ACE/tree/5148804/docs/measurements/ai-evaluation)입니다. 개인 학습 구현과 팀 통합 모델 평가를 연결하며, 모델·자료 버전은 [평가 출처 기록](measurements/ai-evaluation/source_manifest.json)으로 추적합니다.
 
 [프로젝트 개요](../README.md) · [학습 구현](../source/model_training/README.md) · [학습 설계](../docs/design/MODEL_TRAINING.md)

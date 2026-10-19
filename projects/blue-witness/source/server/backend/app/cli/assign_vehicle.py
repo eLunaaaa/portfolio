@@ -1,3 +1,4 @@
+# 파일 역할: 차량을 등록하고 사용자에게 할당하는 관리자 명령행 진입점.
 import argparse
 import sys
 
@@ -6,6 +7,10 @@ from app.services.account_service import (
 )
 
 
+# 기능: 차량을 등록하고 지정 사용자에게 할당한다.
+# 입력: 명령행 사용자명·차량 ID·차량번호와 선택 표시 이름.
+# 출력: 등록·할당 결과 출력; 반환값 없음.
+# 구조·이유: CLI 인자를 assign_vehicle 서비스에 전달하고 등록·할당의 성공 또는 실패를 출력한다.
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(

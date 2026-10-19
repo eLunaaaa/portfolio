@@ -1,3 +1,4 @@
+# 파일 역할: 로그인 사용자의 계정·프로필·비밀번호 변경 API. 서비스 계층의 검증 결과를 HTTP 응답으로 변환한다.
 from fastapi import (
     APIRouter,
     Cookie,
@@ -96,6 +97,10 @@ async def upload_profile_image(
         await file.close()
 
 
+# 기능: 본인 비밀번호를 변경하고 다시 로그인하도록 세션 쿠키를 지운다.
+# 입력: 변경 요청 payload, 쿠키를 수정할 response, 인증된 current_user.
+# 출력: 변경 성공·재인증 필요 JSON; 권한 오류 403, 입력 오류 400.
+# 구조·이유: 현재 비밀번호와 새 비밀번호를 서비스에서 검증하고 현재·이전 이름의 세션 쿠키를 삭제한다.
 @router.post("/password", dependencies=[Depends(require_same_origin)])
 def change_password(
     payload: PasswordChangeRequest, response: Response,

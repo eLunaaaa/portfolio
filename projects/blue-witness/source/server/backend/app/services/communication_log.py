@@ -21,6 +21,10 @@ def safe_identifier(value):
 class CommunicationLog:
     """동시 요청의 bounded 최근 기록을 관리하며 관리자 조회에 복사본만 반환한다."""
 
+    # 기능: 메모리 통신 로그 저장소를 초기화한다.
+    # 입력: 최대 보관 건수 capacity(기본 2000).
+    # 출력: 새 객체의 deque·Lock·순번·시작 시각 설정; 반환값 없음.
+    # 구조·이유: 크기가 제한된 큐로 메모리 사용을 제한하고 잠금으로 동시 요청의 기록을 보호한다.
     def __init__(self, capacity=2000):
         self.entries = deque(maxlen=capacity)
         self.lock = Lock()
@@ -79,6 +83,10 @@ def request_kind(scope):
 class CommunicationLogMiddleware:
     """수신·송신을 그대로 중계하고 본문을 보관하지 않은 채 완료 시 기록한다."""
 
+    # 기능: 통신 기록용 ASGI 미들웨어를 초기화한다.
+    # 입력: 감쌀 ASGI app과 로그 저장소 journal.
+    # 출력: 두 참조가 설정된 미들웨어 객체; 반환값 없음.
+    # 구조·이유: 요청 전달 대상과 기록 대상을 분리해 응답을 관찰하면서 로그를 남길 수 있게 한다.
     def __init__(self, app, journal):
         self.app = app
         self.journal = journal
@@ -95,6 +103,10 @@ class CommunicationLogMiddleware:
         status_code = 500
         completed = False
 
+        # 기능: ASGI 응답을 전달하면서 상태 코드와 완료 여부를 관찰한다.
+        # 입력: 응답 메시지 message와 외부 범위의 send·상태 변수.
+        # 출력: 비동기 전송 완료; status_code와 completed 상태 갱신.
+        # 구조·이유: response.start에서 상태를 얻고 마지막 body 전송 후 완료로 표시해 실제 응답 결과를 기록한다.
         async def observe_send(message):
             nonlocal status_code, completed
             if message["type"] == "http.response.start":

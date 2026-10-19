@@ -1,3 +1,4 @@
+# 파일 역할: 비밀번호를 숨겨 입력받아 관리자 계정을 생성하는 명령행 진입점.
 import argparse
 import getpass
 import sys
@@ -7,6 +8,10 @@ from app.services.account_service import (
 )
 
 
+# 기능: 운영용 관리자 계정을 생성한다.
+# 입력: 명령행 사용자명·표시 이름과 화면에 표시하지 않는 비밀번호 입력.
+# 출력: 생성 결과 출력; 비밀번호 불일치 등 실패 시 종료.
+# 구조·이유: 비밀번호를 두 번 확인하고 계정 생성 서비스로 전달해 평문 비밀번호를 인자에 남기지 않는다.
 def main() -> None:
     parser = argparse.ArgumentParser(
         description="증거 서버 관리자 계정을 생성함."

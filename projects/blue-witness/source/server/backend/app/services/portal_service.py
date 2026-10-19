@@ -87,6 +87,10 @@ def find_merged_video(
         / event_id
     )
 
+    # 기능: 지정 병합 모드의 최신 유효 영상 경로를 찾는다.
+    # 입력: 병합 모드 mode와 외부 함수의 merge_directory.
+    # 출력: 가장 큰 정수 revision의 Path 또는 후보가 없으면 None.
+    # 구조·이유: merged_{mode}_r*.mp4 중 크기가 0보다 큰 파일만 골라 revision 숫자로 비교한다.
     def latest_revision(
         mode: str,
     ) -> Path | None:

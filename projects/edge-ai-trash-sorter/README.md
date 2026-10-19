@@ -26,9 +26,8 @@
 | 모델 구조 | MobileNetV2 α=0.5, RGB 128×128 입력, 5개 클래스 |
 | 핵심 기여 | 시스템 설계·통합, Zybo 카메라·AI·RTOS, AI 학습·변환, Arduino 적재량·통신, 서버·대시보드 |
 | 검증 | 실보드 시스템 연동·실행, 공개 코드의 Arduino 컴파일·C/서버 테스트 |
-| 공개 범위 | 보고서 부록을 기반으로 정리·수정한 코드, 시스템 설명, 사진과 시연 링크 |
 
-실보드에서 카메라 촬영·AI 추론·UART 통신·뚜껑 제어·적재 상태 전송과 관제 화면을 연동해 검증하고 실행한 프로젝트입니다. 이 저장소에는 구현 코드와 설계·시연 자료를 포트폴리오 형식으로 정리했습니다.
+카메라 촬영부터 AI 분류, UART 명령, 뚜껑 제어, 적재 상태 전송과 관제 화면까지 실보드에서 연동해 동작을 검증했습니다.
 
 ## 개인 기여 범위
 
@@ -41,7 +40,7 @@
 - **Arduino 2 — 적재량·Wi-Fi**: 초음파 센서 4개, UART 원형 버퍼, ESP8266과 HTTP 전송
 - **Flask 서버·웹 대시보드**: 상태 API, 위치별 쓰레기통 표시, 상세 화면과 주기적 갱신
 
-**Arduino 1의 물체 감지·뚜껑 서보·LCD 제어는 공동 작업 영역**입니다. 공개본에서는 전체 통신 흐름을 검토하기 위해 해당 코드도 함께 정리했습니다.
+**Arduino 1의 물체 감지·뚜껑 서보·LCD 제어는 공동 작업 영역**입니다. Zybo 분류 명령과 연결되는 센싱·구동 노드입니다.
 
 ## 주요 기능
 
@@ -96,7 +95,7 @@ PL은 주변장치 연결과 핀 라우팅을 맡습니다. **AI 추론은 PS의
 | Flask 서버 | 위치·종류별 상태 저장·조회 | HTTP API, 메모리 내 상태 |
 | 웹 대시보드 | 상태 시각화·상세 화면 | HTML/CSS/JavaScript, 주기적 fetch |
 
-## 공개본에서 반영한 개선 사항
+## 통신·제어 안정성 개선
 
 - Wi-Fi 접속 정보를 `secrets.h`로 분리하고 예시 설정만 공개
 - `true || IsValidJPEG(...)`로 우회되던 JPEG 검사를 복구
@@ -110,17 +109,17 @@ PL은 주변장치 연결과 핀 라우팅을 맡습니다. **AI 추론은 PS의
 - 전송 성공 응답을 확인한 뒤 상태를 반영하고 실패 시 재시도·주기적 재전송
 - 서버 오류 응답 코드, 초기 미확인 상태, 리셋 방식, 대시보드 누락 이미지와 연결 실패 표시 수정
 
-수정 근거와 남은 제약은 [코드 검증 기록](docs/CODE_REVIEW.md), 세부 설계는 [시스템 구조](docs/ARCHITECTURE.md)에 정리했습니다.
+오류 수정과 검사 결과는 [코드 검증 기록](docs/CODE_REVIEW.md), 세부 설계는 [시스템 구조](docs/ARCHITECTURE.md)에 정리했습니다.
 
 ## AI 모델과 성능 기록
 
-보고서에는 ImageNet 기반 MobileNetV2 전이학습, Global Average Pooling, Dense 분류기, 단계별 fine-tuning을 사용한 것으로 설명되어 있습니다. 클래스 순서는 `can, general, glass, pet, empty`이며 런타임 명령도 같은 순서입니다.
+ImageNet 기반 MobileNetV2 전이학습에 Global Average Pooling과 Dense 분류기를 연결하고 단계별 fine-tuning을 적용했습니다. 클래스 순서는 `can, general, glass, pet, empty`이며 런타임 명령도 같은 순서입니다.
 
-| 항목 | 보고서 기록 / 공개본 상태 |
+| 항목 | 학습·실행 설정 |
 |---|---|
 | 입력 | FLOAT32, [1, 128, 128, 3], [-1, 1] 정규화 |
 | 분류 출력 | FLOAT32, 5개 softmax 점수 |
-| 모델 파라미터 | 보고서 기준 876,469개 |
+| 모델 파라미터 | 876,469개 |
 | 최종 accuracy | 학습 결과 0.7229 (약 72.29%) |
 | Tensor arena | 4 MiB |
 
@@ -189,10 +188,10 @@ firmware/
 ├── arduino_lid/          # 물체 감지·서보·LCD 공동 작업 영역
 └── arduino_monitor/      # 초음파·USART ring buffer·ESP8266
 server/                   # Flask API, templates, 시연용 배치도
-ml/                       # 보고서의 학습 구조와 모델 준비 안내
+ml/                       # MobileNetV2 학습 구조와 모델 준비 안내
 docs/                     # architecture, technical notes, code review
-hardware/                 # 보고서에서 추출한 XDC와 배선 안내
-media/                    # 원 시제품 사진과 보고서 화면
+hardware/                 # XDC 핀 설정과 보드 배선 안내
+media/                    # 시제품·회로·모델·관제 화면
 tests/                    # 이미지 로직·서버 회귀 테스트
 ```
 

@@ -6,14 +6,14 @@
       "total": {
         "files": 221,
         "code": 45105,
-        "comment": 6977,
+        "comment": 7458,
         "blank": 7824
       },
       "categories": {
         "implementation": {
           "files": 150,
           "code": 36189,
-          "comment": 6568,
+          "comment": 7049,
           "blank": 6966
         },
         "tests_examples": {
@@ -51,19 +51,19 @@
         "C": {
           "files": 16,
           "code": 7849,
-          "comment": 1071,
+          "comment": 1267,
           "blank": 1180
         },
         "C++": {
           "files": 2,
           "code": 4245,
-          "comment": 239,
+          "comment": 241,
           "blank": 541
         },
         "C/C++ Header": {
           "files": 26,
           "code": 1210,
-          "comment": 223,
+          "comment": 263,
           "blank": 212
         },
         "CSS": {
@@ -87,7 +87,7 @@
         "Python": {
           "files": 109,
           "code": 19647,
-          "comment": 4772,
+          "comment": 5015,
           "blank": 4154
         },
         "SQL": {
@@ -186,14 +186,14 @@
       "total": {
         "files": 18,
         "code": 1541,
-        "comment": 780,
+        "comment": 796,
         "blank": 263
       },
       "categories": {
         "implementation": {
           "files": 13,
           "code": 1391,
-          "comment": 729,
+          "comment": 745,
           "blank": 243
         },
         "tests_examples": {
@@ -261,7 +261,7 @@
         "Python": {
           "files": 2,
           "code": 82,
-          "comment": 51,
+          "comment": 67,
           "blank": 19
         },
         "Tcl/Tk": {

@@ -17,6 +17,10 @@ FALLBACK_PROFILE = DEFAULT_PROFILE.with_suffix(".svg")
 MAX_PROFILE_BYTES = 5 * 1024 * 1024
 
 
+# 기능: 사용자에게 제공할 프로필 이미지 경로를 결정한다.
+# 입력: user_id.
+# 출력: 저장 이미지 또는 기본·대체 이미지의 Path.
+# 구조·이유: DB 파일명이 순수 파일명인지 검사한 뒤 존재 여부를 확인해 경로 이탈을 방지한다.
 def resolve_profile_image(user_id: int) -> Path:
     name = get_profile_image_name(user_id)
     if name and Path(name).name == name:
@@ -56,6 +60,10 @@ def normalize_profile_image(data: bytes) -> bytes:
     return result.stdout
 
 
+# 기능: 프로필 이미지 파일을 저장하고 DB에 연결한다.
+# 입력: 사용자 ID와 업로드 이미지 바이트 data.
+# 출력: 새 PNG 파일명; 변환·저장·DB 실패 시 예외.
+# 구조·이유: 정규화된 PNG를 고유 이름으로 저장하고 DB 갱신 실패 시 파일을 삭제해 고아 파일을 줄인다.
 def store_profile_image(user_id: int, data: bytes) -> str:
     image = normalize_profile_image(data)
     PROFILE_ROOT.mkdir(parents=True, exist_ok=True)
